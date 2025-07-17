@@ -1,1 +1,18 @@
 services:
+  mysql:
+    image: mysql:8.0
+    container_name: hospital-db
+    environment:
+      MYSQL_USER: ${ENV_MYSQL_USER}
+      MYSQL_PASSWORD: ${ENV_MYSQL_PASSWORD}
+      MYSQL_DATABASE: hospital_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - data_db:/var/lib/mysql
+
+volumes:
+  data_db:
+
+
+

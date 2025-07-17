@@ -1,3 +1,12 @@
 spring:
   application:
     name: hospital-management
+  datasource:
+    url: jdbc:mysql://localhost:3307/hospital_db?useTimezone=true&serverTimezone=UTC&createDatabaseIfNotExist=true
+    username: ${ENV_MYSQL_USER}
+    password: ${ENV_MYSQL_PASSWORD}
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
