@@ -1,7 +1,11 @@
 package com.kayky.domain.patient;
 
+import com.kayky.domain.patient.request.PatientPostRequest;
 import com.kayky.domain.patient.response.PatientGetResponse;
+import com.kayky.domain.patient.response.PatientPostResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,14 +15,28 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class PatientService {
 
-    private final PatientRepository repository;
-    private final PatientMapper mapper;
+    private final PatientRepository patientRepository;
+    private final PatientMapper patientMapper;
 
     @Transactional(readOnly = true)
-    public PatientGetResponse findById(Long id){
-        var patient = repository.findById(id).
+    public PatientGetResponse findById(Long id) {
+        var patient = patientRepository.findById(id).
                 orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return mapper.toPatientGetResponse(patient);
+        return patientMapper.toPatientGetResponse(patient);
     }
+
+    @Transactional(readOnly = true)
+    public Page<PatientGetResponse> findAll(Pageable pageable) {
+        var paginatedPatients = patientRepository.findAll(pageable);
+        return patientMapper.toPageGetResponse(paginatedPatients);
+    }
+
+    @Transactional
+    public PatientPostResponse save(PatientPostRequest postRequest) {
+        var patientToSave = patientMapper.toEntity(postRequest);
+        var patientSaved = patientRepository.save(patientToSave);
+        return patientMapper.toPatientPostResponse(patientSaved);
+    }
+
 
 }

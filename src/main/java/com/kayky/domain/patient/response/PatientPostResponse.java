@@ -2,16 +2,14 @@ package com.kayky.domain.patient.response;
 
 import com.kayky.domain.user.response.UserBaseResponse;
 import com.kayky.enums.Gender;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PatientGetResponse extends UserBaseResponse {
+public class PatientPostResponse extends UserBaseResponse {
     private Gender gender;
     private String address;
     private String bloodType;
