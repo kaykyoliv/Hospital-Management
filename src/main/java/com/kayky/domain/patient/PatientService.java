@@ -5,6 +5,8 @@ import com.kayky.domain.patient.request.PatientPutRequest;
 import com.kayky.domain.patient.response.PatientGetResponse;
 import com.kayky.domain.patient.response.PatientPostResponse;
 import com.kayky.domain.patient.response.PatientPutResponse;
+import com.kayky.exception.EmailAlreadyExistsException;
+import com.kayky.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -28,7 +30,7 @@ public class PatientService {
                 .map(patientMapper::toPatientGetResponse)
                 .orElseThrow(() -> {
                     log.warn("Patient not found with ID {}", id);
-                   return new ResponseStatusException(HttpStatus.NOT_FOUND);
+                   return new ResourceNotFoundException("Patient not found");
                 });
     }
 
@@ -55,7 +57,7 @@ public class PatientService {
         var patientToUpdate = patientRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Cannot update: Patient not found with ID {}", id);
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND);
+                    return new ResourceNotFoundException("Patient not found");
                 });
 
 
@@ -79,6 +81,6 @@ public class PatientService {
     private void throwEmailExistsException(Patient patient) {
         log.warn("Email conflict: {} already in use by patient ID {}", patient.getEmail(), patient.getId());
 
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already in use");
+        throw new EmailAlreadyExistsException("Email %s already in use".formatted(patient.getEmail()));
     }
 }

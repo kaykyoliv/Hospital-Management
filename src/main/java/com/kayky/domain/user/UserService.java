@@ -1,5 +1,6 @@
 package com.kayky.domain.user;
 
+import com.kayky.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -39,7 +40,7 @@ public class UserService {
         return userRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("User not found with ID: {}", id);
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+                    return new ResourceNotFoundException("User not found");
                 });
     }
 
