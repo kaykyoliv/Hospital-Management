@@ -5,6 +5,7 @@ import com.kayky.domain.patient.request.PatientPutRequest;
 import com.kayky.domain.patient.response.PatientGetResponse;
 import com.kayky.domain.patient.response.PatientPostResponse;
 import com.kayky.domain.patient.response.PatientPutResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -40,8 +41,8 @@ public class PatientController {
     }
 
     @PostMapping
-    public ResponseEntity<PatientPostResponse> save(@RequestBody PatientPostRequest request) {
-        log.debug("request to create new product");
+    public ResponseEntity<PatientPostResponse> save(@Valid @RequestBody PatientPostRequest request) {
+        log.debug("request to create new patient");
 
         var response = service.save(request);
 
@@ -54,7 +55,7 @@ public class PatientController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PatientPutResponse> update(@RequestBody PatientPutRequest request, @PathVariable Long id) {
+    public ResponseEntity<PatientPutResponse> update(@Valid @RequestBody PatientPutRequest request, @PathVariable Long id) {
         log.debug("Request to update patient with id {}", id);
 
         var response = service.update(request, id);

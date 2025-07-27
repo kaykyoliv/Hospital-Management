@@ -22,7 +22,6 @@ public interface PatientMapper {
 
     void updatePatientFromRequest(PatientPutRequest putRequest, @MappingTarget Patient patient);
 
-
     default Page<PatientGetResponse> toPageGetResponse(Page<Patient> patients) {
         return patients.map(this::toPatientGetResponse);
     }
