@@ -1,8 +1,10 @@
 package com.kayky.domain.patient;
 
 import com.kayky.domain.patient.request.PatientPostRequest;
+import com.kayky.domain.patient.request.PatientPutRequest;
 import com.kayky.domain.patient.response.PatientGetResponse;
 import com.kayky.domain.patient.response.PatientPostResponse;
+import com.kayky.domain.patient.response.PatientPutResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,5 +40,24 @@ public class PatientService {
         return patientMapper.toPatientPostResponse(patientSaved);
     }
 
+    @Transactional
+    public PatientPutResponse update(PatientPutRequest putRequest, Long id) {
+        var patientToUpdate = patientRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        assertEmailDoesNotExist(putRequest.getEmail(), id);
+
+        patientMapper.updatePatientFromRequest(putRequest, patientToUpdate);
+        var updatedPatient = patientRepository.save(patientToUpdate);
+        return patientMapper.toPatientPutResponse(updatedPatient);
+    }
+
+    private void assertEmailDoesNotExist(String email, Long id) {
+        patientRepository.findByEmailAndIdNot(email, id).ifPresent(this::throwEmailExistsException);
+    }
+
+    private void throwEmailExistsException(Patient patient) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already in use");
+    }
 
 }

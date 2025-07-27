@@ -1,8 +1,10 @@
 package com.kayky.domain.patient;
 
 import com.kayky.domain.patient.request.PatientPostRequest;
+import com.kayky.domain.patient.request.PatientPutRequest;
 import com.kayky.domain.patient.response.PatientGetResponse;
 import com.kayky.domain.patient.response.PatientPostResponse;
+import com.kayky.domain.patient.response.PatientPutResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -49,6 +51,15 @@ public class PatientController {
                 .buildAndExpand(response.getId()).toUri();
 
         return ResponseEntity.created(uri).body(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PatientPutResponse> update(@RequestBody PatientPutRequest request, @PathVariable Long id) {
+        log.debug("Request to update patient with id {}", id);
+
+        var response = service.update(request, id);
+
+        return ResponseEntity.ok(response);
     }
 
 }
