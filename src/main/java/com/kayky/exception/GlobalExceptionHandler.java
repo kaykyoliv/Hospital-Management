@@ -10,8 +10,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.swing.*;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -41,9 +44,12 @@ public class GlobalExceptionHandler {
                 request.getRequestURI()
         );
 
-        for(FieldError f : e.getBindingResult().getFieldErrors()){
-            error.addError(f.getField(), f.getDefaultMessage());
-        }
+        List<FieldError> fieldErrorList = e.getBindingResult().getFieldErrors();
+
+        fieldErrorList.stream()
+                .sorted(Comparator.comparing(FieldError::getField))
+                .forEach(f -> error.addError(f.getField(), f.getDefaultMessage()));
+
 
         return ResponseEntity.status(status).body(error);
     }
