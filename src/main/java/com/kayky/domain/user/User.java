@@ -2,13 +2,16 @@ package com.kayky.domain.user;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
+@Table(name = "tb_user")
 @Inheritance(strategy = InheritanceType.JOINED)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@SuperBuilder
 @EqualsAndHashCode
 public abstract class User {
 
