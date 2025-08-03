@@ -3,15 +3,14 @@ package com.kayky.domain.patient.response;
 import com.kayky.domain.user.response.UserBaseResponse;
 import com.kayky.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 public class PatientGetResponse extends UserBaseResponse {
     @Schema(description = "Patient's gender", example = "MALE")
     private Gender gender;

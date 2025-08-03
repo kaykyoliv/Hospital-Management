@@ -2,11 +2,13 @@ package com.kayky.domain.user.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 public abstract class UserBaseResponse {
 
     @Schema(description = "Unique identifier of the user", example = "1")
