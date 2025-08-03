@@ -23,6 +23,7 @@ import static org.mockito.Mockito.*;
 class PatientServiceTest {
 
     private static final String PATIENT_NOT_FOUND = "Patient not found";
+    private static final String EMAIL_ALREADY_EXIST = "Email %s already in use";
     private static final Long EXISTING_ID = 1L;
     private static final Long NON_EXISTING_ID = 999L;
 
@@ -123,7 +124,7 @@ class PatientServiceTest {
 
         assertThatThrownBy(() -> service.save(request))
                 .isInstanceOf(EmailAlreadyExistsException.class)
-                .hasMessage("Email %s already in use".formatted(email));
+                .hasMessage(EMAIL_ALREADY_EXIST.formatted(email));
 
         verify(repository, times(0)).save(any());
         verify(repository).findByEmail(email);
@@ -152,6 +153,34 @@ class PatientServiceTest {
         verify(repository).save(any(Patient.class));
     }
 
+    @Test
+    void shouldThrowResourceNotFoundException_whenPatientToUpdateDoesNotExist(){
+        var request = PatientUtils.asPutRequest();
+
+        when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.update(request, NON_EXISTING_ID))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage(PATIENT_NOT_FOUND);
+
+        verify(repository).findById(NON_EXISTING_ID);
+    }
+
+    @Test
+    void shouldThrowEmailAlreadyExistsException_whenUpdatingToEmailAlreadyUsedByAnother(){
+        var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
+        var email = savedPatient.getEmail();
+        var request = PatientUtils.asPutRequest();
+
+        when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedPatient));
+        when(repository.findByEmailAndIdNot(email, EXISTING_ID)).thenReturn(Optional.of(savedPatient));
+
+        assertThatThrownBy(() -> service.update(request, EXISTING_ID))
+                .isInstanceOf(EmailAlreadyExistsException.class)
+                .hasMessage(EMAIL_ALREADY_EXIST.formatted(email));
+
+        verify(repository).findByEmailAndIdNot(email, EXISTING_ID);
+    }
 
 
 
