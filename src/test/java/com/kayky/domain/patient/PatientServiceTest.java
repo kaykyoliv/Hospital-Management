@@ -4,6 +4,7 @@ import com.kayky.commons.PatientUtils;
 import com.kayky.exception.EmailAlreadyExistsException;
 import com.kayky.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -20,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("PatientServiceTest")
 class PatientServiceTest {
 
     private static final String PATIENT_NOT_FOUND = "Patient not found";
@@ -40,7 +42,8 @@ class PatientServiceTest {
     }
 
     @Test
-    void shouldReturnPatientGetResponse_whenPatientExists() {
+    @DisplayName("findById: Should return PatientGetResponse when the patient exists")
+    void findById_ShouldReturnPatientGetResponse_WhenPatientExists() {
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
 
         var expectedResponse = PatientUtils.asGetResponse(savedPatient);
@@ -57,7 +60,8 @@ class PatientServiceTest {
     }
 
     @Test
-    void shouldThrowResourceNotFoundException_whenPatientDoesNotExist() {
+    @DisplayName("findById: Should throw ResourceNotFoundException when the patient does not exist")
+    void findById_ShouldThrowResourceNotFoundException_WhenPatientDoesNotExist() {
         when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.findById(NON_EXISTING_ID))
@@ -68,7 +72,8 @@ class PatientServiceTest {
     }
 
     @Test
-    void shouldReturnPatientPageResponse_whenPatientsExist(){
+    @DisplayName("findAll: Should return PatientPageResponse when patients exist")
+    void findAll_ShouldReturnPatientPageResponse_WhenPatientsExist() {
         PageRequest pageRequest = PageRequest.of(0, 3);
         var patientList = PatientUtils.newPatientList();
         var pagedPatient = new PageImpl<>(patientList, pageRequest, patientList.size());
@@ -92,7 +97,8 @@ class PatientServiceTest {
     }
 
     @Test
-    void shouldSavePatientAndReturnPostResponse_whenEmailIsUnique(){
+    @DisplayName("save: Should return PostResponse when email is unique")
+    void save_ShouldReturnPostResponse_WhenEmailIsUnique() {
         var request = PatientUtils.asPostRequest();
         var email = request.getEmail();
 
@@ -112,7 +118,8 @@ class PatientServiceTest {
     }
 
     @Test
-    void shouldThrowEmailAlreadyExistsException_whenEmailAlreadyExists(){
+    @DisplayName("save: Should throw EmailAlreadyExistsException when email is already in use")
+    void save_ShouldThrowEmailAlreadyExistsException_WhenEmailAlreadyExists() {
         var request = PatientUtils.asPostRequest();
 
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
@@ -131,7 +138,8 @@ class PatientServiceTest {
     }
 
     @Test
-    void shouldUpdatePatientAndReturnPutResponse_whenValidUpdate(){
+    @DisplayName("update: Should return PutResponse when update is valid")
+    void update_ShouldReturnPutResponse_WhenUpdateIsValid() {
         var putRequest = PatientUtils.asPutRequest();
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
         var updatedPatient = PatientUtils.updatedPatient();
@@ -154,7 +162,8 @@ class PatientServiceTest {
     }
 
     @Test
-    void shouldThrowResourceNotFoundException_whenPatientToUpdateDoesNotExist(){
+    @DisplayName("update: Should throw ResourceNotFoundException when patient does not exist")
+    void update_ShouldThrowResourceNotFoundException_WhenPatientDoesNotExist() {
         var request = PatientUtils.asPutRequest();
 
         when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
@@ -167,7 +176,8 @@ class PatientServiceTest {
     }
 
     @Test
-    void shouldThrowEmailAlreadyExistsException_whenUpdatingToEmailAlreadyUsedByAnother(){
+    @DisplayName("update: Should throw EmailAlreadyExistsException when email is used by another patient")
+    void update_ShouldThrowEmailAlreadyExistsException_WhenEmailUsedByAnotherPatient() {
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
         var email = savedPatient.getEmail();
         var request = PatientUtils.asPutRequest();
@@ -181,8 +191,4 @@ class PatientServiceTest {
 
         verify(repository).findByEmailAndIdNot(email, EXISTING_ID);
     }
-
-
-
-
 }
