@@ -3,6 +3,7 @@ package com.kayky.domain.patient;
 import com.kayky.domain.patient.request.PatientPostRequest;
 import com.kayky.domain.patient.request.PatientPutRequest;
 import com.kayky.domain.patient.response.PatientGetResponse;
+import com.kayky.domain.patient.response.PatientPageResponse;
 import com.kayky.domain.patient.response.PatientPostResponse;
 import com.kayky.domain.patient.response.PatientPutResponse;
 import com.kayky.exception.ApiError;
@@ -67,10 +68,10 @@ public class PatientController {
             responseCode = "200",
             description = "List of all patients returned successfully",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    array = @ArraySchema(schema = @Schema(implementation = PatientGetResponse.class)))
+                    array = @ArraySchema(schema = @Schema(implementation = PatientPageResponse.class)))
     )
     @GetMapping
-    public ResponseEntity<Page<PatientGetResponse>> findAllPaged(Pageable pageable) {
+    public ResponseEntity<PatientPageResponse> findAllPaged(Pageable pageable) {
         log.debug("Request received to list all patients");
 
         var response = service.findAll(pageable);

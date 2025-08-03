@@ -3,6 +3,7 @@ package com.kayky.domain.patient;
 import com.kayky.domain.patient.request.PatientPostRequest;
 import com.kayky.domain.patient.request.PatientPutRequest;
 import com.kayky.domain.patient.response.PatientGetResponse;
+import com.kayky.domain.patient.response.PatientPageResponse;
 import com.kayky.domain.patient.response.PatientPostResponse;
 import com.kayky.domain.patient.response.PatientPutResponse;
 import com.kayky.exception.EmailAlreadyExistsException;
@@ -33,9 +34,10 @@ public class PatientService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PatientGetResponse> findAll(Pageable pageable) {
+    public PatientPageResponse findAll(Pageable pageable) {
         var paginatedPatients = patientRepository.findAll(pageable);
-        return patientMapper.toPageGetResponse(paginatedPatients);
+
+        return patientMapper.toPatientPageResponse(paginatedPatients);
     }
 
     @Transactional

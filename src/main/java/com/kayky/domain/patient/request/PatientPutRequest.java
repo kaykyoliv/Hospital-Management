@@ -9,9 +9,11 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
+@SuperBuilder
 @NoArgsConstructor
 public class PatientPutRequest extends UserBaseRequest {
     @Schema(description = "Patient's gender", example = "MALE")
