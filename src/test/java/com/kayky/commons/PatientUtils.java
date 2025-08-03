@@ -4,15 +4,17 @@ import com.kayky.domain.patient.Patient;
 import com.kayky.domain.patient.request.PatientPostRequest;
 import com.kayky.domain.patient.request.PatientPutRequest;
 import com.kayky.domain.patient.response.PatientGetResponse;
+import com.kayky.domain.patient.response.PatientPageResponse;
 import com.kayky.domain.patient.response.PatientPostResponse;
 import com.kayky.domain.patient.response.PatientPutResponse;
 import com.kayky.enums.Gender;
 
 import java.util.List;
 
-public final  class PatientUtils {
+public final class PatientUtils {
 
-    private PatientUtils() {}
+    private PatientUtils() {
+    }
 
     private static Patient basePatient() {
         return Patient.builder()
@@ -23,7 +25,7 @@ public final  class PatientUtils {
                 .active(true)
                 .gender(Gender.MALE)
                 .address("101 Oak Lane, Newtown")
-                .bloodType("A_NEGATIVE")
+                .bloodType("AB-")
                 .build();
     }
 
@@ -37,7 +39,7 @@ public final  class PatientUtils {
                 .active(true)
                 .gender(Gender.MALE)
                 .address("123 Main St, Anytown")
-                .bloodType("O_POSITIVE")
+                .bloodType("AB-")
                 .build();
 
         var patient2 = Patient.builder()
@@ -49,7 +51,7 @@ public final  class PatientUtils {
                 .active(true)
                 .gender(Gender.FEMALE)
                 .address("456 Oak Ave, Somecity")
-                .bloodType("A_NEGATIVE")
+                .bloodType("AB-")
                 .build();
 
         var patient3 = Patient.builder()
@@ -61,17 +63,17 @@ public final  class PatientUtils {
                 .active(false)
                 .gender(Gender.FEMALE)
                 .address("789 Pine Rd, Othercity")
-                .bloodType("B_POSITIVE")
+                .bloodType("AB-")
                 .build();
 
         return List.of(patient1, patient2, patient3);
     }
 
-    public static Patient patientToSave(){
+    public static Patient patientToSave() {
         return basePatient();
     }
 
-    public static Patient updatedPatient(){
+    public static Patient updatedPatient() {
         return basePatient().toBuilder()
                 .id(1L)
                 .firstName("Robert updated")
@@ -86,7 +88,7 @@ public final  class PatientUtils {
                 .build();
     }
 
-    public static PatientGetResponse asGetResponse(Patient patient){
+    public static PatientGetResponse asGetResponse(Patient patient) {
         return PatientGetResponse.builder()
                 .id(patient.getId())
                 .firstName(patient.getFirstName())
@@ -98,7 +100,13 @@ public final  class PatientUtils {
                 .build();
     }
 
-    public static PatientPostRequest asPostRequest(){
+    public static List<PatientGetResponse> newPatientGetResponseList() {
+        return newPatientList().stream()
+                .map(PatientUtils::asGetResponse)
+                .toList();
+    }
+
+    public static PatientPostRequest asPostRequest() {
         return PatientPostRequest.builder()
                 .firstName("Robert")
                 .lastName("Williams")
@@ -106,11 +114,11 @@ public final  class PatientUtils {
                 .password("hashed_password_4")
                 .gender(Gender.MALE)
                 .address("101 Oak Lane, Newtown")
-                .bloodType("A_NEGATIVE")
+                .bloodType("AB-")
                 .build();
     }
 
-    public static PatientPostResponse asPostResponse(Patient patient){
+    public static PatientPostResponse asPostResponse(Patient patient) {
         return PatientPostResponse.builder()
                 .id(patient.getId())
                 .firstName(patient.getFirstName())
@@ -122,7 +130,7 @@ public final  class PatientUtils {
                 .build();
     }
 
-    public static PatientPutRequest asPutRequest(){
+    public static PatientPutRequest asPutRequest() {
         return PatientPutRequest.builder()
                 .firstName("Robert")
                 .lastName("Williams")
@@ -130,11 +138,11 @@ public final  class PatientUtils {
                 .password("hashed_password_4")
                 .gender(Gender.MALE)
                 .address("101 Oak Lane, Newtown")
-                .bloodType("A_NEGATIVE")
+                .bloodType("AB-")
                 .build();
     }
 
-    public static PatientPutResponse asPutResponse(Patient patient){
+    public static PatientPutResponse asPutResponse(Patient patient) {
         return PatientPutResponse.builder()
                 .id(patient.getId())
                 .firstName(patient.getFirstName())
@@ -146,5 +154,13 @@ public final  class PatientUtils {
                 .build();
     }
 
+    public static PatientPageResponse asPageResponse() {
+        return PatientPageResponse.builder()
+                .patients(newPatientGetResponseList())
+                .currentPage(0)
+                .totalPages(10)
+                .totalElements(3)
+                .build();
+    }
 }
 
