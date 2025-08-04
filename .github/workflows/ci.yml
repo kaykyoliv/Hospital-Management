@@ -1,4 +1,4 @@
-name:  CI (Java 21 + MySQL)
+name: CI (Java 21 + H2)
 
 on:
   push:
@@ -10,19 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-        ports:
-          - 3306:3306
-        env:
-          MYSQL_ROOT_PASSWORD: rootpass
-          MYSQL_DATABASE: testdb
-        options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -prootpass"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
@@ -34,16 +21,5 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Aguardar MySQL ficar pronto 
-        run: |
-          sudo apt-get install -y mysql-client
-          until mysqladmin ping -h 127.0.0.1 -uroot -prootpass --silent; do
-            echo "Aguardando MySQL..."
-            sleep 3
-          done
       - name: Rodar build e testes com Maven
         run: mvn verify --batch-mode
-        env:
-          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/testdb
-          SPRING_DATASOURCE_USERNAME: root
-          SPRING_DATASOURCE_PASSWORD: rootpass
