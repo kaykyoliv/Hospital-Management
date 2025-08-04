@@ -3,6 +3,7 @@ package com.kayky.domain.patient;
 import com.kayky.commons.FileUtils;
 import com.kayky.commons.PatientUtils;
 import com.kayky.domain.patient.request.PatientPostRequest;
+import com.kayky.domain.patient.request.PatientPutRequest;
 import com.kayky.exception.EmailAlreadyExistsException;
 import com.kayky.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.DisplayName;
@@ -16,8 +17,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -58,15 +59,17 @@ class PatientControllerTest {
     @Test
     @DisplayName("GET /v1/patient/{id} - Should return 404 when patient is not found")
     void findById_ShouldThrowResourceNotFoundException_WhenPatientDoesNotExist() throws Exception {
-        var expectedJsonResponse = FileUtils.readResourceFile("patient/get/patient-by-id-404.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("patient/get/patient-not-found-404.json");
+
+        var expectedErrorMessage = PATIENT_NOT_FOUND;
 
         BDDMockito.when(service.findById(NON_EXISTING_ID))
-                .thenThrow(new ResourceNotFoundException(PATIENT_NOT_FOUND));
+                .thenThrow(new ResourceNotFoundException(expectedErrorMessage));
 
         mockMvc.perform(get(BASE_URI + "/{id}", NON_EXISTING_ID))
                 .andDo(print())
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value(PATIENT_NOT_FOUND))
+                .andExpect(jsonPath("$.error").value(expectedErrorMessage))
                 .andExpect(content().json(expectedJsonResponse));
 
         BDDMockito.verify(service).findById(NON_EXISTING_ID);
@@ -92,8 +95,8 @@ class PatientControllerTest {
     @Test
     @DisplayName("POST /v1/patient - Should return 201 Created when patient is saved successfully")
     void save_ShouldReturnPostResponse_WhenEmailIsUnique() throws Exception {
-        var request = FileUtils.readResourceFile("patient/post/request-patient-201.json");
-        var expectedJsonResponse =  FileUtils.readResourceFile("patient/post/response-patient-200.json");
+        var request = FileUtils.readResourceFile("patient/post/request-create-patient-201.json");
+        var expectedJsonResponse =  FileUtils.readResourceFile("patient/post/response-created-patient-200.json");
 
         var patient = PatientUtils.savedPatient(EXISTING_ID);
         var expectedResponse = PatientUtils.asPostResponse(patient);
@@ -116,13 +119,15 @@ class PatientControllerTest {
     @Test
     @DisplayName("POST /v1/patient - Should return 400 when email already exists")
     void save_ShouldThrowEmailAlreadyExistsException_WhenEmailAlreadyExists() throws Exception {
-        var request = FileUtils.readResourceFile("patient/post/request-patient-201.json");
-        var expectedJsonResponse =  FileUtils.readResourceFile("patient/post/response-patient-400.json");
+        var request = FileUtils.readResourceFile("patient/post/request-create-patient-201.json");
+        var expectedJsonResponse =  FileUtils.readResourceFile("patient/post/response-email-already-exists-400.json");
 
         var postRequest= PatientUtils.asPostRequest();
+        var expectedErrorMessage = EMAIL_ALREADY_EXIST.formatted(postRequest.getEmail());
+
 
         BDDMockito.when(service.save(any(PatientPostRequest.class)))
-                .thenThrow(new EmailAlreadyExistsException(EMAIL_ALREADY_EXIST.formatted(postRequest.getEmail())));
+                .thenThrow(new EmailAlreadyExistsException(expectedErrorMessage));
 
         mockMvc.perform(post(BASE_URI)
                     .content(request)
@@ -130,10 +135,85 @@ class PatientControllerTest {
                     .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value(EMAIL_ALREADY_EXIST.formatted(postRequest.getEmail())))
+                .andExpect(jsonPath("$.error").value(expectedErrorMessage))
                 .andExpect(content().json(expectedJsonResponse));
 
         BDDMockito.verify(service).save(any(PatientPostRequest.class));
     }
 
-}
+    @Test
+    @DisplayName("PUT /v1/patient/{id} - Should return 200 and updated patient when request is valid")
+    void update_ShouldReturnPutResponse_WhenUpdateIsValid() throws Exception {
+        var request = FileUtils.readResourceFile("patient/put/request-update-patient.json");
+        var expectedJsonResponse =  FileUtils.readResourceFile("patient/put/response-updated-patient-200.json");
+
+        var updatedPatient = PatientUtils.updatedPatient();
+        var expectedResponse = PatientUtils.asPutResponse(updatedPatient);
+
+        BDDMockito.when(service.update(any(PatientPutRequest.class), eq(EXISTING_ID))).thenReturn(expectedResponse);
+
+        mockMvc.perform(put(BASE_URI + "/{id}", EXISTING_ID)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .content(request)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedJsonResponse));
+
+        BDDMockito.verify(service).update(any(PatientPutRequest.class), eq(EXISTING_ID));
+
+    }
+
+    @Test
+    @DisplayName("PUT /v1/patient/{id} - Should return 404 when patient does not exist")
+    void update_ShouldThrowResourceNotFoundException_WhenPatientDoesNotExist() throws Exception {
+        var request = FileUtils.readResourceFile("patient/put/request-update-patient.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("patient/put/response-patient-not-found-404.json");
+
+        var expectedErrorMessage = PATIENT_NOT_FOUND;
+
+        BDDMockito.when(service.update(any(PatientPutRequest.class), eq(NON_EXISTING_ID)))
+                .thenThrow(new ResourceNotFoundException(expectedErrorMessage));
+
+        mockMvc.perform(put(BASE_URI + "/{id}", NON_EXISTING_ID)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .content(request)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(content().json(expectedJsonResponse))
+                .andExpect(jsonPath("$.error").value(expectedErrorMessage));
+
+        BDDMockito.verify(service).update(any(PatientPutRequest.class), eq(NON_EXISTING_ID));
+
+    }
+
+    @Test
+    @DisplayName("PUT /v1/patient/{id} - Should return 400 when email is already used by another patient")
+    void update_ShouldThrowEmailAlreadyExistsException_WhenEmailUsedByAnotherPatient() throws Exception {
+        var request = FileUtils.readResourceFile("patient/put/request-update-patient.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("patient/put/response-email-already-exists-400.json");
+
+        var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
+        var expectedErrorMessage = EMAIL_ALREADY_EXIST.formatted(savedPatient.getEmail());
+
+        BDDMockito.when(service.update(any(PatientPutRequest.class), eq(EXISTING_ID)))
+                .thenThrow(new EmailAlreadyExistsException(expectedErrorMessage));
+
+        mockMvc.perform(put(BASE_URI + "/{id}", EXISTING_ID)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(request)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(expectedJsonResponse))
+                .andExpect(jsonPath("$.error").value(expectedErrorMessage));
+
+        BDDMockito.verify(service).update(any(PatientPutRequest.class), eq(EXISTING_ID));
+    }
+
+
+
+
+    }
