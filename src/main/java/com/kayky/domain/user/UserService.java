@@ -22,6 +22,7 @@ public class UserService {
         validateUserState(user, false, "activate");
 
         user.setActive(true);
+        userRepository.save(user);
         log.info("Activated user ID: {}", id);
     }
 
@@ -32,6 +33,7 @@ public class UserService {
         validateUserState(user, true, "deactivate");
 
         user.setActive(false);
+        userRepository.save(user);
         log.info("Deactivated user ID: {}", id);
     }
 
