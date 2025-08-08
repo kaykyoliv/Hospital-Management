@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 
 import java.util.Optional;
 
+import static com.kayky.commons.TestConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,11 +24,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("PatientServiceTest")
 class PatientServiceTest {
-
-    private static final String PATIENT_NOT_FOUND = "Patient not found";
-    private static final String EMAIL_ALREADY_EXIST = "Email %s already in use";
-    private static final Long EXISTING_ID = 1L;
-    private static final Long NON_EXISTING_ID = 999L;
 
     private PatientService service;
 

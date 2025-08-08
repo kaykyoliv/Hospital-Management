@@ -26,8 +26,8 @@ public class UserController {
             description = "Activates a user account that is currently inactive")
     @ApiResponses(value = {
             @ApiResponse( responseCode = "204", description = "User activated successfully"),
+            @ApiResponse(responseCode = "400", description = "User already active"),
             @ApiResponse( responseCode = "404", description = "User not found")
-
     })
     @PatchMapping("/{id}/activate")
     public ResponseEntity<Void> activateUser(@PathVariable Long id){
@@ -40,6 +40,7 @@ public class UserController {
             description = "Deactivates a user account that is currently activate")
     @ApiResponses(value = {
             @ApiResponse( responseCode = "204", description = "User deactivate successfully"),
+            @ApiResponse(responseCode = "400", description = "User already inactive"),
             @ApiResponse( responseCode = "404", description = "User not found")
 
     })    @PatchMapping("/{id}/deactivate")

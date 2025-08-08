@@ -13,6 +13,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
+import static com.kayky.commons.TestConstants.EXISTING_ID;
+import static com.kayky.commons.TestConstants.NON_EXISTING_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.when;
@@ -20,9 +22,6 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
-
-    private static final Long EXISTING_ID = 1L;
-    private static final Long NON_EXISTING_ID = 999L;
 
     @InjectMocks
     private UserService service;

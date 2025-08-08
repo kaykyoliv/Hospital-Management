@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static com.kayky.commons.TestConstants.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -26,10 +27,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PatientControllerTest {
 
     private static final String BASE_URI = "/v1/patient";
-    private static final Long EXISTING_ID = 1L;
-    private static final Long NON_EXISTING_ID = 999L;
-    private static final String PATIENT_NOT_FOUND = "Patient not found";
-    private static final String EMAIL_ALREADY_EXIST = "Email %s already in use";
 
     @Autowired
     private MockMvc mockMvc;
