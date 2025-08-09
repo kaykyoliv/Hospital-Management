@@ -1,9 +1,11 @@
 package com.kayky.domain.doctor;
 
 import com.kayky.domain.doctor.response.DoctorGetResponse;
+import com.kayky.domain.doctor.response.DoctorPageResponse;
 import com.kayky.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,13 @@ public class DoctorService {
 
                     return new ResourceNotFoundException("Doctor not found");
                 });
+    }
+
+    @Transactional(readOnly = true)
+    public DoctorPageResponse findAll(Pageable pageable){
+        var paginatedDoctors = repository.findAll(pageable);
+
+        return mapper.toDoctorPageResponse(paginatedDoctors);
     }
 
 }
