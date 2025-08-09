@@ -6,7 +6,7 @@ import com.kayky.domain.patient.response.PatientGetResponse;
 import com.kayky.domain.patient.response.PatientPageResponse;
 import com.kayky.domain.patient.response.PatientPostResponse;
 import com.kayky.domain.patient.response.PatientPutResponse;
-import com.kayky.exception.EmailAlreadyExistsException;
+import com.kayky.domain.user.UserValidator;
 import com.kayky.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +21,7 @@ public class PatientService {
 
     private final PatientRepository patientRepository;
     private final PatientMapper patientMapper;
+    private final UserValidator userValidator;
 
     @Transactional(readOnly = true)
     public PatientGetResponse findById(Long id) {
@@ -41,7 +42,7 @@ public class PatientService {
 
     @Transactional
     public PatientPostResponse save(PatientPostRequest postRequest) {
-        assertEmailDoesNotExist(postRequest.getEmail());
+        userValidator.assertEmailDoesNotExist(postRequest.getEmail());
 
         var patientToSave = patientMapper.toEntity(postRequest);
         var patientSaved = patientRepository.save(patientToSave);
@@ -60,26 +61,12 @@ public class PatientService {
                 });
 
 
-        assertEmailDoesNotExist(putRequest.getEmail(), id);
+        userValidator.assertEmailDoesNotExist(putRequest.getEmail(), id);
 
         patientMapper.updatePatientFromRequest(putRequest, patientToUpdate);
         var updatedPatient = patientRepository.save(patientToUpdate);
 
         log.info("Patient updated with ID {}", updatedPatient.getId());
         return patientMapper.toPatientPutResponse(updatedPatient);
-    }
-
-    private void assertEmailDoesNotExist(String email) {
-        patientRepository.findByEmail(email).ifPresent(this::throwEmailExistsException);
-    }
-
-    private void assertEmailDoesNotExist(String email, Long id) {
-        patientRepository.findByEmailAndIdNot(email, id).ifPresent(this::throwEmailExistsException);
-    }
-
-    private void throwEmailExistsException(Patient patient) {
-        log.warn("Email conflict: {} already in use by patient ID {}", patient.getEmail(), patient.getId());
-
-        throw new EmailAlreadyExistsException("Email %s already in use".formatted(patient.getEmail()));
     }
 }

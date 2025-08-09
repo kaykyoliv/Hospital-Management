@@ -4,6 +4,7 @@ import com.kayky.domain.doctor.request.DoctorPostRequest;
 import com.kayky.domain.doctor.response.DoctorGetResponse;
 import com.kayky.domain.doctor.response.DoctorPageResponse;
 import com.kayky.domain.doctor.response.DoctorPostResponse;
+import com.kayky.domain.user.UserValidator;
 import com.kayky.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ public class DoctorService {
 
     private final DoctorRepository repository;
     private final DoctorMapper mapper;
+    private final UserValidator userValidator;
 
     @Transactional(readOnly = true)
     public DoctorGetResponse findById(Long id){
@@ -39,8 +41,12 @@ public class DoctorService {
 
     @Transactional
     public DoctorPostResponse save(DoctorPostRequest request){
+        userValidator.assertEmailDoesNotExist(request.getEmail());
         var doctorToSave = mapper.toEntity(request);
         var savedDoctor = repository.save(doctorToSave);
+
+        log.info("New doctor saved with ID {}", savedDoctor.getId());
+
         return mapper.toDoctorPostResponse(savedDoctor);
     }
 

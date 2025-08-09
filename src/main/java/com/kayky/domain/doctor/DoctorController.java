@@ -49,5 +49,4 @@ public class DoctorController {
         return ResponseEntity.created(uri).body(response);
     }
 
-
 }

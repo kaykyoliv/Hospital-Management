@@ -1,4 +1,4 @@
-package com.kayky.domain.patient;
+package com.kayky.domain.user;
 
 import com.kayky.commons.PatientUtils;
 import org.junit.jupiter.api.DisplayName;
@@ -9,10 +9,10 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-class PatientRepositoryTest {
+public class UserRepositoryTest {
 
     @Autowired
-    private PatientRepository repository;
+    private UserRepository repository;
 
     @Test
     @DisplayName("findByEmail returns patient when email exists")

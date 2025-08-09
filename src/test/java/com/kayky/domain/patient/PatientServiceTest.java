@@ -1,6 +1,7 @@
 package com.kayky.domain.patient;
 
 import com.kayky.commons.PatientUtils;
+import com.kayky.domain.user.UserValidator;
 import com.kayky.exception.EmailAlreadyExistsException;
 import com.kayky.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,9 +33,12 @@ class PatientServiceTest {
 
     private final PatientMapper mapper = Mappers.getMapper(PatientMapper.class);
 
+    @Mock
+    private UserValidator userValidator;
+
     @BeforeEach
     void setUp() {
-        service = new PatientService(repository, mapper);
+        service = new PatientService(repository, mapper, userValidator);
     }
 
     @Test
@@ -101,7 +105,6 @@ class PatientServiceTest {
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
         var expectedResponse = PatientUtils.asPostResponse(savedPatient);
 
-        when(repository.findByEmail(email)).thenReturn(Optional.empty());
         when(repository.save(any(Patient.class))).thenReturn(savedPatient);
 
         var result = service.save(request);
@@ -109,7 +112,6 @@ class PatientServiceTest {
         assertThat(result).usingRecursiveComparison()
                 .isEqualTo(expectedResponse);
 
-        verify(repository).findByEmail(email);
         verify(repository).save(any(Patient.class));
     }
 
@@ -123,14 +125,15 @@ class PatientServiceTest {
 
         request.setEmail(email);
 
-        when(repository.findByEmail(email)).thenReturn(Optional.of(savedPatient));
+        doThrow(new EmailAlreadyExistsException(EMAIL_ALREADY_EXIST.formatted(email)))
+                .when(userValidator)
+                .assertEmailDoesNotExist(email);
 
         assertThatThrownBy(() -> service.save(request))
                 .isInstanceOf(EmailAlreadyExistsException.class)
                 .hasMessage(EMAIL_ALREADY_EXIST.formatted(email));
 
         verify(repository, times(0)).save(any());
-        verify(repository).findByEmail(email);
     }
 
     @Test
@@ -143,7 +146,6 @@ class PatientServiceTest {
         var expectedResponse = PatientUtils.asPutResponse(updatedPatient);
 
         when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedPatient));
-        when(repository.findByEmailAndIdNot(putRequest.getEmail(), EXISTING_ID)).thenReturn(Optional.empty());
         when(repository.save(any(Patient.class))).thenReturn(updatedPatient);
 
         var result = service.update(putRequest, EXISTING_ID);
@@ -153,7 +155,6 @@ class PatientServiceTest {
                 .isEqualTo(expectedResponse);
 
         verify(repository).findById(EXISTING_ID);
-        verify(repository).findByEmailAndIdNot(putRequest.getEmail(), EXISTING_ID);
         verify(repository).save(any(Patient.class));
     }
 
@@ -179,12 +180,15 @@ class PatientServiceTest {
         var request = PatientUtils.asPutRequest();
 
         when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedPatient));
-        when(repository.findByEmailAndIdNot(email, EXISTING_ID)).thenReturn(Optional.of(savedPatient));
+
+        doThrow(new EmailAlreadyExistsException(EMAIL_ALREADY_EXIST.formatted(email)))
+                .when(userValidator)
+                .assertEmailDoesNotExist(request.getEmail(), EXISTING_ID);
 
         assertThatThrownBy(() -> service.update(request, EXISTING_ID))
                 .isInstanceOf(EmailAlreadyExistsException.class)
                 .hasMessage(EMAIL_ALREADY_EXIST.formatted(email));
 
-        verify(repository).findByEmailAndIdNot(email, EXISTING_ID);
+        verify(userValidator).assertEmailDoesNotExist(request.getEmail(), EXISTING_ID);
     }
 }
