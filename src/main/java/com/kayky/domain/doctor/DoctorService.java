@@ -1,9 +1,11 @@
 package com.kayky.domain.doctor;
 
 import com.kayky.domain.doctor.request.DoctorPostRequest;
+import com.kayky.domain.doctor.request.DoctorPutRequest;
 import com.kayky.domain.doctor.response.DoctorGetResponse;
 import com.kayky.domain.doctor.response.DoctorPageResponse;
 import com.kayky.domain.doctor.response.DoctorPostResponse;
+import com.kayky.domain.doctor.response.DoctorPutResponse;
 import com.kayky.domain.user.UserValidator;
 import com.kayky.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -42,12 +44,30 @@ public class DoctorService {
     @Transactional
     public DoctorPostResponse save(DoctorPostRequest request){
         userValidator.assertEmailDoesNotExist(request.getEmail());
+
         var doctorToSave = mapper.toEntity(request);
         var savedDoctor = repository.save(doctorToSave);
 
         log.info("New doctor saved with ID {}", savedDoctor.getId());
 
         return mapper.toDoctorPostResponse(savedDoctor);
+    }
+
+    @Transactional
+    public DoctorPutResponse update(DoctorPutRequest request, Long id){
+        var doctorToUpdate = repository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Cannot update: Doctor not found with ID {}", id);
+                    return new ResourceNotFoundException("Doctor not found");
+                });
+
+        userValidator.assertEmailDoesNotExist(request.getEmail(), id);
+
+        mapper.updateDoctorFromRequest(request, doctorToUpdate);
+
+        var updatedDoctor = repository.save(doctorToUpdate);
+
+        return mapper.toDoctorPutResponse(updatedDoctor);
     }
 
 }

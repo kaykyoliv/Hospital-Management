@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-public class DoctorPostRequest extends UserBaseRequest {
+public class DoctorPutRequest extends UserBaseRequest {
     private String crm;
     private String phoneNumber;
     private String officeNumber;

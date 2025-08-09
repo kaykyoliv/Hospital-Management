@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class UserValidator {
 
-    private UserRepository repository;
+    private final UserRepository repository;
 
     public void assertEmailDoesNotExist(String email) {
         repository.findByEmail(email).ifPresent(this::throwEmailExistsException);

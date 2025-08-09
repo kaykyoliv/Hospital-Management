@@ -102,7 +102,7 @@ public class PatientController {
     })
     @PostMapping
     public ResponseEntity<PatientPostResponse> save(@Valid @RequestBody PatientPostRequest request) {
-        log.debug("request to create new patient");
+        log.debug("Request to create new patient");
 
         var response = service.save(request);
 
