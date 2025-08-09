@@ -1,7 +1,9 @@
 package com.kayky.domain.doctor;
 
+import com.kayky.domain.doctor.request.DoctorPostRequest;
 import com.kayky.domain.doctor.response.DoctorGetResponse;
 import com.kayky.domain.doctor.response.DoctorPageResponse;
+import com.kayky.domain.doctor.response.DoctorPostResponse;
 import org.mapstruct.Mapper;
 import org.springframework.data.domain.Page;
 
@@ -11,6 +13,10 @@ import java.util.List;
 public interface DoctorMapper {
 
     DoctorGetResponse toDoctorGetResponse(Doctor doctor);
+
+    Doctor toEntity(DoctorPostRequest postRequest);
+
+    DoctorPostResponse toDoctorPostResponse(Doctor doctor);
 
     default DoctorPageResponse toDoctorPageResponse(Page<Doctor> doctors){
         List<DoctorGetResponse> content = doctors.map(this::toDoctorGetResponse).getContent();

@@ -1,7 +1,9 @@
 package com.kayky.domain.doctor;
 
+import com.kayky.domain.doctor.request.DoctorPostRequest;
 import com.kayky.domain.doctor.response.DoctorGetResponse;
 import com.kayky.domain.doctor.response.DoctorPageResponse;
+import com.kayky.domain.doctor.response.DoctorPostResponse;
 import com.kayky.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,13 @@ public class DoctorService {
         var paginatedDoctors = repository.findAll(pageable);
 
         return mapper.toDoctorPageResponse(paginatedDoctors);
+    }
+
+    @Transactional
+    public DoctorPostResponse save(DoctorPostRequest request){
+        var doctorToSave = mapper.toEntity(request);
+        var savedDoctor = repository.save(doctorToSave);
+        return mapper.toDoctorPostResponse(savedDoctor);
     }
 
 }
