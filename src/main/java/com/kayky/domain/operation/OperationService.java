@@ -47,7 +47,7 @@ public class OperationService {
         return PageUtils.mapPage(page, mapper::toOperationDetailsResponse);
     }
 
-
+    @Transactional
     public OperationPostResponse save(OperationPostRequest request){
         userValidator.assertIfUserExist(request.getPatient().getId(), "Patient");
         userValidator.assertIfUserExist(request.getDoctor().getId(), "Doctor");
@@ -58,6 +58,7 @@ public class OperationService {
         return mapper.toOperationPostResponse(savedOperation);
     }
 
+    @Transactional
     public OperationPutResponse update(OperationPutRequest request, Long id){
         var operationToUpdate = repository.findById(id)
                         .orElseThrow(()-> new ResourceNotFoundException("Operation not found"));
@@ -78,5 +79,17 @@ public class OperationService {
         var savedOperation = repository.save(operationToUpdate);
 
         return mapper.toOperationPutResponse(savedOperation);
+    }
+
+    @Transactional
+    public void delete(Long id){
+        assertIfOperationExist(id);
+        repository.deleteById(id);
+    }
+
+    private void assertIfOperationExist(Long id){
+        if(!repository.existsById(id)){
+            throw new ResourceNotFoundException("Operation not found");
+        }
     }
 }
