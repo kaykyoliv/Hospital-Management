@@ -2,15 +2,18 @@ package com.kayky.domain.operation;
 
 
 import com.kayky.core.pagination.PageResponse;
+import com.kayky.domain.operation.request.OperationPostRequest;
 import com.kayky.domain.operation.response.OperationDetailsResponse;
 import com.kayky.domain.operation.response.OperationGetResponse;
+import com.kayky.domain.operation.response.OperationPostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping(value = "v1/operation")
@@ -28,5 +31,15 @@ public class OperationController {
     @GetMapping
     public PageResponse<OperationDetailsResponse> findAll(Pageable pageable) {
         return service.findAll(pageable);
+    }
+
+    @PostMapping
+    public ResponseEntity<OperationPostResponse> save(@RequestBody OperationPostRequest request){
+        var response = service.save(request);
+
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(response.getId()).toUri();
+
+        return ResponseEntity.created(uri).body(response);
     }
 }

@@ -1,6 +1,7 @@
 package com.kayky.domain.user;
 
 import com.kayky.exception.EmailAlreadyExistsException;
+import com.kayky.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -24,5 +25,12 @@ public class UserValidator {
         log.warn("Email conflict: {} already in use by patient ID {}", user.getEmail(), user.getId());
 
         throw new EmailAlreadyExistsException("Email %s already in use".formatted(user.getEmail()));
+    }
+
+    public void assertIfUserExist(Long id, String userType){
+        if (!repository.existsById(id)) {
+            log.warn("{} with id {} not found", userType, id);
+            throw new ResourceNotFoundException("%s with id %d not found".formatted(userType, id));
+        }
     }
 }
