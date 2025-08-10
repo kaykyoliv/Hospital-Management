@@ -6,6 +6,7 @@ import com.kayky.domain.doctor.request.DoctorPutRequest;
 import com.kayky.domain.doctor.response.DoctorGetResponse;
 import com.kayky.domain.doctor.response.DoctorPostResponse;
 import com.kayky.domain.doctor.response.DoctorPutResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +37,7 @@ public class DoctorController {
     }
 
     @PostMapping
-    public ResponseEntity<DoctorPostResponse> save(@RequestBody DoctorPostRequest request) {
+    public ResponseEntity<DoctorPostResponse> save(@Valid @RequestBody DoctorPostRequest request) {
         log.debug("request to create new doctor");
 
         var response = service.save(request);
@@ -48,7 +49,7 @@ public class DoctorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DoctorPutResponse> update(@RequestBody DoctorPutRequest request, @PathVariable Long id) {
+    public ResponseEntity<DoctorPutResponse> update(@Valid @RequestBody DoctorPutRequest request, @PathVariable Long id) {
         log.debug("Request to update doctor with id {}", id);
 
         var response = service.update(request, id);

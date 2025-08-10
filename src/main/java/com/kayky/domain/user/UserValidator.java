@@ -22,7 +22,7 @@ public class UserValidator {
     }
 
     public void throwEmailExistsException(User user) {
-        log.warn("Email conflict: {} already in use by patient ID {}", user.getEmail(), user.getId());
+        log.warn("Email conflict: {} already in use by user ID {}", user.getEmail(), user.getId());
 
         throw new EmailAlreadyExistsException("Email %s already in use".formatted(user.getEmail()));
     }

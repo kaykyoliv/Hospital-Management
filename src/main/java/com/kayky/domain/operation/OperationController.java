@@ -8,6 +8,7 @@ import com.kayky.domain.operation.response.OperationDetailsResponse;
 import com.kayky.domain.operation.response.OperationGetResponse;
 import com.kayky.domain.operation.response.OperationPostResponse;
 import com.kayky.domain.operation.response.OperationPutResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +37,7 @@ public class OperationController {
     }
 
     @PostMapping
-    public ResponseEntity<OperationPostResponse> save(@RequestBody OperationPostRequest request){
+    public ResponseEntity<OperationPostResponse> save(@Valid @RequestBody OperationPostRequest request){
         var response = service.save(request);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
@@ -46,7 +47,7 @@ public class OperationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<OperationPutResponse> update(@RequestBody OperationPutRequest request, @PathVariable Long id){
+    public ResponseEntity<OperationPutResponse> update(@Valid @RequestBody OperationPutRequest request, @PathVariable Long id){
         var response = service.update(request, id);
         return ResponseEntity.ok(response);
     }
