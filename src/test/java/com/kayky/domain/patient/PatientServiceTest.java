@@ -89,7 +89,7 @@ class PatientServiceTest {
         var expectedResponse = patientList.stream()
                         .map(mapper::toPatientGetResponse).toList();
 
-        assertThat(result.getPatients())
+        assertThat(result.getContent())
                 .usingRecursiveComparison()
                         .isEqualTo(expectedResponse);
 
@@ -100,7 +100,6 @@ class PatientServiceTest {
     @DisplayName("save: Should return PostResponse when email is unique")
     void save_ShouldReturnPostResponse_WhenEmailIsUnique() {
         var request = PatientUtils.asPostRequest();
-        var email = request.getEmail();
 
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
         var expectedResponse = PatientUtils.asPostResponse(savedPatient);

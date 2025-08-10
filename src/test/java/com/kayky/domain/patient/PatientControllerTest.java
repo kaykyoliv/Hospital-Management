@@ -1,6 +1,7 @@
 package com.kayky.domain.patient;
 
 import com.kayky.commons.FileUtils;
+import com.kayky.commons.PageUtils;
 import com.kayky.commons.PatientUtils;
 import com.kayky.domain.patient.request.PatientPostRequest;
 import com.kayky.domain.patient.request.PatientPutRequest;
@@ -11,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -75,7 +78,11 @@ class PatientControllerTest {
     @Test
     @DisplayName("GET /v1/patient - Should return page with patients")
     void findAll_ShouldReturnPatientPageResponse_WhenPatientsExist() throws Exception {
-        var pageResponse = PatientUtils.asPageResponse();
+        PageRequest pageRequest = PageRequest.of(0, 3);
+        var patientList = PatientUtils.newPatientGetResponseList();
+        var pagedPatient = new PageImpl<>(patientList, pageRequest, patientList.size());
+        var pageResponse = PageUtils.pageResponse(pagedPatient);
+
         var expectedJsonResponse =  FileUtils.readResourceFile("patient/get/all-paged-patients-200.json");
 
         BDDMockito.when(service.findAll(any(Pageable.class))).thenReturn(pageResponse);

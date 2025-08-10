@@ -1,9 +1,9 @@
 package com.kayky.domain.patient;
 
+import com.kayky.core.pagination.PageResponse;
 import com.kayky.domain.patient.request.PatientPostRequest;
 import com.kayky.domain.patient.request.PatientPutRequest;
 import com.kayky.domain.patient.response.PatientGetResponse;
-import com.kayky.domain.patient.response.PatientPageResponse;
 import com.kayky.domain.patient.response.PatientPostResponse;
 import com.kayky.domain.patient.response.PatientPutResponse;
 import com.kayky.exception.ApiError;
@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -68,14 +67,12 @@ public class PatientController {
             responseCode = "200",
             description = "List of all patients returned successfully",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    array = @ArraySchema(schema = @Schema(implementation = PatientPageResponse.class)))
+                    array = @ArraySchema(schema = @Schema(implementation = PageResponse.class)))
     )
     @GetMapping
-    public ResponseEntity<PatientPageResponse> findAllPaged(Pageable pageable) {
+    public PageResponse<PatientGetResponse> findAllPaged(Pageable pageable) {
         log.debug("Request received to list all patients");
-
-        var response = service.findAll(pageable);
-        return ResponseEntity.ok(response);
+        return service.findAll(pageable);
     }
 
 

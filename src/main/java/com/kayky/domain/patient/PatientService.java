@@ -1,9 +1,10 @@
 package com.kayky.domain.patient;
 
+import com.kayky.core.pagination.PageResponse;
+import com.kayky.core.pagination.PageUtils;
 import com.kayky.domain.patient.request.PatientPostRequest;
 import com.kayky.domain.patient.request.PatientPutRequest;
 import com.kayky.domain.patient.response.PatientGetResponse;
-import com.kayky.domain.patient.response.PatientPageResponse;
 import com.kayky.domain.patient.response.PatientPostResponse;
 import com.kayky.domain.patient.response.PatientPutResponse;
 import com.kayky.domain.user.UserValidator;
@@ -34,10 +35,9 @@ public class PatientService {
     }
 
     @Transactional(readOnly = true)
-    public PatientPageResponse findAll(Pageable pageable) {
+    public PageResponse<PatientGetResponse> findAll(Pageable pageable) {
         var paginatedPatients = patientRepository.findAll(pageable);
-
-        return patientMapper.toPatientPageResponse(paginatedPatients);
+        return PageUtils.mapPage(paginatedPatients, patientMapper::toPatientGetResponse);
     }
 
     @Transactional

@@ -4,7 +4,6 @@ import com.kayky.domain.patient.Patient;
 import com.kayky.domain.patient.request.PatientPostRequest;
 import com.kayky.domain.patient.request.PatientPutRequest;
 import com.kayky.domain.patient.response.PatientGetResponse;
-import com.kayky.domain.patient.response.PatientPageResponse;
 import com.kayky.domain.patient.response.PatientPostResponse;
 import com.kayky.domain.patient.response.PatientPutResponse;
 import com.kayky.enums.Gender;
@@ -154,13 +153,5 @@ public final class PatientUtils {
                 .build();
     }
 
-    public static PatientPageResponse asPageResponse() {
-        return PatientPageResponse.builder()
-                .patients(newPatientGetResponseList())
-                .currentPage(0)
-                .totalPages(10)
-                .totalElements(3)
-                .build();
-    }
 }
 

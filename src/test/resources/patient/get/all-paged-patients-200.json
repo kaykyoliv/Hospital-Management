@@ -1,5 +1,5 @@
 {
-  "patients": [
+  "content": [
     {
       "id": 1,
       "firstName": "John",
@@ -28,7 +28,7 @@
       "bloodType": "AB-"
     }
   ],
-  "totalPages": 10,
+  "currentPage": 0,
   "totalElements": 3,
-  "currentPage": 0
+  "totalPages": 1
 }

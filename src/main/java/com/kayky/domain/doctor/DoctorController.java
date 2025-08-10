@@ -1,9 +1,9 @@
 package com.kayky.domain.doctor;
 
+import com.kayky.core.pagination.PageResponse;
 import com.kayky.domain.doctor.request.DoctorPostRequest;
 import com.kayky.domain.doctor.request.DoctorPutRequest;
 import com.kayky.domain.doctor.response.DoctorGetResponse;
-import com.kayky.domain.doctor.response.DoctorPageResponse;
 import com.kayky.domain.doctor.response.DoctorPostResponse;
 import com.kayky.domain.doctor.response.DoctorPutResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,19 +24,15 @@ public class DoctorController {
     private final DoctorService service;
 
     @GetMapping("/{id}")
-    public ResponseEntity<DoctorGetResponse> findById(@PathVariable Long id) {
+    public DoctorGetResponse findById(@PathVariable Long id) {
         log.debug("Request to find a doctor by id {}", id);
-        var response = service.findById(id);
-        return ResponseEntity.ok(response);
+        return service.findById(id);
     }
 
     @GetMapping
-    public ResponseEntity<DoctorPageResponse> findAll(Pageable pageable) {
+    public PageResponse<DoctorGetResponse> findAll(Pageable pageable) {
         log.debug("Request received to list all doctors");
-
-        var response = service.findAll(pageable);
-
-        return ResponseEntity.ok(response);
+        return service.findAll(pageable);
     }
 
     @PostMapping
@@ -52,7 +48,7 @@ public class DoctorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DoctorPutResponse> update(@RequestBody DoctorPutRequest request, @PathVariable Long id){
+    public ResponseEntity<DoctorPutResponse> update(@RequestBody DoctorPutRequest request, @PathVariable Long id) {
         log.debug("Request to update doctor with id {}", id);
 
         var response = service.update(request, id);

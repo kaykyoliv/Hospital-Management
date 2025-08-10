@@ -1,9 +1,10 @@
 package com.kayky.domain.doctor;
 
+import com.kayky.core.pagination.PageResponse;
+import com.kayky.core.pagination.PageUtils;
 import com.kayky.domain.doctor.request.DoctorPostRequest;
 import com.kayky.domain.doctor.request.DoctorPutRequest;
 import com.kayky.domain.doctor.response.DoctorGetResponse;
-import com.kayky.domain.doctor.response.DoctorPageResponse;
 import com.kayky.domain.doctor.response.DoctorPostResponse;
 import com.kayky.domain.doctor.response.DoctorPutResponse;
 import com.kayky.domain.user.UserValidator;
@@ -35,10 +36,9 @@ public class DoctorService {
     }
 
     @Transactional(readOnly = true)
-    public DoctorPageResponse findAll(Pageable pageable){
+    public PageResponse<DoctorGetResponse> findAll(Pageable pageable){
         var paginatedDoctors = repository.findAll(pageable);
-
-        return mapper.toDoctorPageResponse(paginatedDoctors);
+        return PageUtils.mapPage(paginatedDoctors, mapper::toDoctorGetResponse);
     }
 
     @Transactional
