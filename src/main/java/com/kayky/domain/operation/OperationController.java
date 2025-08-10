@@ -3,9 +3,11 @@ package com.kayky.domain.operation;
 
 import com.kayky.core.pagination.PageResponse;
 import com.kayky.domain.operation.request.OperationPostRequest;
+import com.kayky.domain.operation.request.OperationPutRequest;
 import com.kayky.domain.operation.response.OperationDetailsResponse;
 import com.kayky.domain.operation.response.OperationGetResponse;
 import com.kayky.domain.operation.response.OperationPostResponse;
+import com.kayky.domain.operation.response.OperationPutResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -41,5 +43,11 @@ public class OperationController {
                 .buildAndExpand(response.getId()).toUri();
 
         return ResponseEntity.created(uri).body(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<OperationPutResponse> update(@RequestBody OperationPutRequest request, @PathVariable Long id){
+        var response = service.update(request, id);
+        return ResponseEntity.ok(response);
     }
 }
