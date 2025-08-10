@@ -55,13 +55,19 @@ public class OperationService {
         var operationToSave = mapper.toEntity(request);
         var savedOperation = repository.save(operationToSave);
 
+        log.info("New operation saved with ID {}", savedOperation.getId());
+
         return mapper.toOperationPostResponse(savedOperation);
     }
 
     @Transactional
     public OperationPutResponse update(OperationPutRequest request, Long id){
         var operationToUpdate = repository.findById(id)
-                        .orElseThrow(()-> new ResourceNotFoundException("Operation not found"));
+                        .orElseThrow(()-> {
+                            log.warn("Cannot update: Operation not found with ID {}", id);
+
+                            return new ResourceNotFoundException("Operation not found");
+                        });
 
         userValidator.assertIfUserExist(request.getPatient().getId(), "Patient");
         userValidator.assertIfUserExist(request.getDoctor().getId(), "Doctor");
@@ -76,9 +82,10 @@ public class OperationService {
         operationToUpdate.setPatient(patient);
         operationToUpdate.setDoctor(doctor);
 
-        var savedOperation = repository.save(operationToUpdate);
+        var updatedOperation = repository.save(operationToUpdate);
 
-        return mapper.toOperationPutResponse(savedOperation);
+        log.info("Operation updated with ID {}", updatedOperation.getId());
+        return mapper.toOperationPutResponse(updatedOperation);
     }
 
     @Transactional

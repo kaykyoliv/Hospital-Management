@@ -30,6 +30,7 @@ public class PatientService {
                 .map(patientMapper::toPatientGetResponse)
                 .orElseThrow(() -> {
                     log.warn("Patient not found with ID {}", id);
+
                    return new ResourceNotFoundException("Patient not found");
                 });
     }

@@ -28,16 +28,22 @@ public class OperationController {
 
     @GetMapping("/{id}")
     public OperationGetResponse findById(@PathVariable Long id) {
+        log.debug("Request to find a operation by id {}", id);
+
         return service.findById(id);
     }
 
     @GetMapping
     public PageResponse<OperationDetailsResponse> findAll(Pageable pageable) {
+        log.debug("Request received to list all operations details");
+
         return service.findAll(pageable);
     }
 
     @PostMapping
     public ResponseEntity<OperationPostResponse> save(@Valid @RequestBody OperationPostRequest request){
+        log.debug("request to create new operation");
+
         var response = service.save(request);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
@@ -48,12 +54,16 @@ public class OperationController {
 
     @PutMapping("/{id}")
     public ResponseEntity<OperationPutResponse> update(@Valid @RequestBody OperationPutRequest request, @PathVariable Long id){
+        log.debug("Request to update operation with id {}", id);
+
         var response = service.update(request, id);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id){
+        log.debug("Request to delete operation with id {}", id);
+
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
