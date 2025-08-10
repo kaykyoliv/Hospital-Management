@@ -1,5 +1,8 @@
 package com.kayky.domain.operation;
 
+import com.kayky.core.pagination.PageMapper;
+import com.kayky.core.pagination.PageResponse;
+import com.kayky.core.pagination.PageUtils;
 import com.kayky.domain.operation.response.OperationDetailsResponse;
 import com.kayky.domain.operation.response.OperationGetResponse;
 import com.kayky.domain.operation.response.OperationPageResponse;
@@ -32,17 +35,8 @@ public class OperationService {
     }
 
     @Transactional(readOnly = true)
-    public OperationPageResponse findAll(Pageable pageable){
+    public PageResponse<OperationDetailsResponse> findAll(Pageable pageable){
         var page = repository.findAllProjected(pageable);
-
-        return OperationPageResponse.builder()
-                .operations(page.getContent()
-                        .stream()
-                        .map(mapper::toOperationDetailsResponse)
-                        .toList())
-                .currentPage(page.getNumber())
-                .totalElements(page.getTotalElements())
-                .totalPages(page.getTotalPages())
-                .build();
+        return PageUtils.mapPage(page, mapper::toOperationDetailsResponse);
     }
 }

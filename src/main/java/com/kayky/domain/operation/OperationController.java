@@ -1,6 +1,8 @@
 package com.kayky.domain.operation;
 
 
+import com.kayky.core.pagination.PageResponse;
+import com.kayky.domain.operation.response.OperationDetailsResponse;
 import com.kayky.domain.operation.response.OperationGetResponse;
 import com.kayky.domain.operation.response.OperationPageResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,14 +23,12 @@ public class OperationController {
     private final OperationService service;
 
     @GetMapping("/{id}")
-    public ResponseEntity<OperationGetResponse> findById(@PathVariable Long id) {
-        var response = service.findById(id);
-
-        return ResponseEntity.ok(response);
+    public OperationGetResponse findById(@PathVariable Long id) {
+        return service.findById(id);
     }
 
     @GetMapping
-    public OperationPageResponse findAll(Pageable pageable) {
+    public PageResponse<OperationDetailsResponse> findAll(Pageable pageable) {
         return service.findAll(pageable);
     }
 }
