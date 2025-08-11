@@ -1,23 +1,16 @@
 package com.kayky.domain.doctor;
 
-import com.kayky.domain.doctor.request.DoctorPostRequest;
-import com.kayky.domain.doctor.request.DoctorPutRequest;
-import com.kayky.domain.doctor.response.DoctorGetResponse;
-import com.kayky.domain.doctor.response.DoctorPostResponse;
-import com.kayky.domain.doctor.response.DoctorPutResponse;
+import com.kayky.domain.doctor.request.DoctorBaseRequest;
+import com.kayky.domain.doctor.response.DoctorBaseResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface DoctorMapper {
 
-    DoctorGetResponse toDoctorGetResponse(Doctor doctor);
+    DoctorBaseResponse toDoctorBaseResponse(Doctor doctor);
 
-    Doctor toEntity(DoctorPostRequest postRequest);
+    Doctor toEntity(DoctorBaseRequest postRequest);
 
-    DoctorPostResponse toDoctorPostResponse(Doctor doctor);
-
-    DoctorPutResponse toDoctorPutResponse(Doctor doctor);
-
-    void updateDoctorFromRequest(DoctorPutRequest putRequest, @MappingTarget Doctor doctor);
+    void updateDoctorFromRequest(DoctorBaseRequest putRequest, @MappingTarget Doctor doctor);
 }

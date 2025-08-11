@@ -1,19 +1,22 @@
 package com.kayky.domain.patient.request;
 
+
 import com.kayky.domain.user.request.UserBaseRequest;
 import com.kayky.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-public class PatientPostRequest extends UserBaseRequest {
+public class PatientBaseRequest extends UserBaseRequest {
 
     @Schema(description = "Patient's gender", example = "MALE")
     @NotNull(message = "Gender must be provided")

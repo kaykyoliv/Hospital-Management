@@ -2,14 +2,10 @@ package com.kayky.domain.operation;
 
 
 import com.kayky.core.pagination.PageResponse;
-import com.kayky.domain.operation.request.OperationPostRequest;
-import com.kayky.domain.operation.request.OperationPutRequest;
+import com.kayky.domain.operation.request.OperationBaseRequest;
+import com.kayky.domain.operation.response.OperationBaseResponse;
 import com.kayky.domain.operation.response.OperationDetailsResponse;
-import com.kayky.domain.operation.response.OperationGetResponse;
-import com.kayky.domain.operation.response.OperationPostResponse;
-import com.kayky.domain.operation.response.OperationPutResponse;
 import com.kayky.exception.ApiError;
-import com.kayky.exception.ResourceNotFoundException;
 import com.kayky.exception.ValidationError;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -46,7 +42,7 @@ public class OperationController {
                     responseCode = "200",
                     description = "Operation found successfully",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = OperationGetResponse.class))),
+                            schema = @Schema(implementation = OperationBaseResponse.class))),
             @ApiResponse(
                     responseCode = "404",
                     description = "Operation not found",
@@ -55,7 +51,7 @@ public class OperationController {
             )
     })
     @GetMapping("/{id}")
-    public OperationGetResponse findById(@PathVariable Long id) {
+    public OperationBaseResponse findById(@PathVariable Long id) {
         log.debug("Request to find a operation by id {}", id);
 
         return service.findById(id);
@@ -89,7 +85,7 @@ public class OperationController {
                     responseCode = "201",
                     description = "Operation created successfully",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = OperationPostResponse.class))),
+                            schema = @Schema(implementation = OperationBaseResponse.class))),
 
             @ApiResponse(
                     responseCode = "400",
@@ -103,7 +99,7 @@ public class OperationController {
                             schema = @Schema(implementation = ValidationError.class)))
     })
     @PostMapping
-    public ResponseEntity<OperationPostResponse> save(@Valid @RequestBody OperationPostRequest request) {
+    public ResponseEntity<OperationBaseResponse> save(@Valid @RequestBody OperationBaseRequest request) {
         log.debug("request to create new operation");
 
         var response = service.save(request);
@@ -124,7 +120,7 @@ public class OperationController {
                     responseCode = "201",
                     description = "Operation updated successfully",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = OperationPostResponse.class))),
+                            schema = @Schema(implementation = OperationBaseResponse.class))),
 
             @ApiResponse(
                     responseCode = "400",
@@ -138,7 +134,7 @@ public class OperationController {
                             schema = @Schema(implementation = ValidationError.class)))
     })
     @PutMapping("/{id}")
-    public ResponseEntity<OperationPutResponse> update(@Valid @RequestBody OperationPutRequest request, @PathVariable Long id) {
+    public ResponseEntity<OperationBaseResponse> update(@Valid @RequestBody OperationBaseRequest request, @PathVariable Long id) {
         log.debug("Request to update operation with id {}", id);
 
         var response = service.update(request, id);

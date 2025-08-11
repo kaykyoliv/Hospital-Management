@@ -2,11 +2,8 @@ package com.kayky.domain.doctor;
 
 import com.kayky.core.pagination.PageResponse;
 import com.kayky.core.pagination.PageUtils;
-import com.kayky.domain.doctor.request.DoctorPostRequest;
-import com.kayky.domain.doctor.request.DoctorPutRequest;
-import com.kayky.domain.doctor.response.DoctorGetResponse;
-import com.kayky.domain.doctor.response.DoctorPostResponse;
-import com.kayky.domain.doctor.response.DoctorPutResponse;
+import com.kayky.domain.doctor.request.DoctorBaseRequest;
+import com.kayky.domain.doctor.response.DoctorBaseResponse;
 import com.kayky.domain.user.UserValidator;
 import com.kayky.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +22,9 @@ public class DoctorService {
     private final UserValidator userValidator;
 
     @Transactional(readOnly = true)
-    public DoctorGetResponse findById(Long id){
+    public DoctorBaseResponse findById(Long id) {
         return repository.findById(id)
-                .map(mapper::toDoctorGetResponse)
+                .map(mapper::toDoctorBaseResponse)
                 .orElseThrow(() -> {
                     log.warn("Doctor not found with id {}", id);
 
@@ -36,13 +33,13 @@ public class DoctorService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<DoctorGetResponse> findAll(Pageable pageable){
+    public PageResponse<DoctorBaseResponse> findAll(Pageable pageable) {
         var paginatedDoctors = repository.findAll(pageable);
-        return PageUtils.mapPage(paginatedDoctors, mapper::toDoctorGetResponse);
+        return PageUtils.mapPage(paginatedDoctors, mapper::toDoctorBaseResponse);
     }
 
     @Transactional
-    public DoctorPostResponse save(DoctorPostRequest request){
+    public DoctorBaseResponse save(DoctorBaseRequest request) {
         userValidator.assertEmailDoesNotExist(request.getEmail());
 
         var doctorToSave = mapper.toEntity(request);
@@ -50,11 +47,11 @@ public class DoctorService {
 
         log.info("New doctor saved with ID {}", savedDoctor.getId());
 
-        return mapper.toDoctorPostResponse(savedDoctor);
+        return mapper.toDoctorBaseResponse(savedDoctor);
     }
 
     @Transactional
-    public DoctorPutResponse update(DoctorPutRequest request, Long id){
+    public DoctorBaseResponse update(DoctorBaseRequest request, Long id) {
         var doctorToUpdate = repository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Cannot update: Doctor not found with ID {}", id);
@@ -67,7 +64,7 @@ public class DoctorService {
 
         var updatedDoctor = repository.save(doctorToUpdate);
 
-        return mapper.toDoctorPutResponse(updatedDoctor);
+        return mapper.toDoctorBaseResponse(updatedDoctor);
     }
 
 }

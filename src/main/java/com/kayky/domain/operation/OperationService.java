@@ -3,12 +3,9 @@ package com.kayky.domain.operation;
 import com.kayky.core.pagination.PageResponse;
 import com.kayky.core.pagination.PageUtils;
 import com.kayky.domain.doctor.DoctorRepository;
-import com.kayky.domain.operation.request.OperationPostRequest;
-import com.kayky.domain.operation.request.OperationPutRequest;
+import com.kayky.domain.operation.request.OperationBaseRequest;
+import com.kayky.domain.operation.response.OperationBaseResponse;
 import com.kayky.domain.operation.response.OperationDetailsResponse;
-import com.kayky.domain.operation.response.OperationGetResponse;
-import com.kayky.domain.operation.response.OperationPostResponse;
-import com.kayky.domain.operation.response.OperationPutResponse;
 import com.kayky.domain.patient.PatientRepository;
 import com.kayky.domain.user.UserValidator;
 import com.kayky.exception.ResourceNotFoundException;
@@ -31,9 +28,9 @@ public class OperationService {
     private final OperationMapper mapper;
 
     @Transactional(readOnly = true)
-    public OperationGetResponse findById(Long id){
+    public OperationBaseResponse findById(Long id){
         return repository.findById(id)
-                .map(mapper::toOperationGetResponse)
+                .map(mapper::toOperationBaseResponse)
                 .orElseThrow(() -> {
                     log.warn("Operation not found with id {}", id);
 
@@ -48,7 +45,7 @@ public class OperationService {
     }
 
     @Transactional
-    public OperationPostResponse save(OperationPostRequest request){
+    public OperationBaseResponse save(OperationBaseRequest request){
         userValidator.assertIfUserExist(request.getPatient().getId(), "Patient");
         userValidator.assertIfUserExist(request.getDoctor().getId(), "Doctor");
 
@@ -57,11 +54,11 @@ public class OperationService {
 
         log.info("New operation saved with ID {}", savedOperation.getId());
 
-        return mapper.toOperationPostResponse(savedOperation);
+        return mapper.toOperationBaseResponse(savedOperation);
     }
 
     @Transactional
-    public OperationPutResponse update(OperationPutRequest request, Long id){
+    public OperationBaseResponse update(OperationBaseRequest request, Long id){
         var operationToUpdate = repository.findById(id)
                         .orElseThrow(()-> {
                             log.warn("Cannot update: Operation not found with ID {}", id);
@@ -85,7 +82,7 @@ public class OperationService {
         var updatedOperation = repository.save(operationToUpdate);
 
         log.info("Operation updated with ID {}", updatedOperation.getId());
-        return mapper.toOperationPutResponse(updatedOperation);
+        return mapper.toOperationBaseResponse(updatedOperation);
     }
 
     @Transactional

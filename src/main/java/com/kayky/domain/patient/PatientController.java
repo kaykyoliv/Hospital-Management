@@ -1,11 +1,8 @@
 package com.kayky.domain.patient;
 
 import com.kayky.core.pagination.PageResponse;
-import com.kayky.domain.patient.request.PatientPostRequest;
-import com.kayky.domain.patient.request.PatientPutRequest;
-import com.kayky.domain.patient.response.PatientGetResponse;
-import com.kayky.domain.patient.response.PatientPostResponse;
-import com.kayky.domain.patient.response.PatientPutResponse;
+import com.kayky.domain.patient.request.PatientBaseRequest;
+import com.kayky.domain.patient.response.PatientBaseResponse;
 import com.kayky.exception.ApiError;
 import com.kayky.exception.ValidationError;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,15 +41,15 @@ public class PatientController {
                     responseCode = "200",
                     description = "Patient found successfully",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        schema = @Schema(implementation = PatientGetResponse.class))),
+                            schema = @Schema(implementation = PatientBaseResponse.class))),
             @ApiResponse(
                     responseCode = "404",
                     description = "Patient not found",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        schema = @Schema(implementation = ApiError.class)))
+                            schema = @Schema(implementation = ApiError.class)))
     })
     @GetMapping(value = "/{id}")
-    public ResponseEntity<PatientGetResponse> findById(@PathVariable Long id) {
+    public ResponseEntity<PatientBaseResponse> findById(@PathVariable Long id) {
         log.debug("Request to find patient by id {}", id);
 
         var response = service.findById(id);
@@ -70,7 +67,7 @@ public class PatientController {
                     array = @ArraySchema(schema = @Schema(implementation = PageResponse.class)))
     )
     @GetMapping
-    public PageResponse<PatientGetResponse> findAllPaged(Pageable pageable) {
+    public PageResponse<PatientBaseResponse> findAllPaged(Pageable pageable) {
         log.debug("Request received to list all patients");
         return service.findAll(pageable);
     }
@@ -85,7 +82,7 @@ public class PatientController {
                     responseCode = "201",
                     description = "Patient created successfully",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = PatientPostResponse.class))),
+                            schema = @Schema(implementation = PatientBaseResponse.class))),
             @ApiResponse(
                     responseCode = "400",
                     description = "Malformed JSON or invalid enum",
@@ -98,7 +95,7 @@ public class PatientController {
                             schema = @Schema(implementation = ValidationError.class)))
     })
     @PostMapping
-    public ResponseEntity<PatientPostResponse> save(@Valid @RequestBody PatientPostRequest request) {
+    public ResponseEntity<PatientBaseResponse> save(@Valid @RequestBody PatientBaseRequest request) {
         log.debug("Request to create new patient");
 
         var response = service.save(request);
@@ -121,7 +118,7 @@ public class PatientController {
                     responseCode = "200",
                     description = "Patient updated successfully",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = PatientPutResponse.class))),
+                            schema = @Schema(implementation = PatientBaseResponse.class))),
             @ApiResponse(
                     responseCode = "400",
                     description = "Malformed JSON or invalid enum",
@@ -134,7 +131,7 @@ public class PatientController {
                             schema = @Schema(implementation = ValidationError.class)))
     })
     @PutMapping("/{id}")
-    public ResponseEntity<PatientPutResponse> update(@Valid @RequestBody PatientPutRequest request, @PathVariable Long id) {
+    public ResponseEntity<PatientBaseResponse> update(@Valid @RequestBody PatientBaseRequest request, @PathVariable Long id) {
         log.debug("Request to update patient with id {}", id);
 
         var response = service.update(request, id);

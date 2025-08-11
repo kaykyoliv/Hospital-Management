@@ -3,8 +3,7 @@ package com.kayky.domain.patient;
 import com.kayky.commons.FileUtils;
 import com.kayky.commons.PageUtils;
 import com.kayky.commons.PatientUtils;
-import com.kayky.domain.patient.request.PatientPostRequest;
-import com.kayky.domain.patient.request.PatientPutRequest;
+import com.kayky.domain.patient.request.PatientBaseRequest;
 import com.kayky.exception.EmailAlreadyExistsException;
 import com.kayky.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.DisplayName;
@@ -41,7 +40,7 @@ class PatientControllerTest {
     @DisplayName("GET /v1/patient/{id} - Should return 200 with patient data when patient exists")
     void findById_ShouldReturnPatientGetResponse_WhenPatientExists() throws Exception {
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
-        var response = PatientUtils.asGetResponse(savedPatient);
+        var response = PatientUtils.asBaseResponse(savedPatient);
 
         BDDMockito.when(service.findById(EXISTING_ID)).thenReturn(response);
 
@@ -79,7 +78,7 @@ class PatientControllerTest {
     @DisplayName("GET /v1/patient - Should return page with patients")
     void findAll_ShouldReturnPatientPageResponse_WhenPatientsExist() throws Exception {
         PageRequest pageRequest = PageRequest.of(0, 3);
-        var patientList = PatientUtils.newPatientGetResponseList();
+        var patientList = PatientUtils.PatientBaseResponseList();
         var pagedPatient = new PageImpl<>(patientList, pageRequest, patientList.size());
         var pageResponse = PageUtils.pageResponse(pagedPatient);
 
@@ -103,9 +102,9 @@ class PatientControllerTest {
         var expectedJsonResponse =  FileUtils.readResourceFile("patient/post/response-created-patient-200.json");
 
         var patient = PatientUtils.savedPatient(EXISTING_ID);
-        var expectedResponse = PatientUtils.asPostResponse(patient);
+        var expectedResponse = PatientUtils.asBaseResponse(patient);
 
-        BDDMockito.when(service.save(any(PatientPostRequest.class))).thenReturn(expectedResponse);
+        BDDMockito.when(service.save(any(PatientBaseRequest.class))).thenReturn(expectedResponse);
 
         mockMvc.perform(post(BASE_URI)
                     .content(request)
@@ -117,7 +116,7 @@ class PatientControllerTest {
                 .andExpect(content().json(expectedJsonResponse))
                 .andExpect(header().string("Location", "http://localhost/v1/patient/1"));
 
-        BDDMockito.verify(service).save(any(PatientPostRequest.class));
+        BDDMockito.verify(service).save(any(PatientBaseRequest.class));
     }
 
     @Test
@@ -126,11 +125,11 @@ class PatientControllerTest {
         var request = FileUtils.readResourceFile("patient/post/request-create-patient-201.json");
         var expectedJsonResponse =  FileUtils.readResourceFile("patient/post/response-email-already-exists-400.json");
 
-        var postRequest= PatientUtils.asPostRequest();
+        var postRequest= PatientUtils.asBaseRequest();
         var expectedErrorMessage = EMAIL_ALREADY_EXIST.formatted(postRequest.getEmail());
 
 
-        BDDMockito.when(service.save(any(PatientPostRequest.class)))
+        BDDMockito.when(service.save(any(PatientBaseRequest.class)))
                 .thenThrow(new EmailAlreadyExistsException(expectedErrorMessage));
 
         mockMvc.perform(post(BASE_URI)
@@ -142,7 +141,7 @@ class PatientControllerTest {
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage))
                 .andExpect(content().json(expectedJsonResponse));
 
-        BDDMockito.verify(service).save(any(PatientPostRequest.class));
+        BDDMockito.verify(service).save(any(PatientBaseRequest.class));
     }
 
     @Test
@@ -152,9 +151,9 @@ class PatientControllerTest {
         var expectedJsonResponse =  FileUtils.readResourceFile("patient/put/response-updated-patient-200.json");
 
         var updatedPatient = PatientUtils.updatedPatient();
-        var expectedResponse = PatientUtils.asPutResponse(updatedPatient);
+        var expectedResponse = PatientUtils.asBaseResponse(updatedPatient);
 
-        BDDMockito.when(service.update(any(PatientPutRequest.class), eq(EXISTING_ID))).thenReturn(expectedResponse);
+        BDDMockito.when(service.update(any(PatientBaseRequest.class), eq(EXISTING_ID))).thenReturn(expectedResponse);
 
         mockMvc.perform(put(BASE_URI + "/{id}", EXISTING_ID)
                     .accept(MediaType.APPLICATION_JSON)
@@ -165,7 +164,7 @@ class PatientControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedJsonResponse));
 
-        BDDMockito.verify(service).update(any(PatientPutRequest.class), eq(EXISTING_ID));
+        BDDMockito.verify(service).update(any(PatientBaseRequest.class), eq(EXISTING_ID));
 
     }
 
@@ -177,7 +176,7 @@ class PatientControllerTest {
 
         var expectedErrorMessage = PATIENT_NOT_FOUND;
 
-        BDDMockito.when(service.update(any(PatientPutRequest.class), eq(NON_EXISTING_ID)))
+        BDDMockito.when(service.update(any(PatientBaseRequest.class), eq(NON_EXISTING_ID)))
                 .thenThrow(new ResourceNotFoundException(expectedErrorMessage));
 
         mockMvc.perform(put(BASE_URI + "/{id}", NON_EXISTING_ID)
@@ -189,7 +188,7 @@ class PatientControllerTest {
                 .andExpect(content().json(expectedJsonResponse))
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage));
 
-        BDDMockito.verify(service).update(any(PatientPutRequest.class), eq(NON_EXISTING_ID));
+        BDDMockito.verify(service).update(any(PatientBaseRequest.class), eq(NON_EXISTING_ID));
 
     }
 
@@ -202,7 +201,7 @@ class PatientControllerTest {
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
         var expectedErrorMessage = EMAIL_ALREADY_EXIST.formatted(savedPatient.getEmail());
 
-        BDDMockito.when(service.update(any(PatientPutRequest.class), eq(EXISTING_ID)))
+        BDDMockito.when(service.update(any(PatientBaseRequest.class), eq(EXISTING_ID)))
                 .thenThrow(new EmailAlreadyExistsException(expectedErrorMessage));
 
         mockMvc.perform(put(BASE_URI + "/{id}", EXISTING_ID)
@@ -214,7 +213,7 @@ class PatientControllerTest {
                 .andExpect(content().json(expectedJsonResponse))
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage));
 
-        BDDMockito.verify(service).update(any(PatientPutRequest.class), eq(EXISTING_ID));
+        BDDMockito.verify(service).update(any(PatientBaseRequest.class), eq(EXISTING_ID));
     }
 
 

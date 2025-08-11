@@ -1,11 +1,8 @@
 package com.kayky.commons;
 
 import com.kayky.domain.patient.Patient;
-import com.kayky.domain.patient.request.PatientPostRequest;
-import com.kayky.domain.patient.request.PatientPutRequest;
-import com.kayky.domain.patient.response.PatientGetResponse;
-import com.kayky.domain.patient.response.PatientPostResponse;
-import com.kayky.domain.patient.response.PatientPutResponse;
+import com.kayky.domain.patient.request.PatientBaseRequest;
+import com.kayky.domain.patient.response.PatientBaseResponse;
 import com.kayky.enums.Gender;
 
 import java.util.List;
@@ -28,7 +25,7 @@ public final class PatientUtils {
                 .build();
     }
 
-    public static List<Patient> newPatientList() {
+    public static List<Patient> PatientList() {
         var patient1 = Patient.builder()
                 .id(1L)
                 .firstName("John")
@@ -87,38 +84,15 @@ public final class PatientUtils {
                 .build();
     }
 
-    public static PatientGetResponse asGetResponse(Patient patient) {
-        return PatientGetResponse.builder()
-                .id(patient.getId())
-                .firstName(patient.getFirstName())
-                .lastName(patient.getLastName())
-                .email(patient.getEmail())
-                .gender(patient.getGender())
-                .address(patient.getAddress())
-                .bloodType(patient.getBloodType())
-                .build();
-    }
 
-    public static List<PatientGetResponse> newPatientGetResponseList() {
-        return newPatientList().stream()
-                .map(PatientUtils::asGetResponse)
+    public static List<PatientBaseResponse> PatientBaseResponseList() {
+        return PatientList().stream()
+                .map(PatientUtils::asBaseResponse)
                 .toList();
     }
 
-    public static PatientPostRequest asPostRequest() {
-        return PatientPostRequest.builder()
-                .firstName("Robert")
-                .lastName("Williams")
-                .email("robert.williams@example.com")
-                .password("hashed_password_4")
-                .gender(Gender.MALE)
-                .address("101 Oak Lane, Newtown")
-                .bloodType("AB-")
-                .build();
-    }
-
-    public static PatientPostResponse asPostResponse(Patient patient) {
-        return PatientPostResponse.builder()
+    public static PatientBaseResponse asBaseResponse(Patient patient) {
+        return PatientBaseResponse.builder()
                 .id(patient.getId())
                 .firstName(patient.getFirstName())
                 .lastName(patient.getLastName())
@@ -129,8 +103,8 @@ public final class PatientUtils {
                 .build();
     }
 
-    public static PatientPutRequest asPutRequest() {
-        return PatientPutRequest.builder()
+    public static PatientBaseRequest asBaseRequest() {
+        return PatientBaseRequest.builder()
                 .firstName("Robert")
                 .lastName("Williams")
                 .email("robert.williams@example.com")
@@ -138,18 +112,6 @@ public final class PatientUtils {
                 .gender(Gender.MALE)
                 .address("101 Oak Lane, Newtown")
                 .bloodType("AB-")
-                .build();
-    }
-
-    public static PatientPutResponse asPutResponse(Patient patient) {
-        return PatientPutResponse.builder()
-                .id(patient.getId())
-                .firstName(patient.getFirstName())
-                .lastName(patient.getLastName())
-                .email(patient.getEmail())
-                .gender(patient.getGender())
-                .address(patient.getAddress())
-                .bloodType(patient.getBloodType())
                 .build();
     }
 

@@ -1,11 +1,8 @@
 package com.kayky.domain.doctor;
 
 import com.kayky.core.pagination.PageResponse;
-import com.kayky.domain.doctor.request.DoctorPostRequest;
-import com.kayky.domain.doctor.request.DoctorPutRequest;
-import com.kayky.domain.doctor.response.DoctorGetResponse;
-import com.kayky.domain.doctor.response.DoctorPostResponse;
-import com.kayky.domain.doctor.response.DoctorPutResponse;
+import com.kayky.domain.doctor.request.DoctorBaseRequest;
+import com.kayky.domain.doctor.response.DoctorBaseResponse;
 import com.kayky.exception.ApiError;
 import com.kayky.exception.ValidationError;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,7 +40,7 @@ public class DoctorController {
                     responseCode = "200",
                     description = "Doctor found successfully",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = DoctorGetResponse.class))),
+                            schema = @Schema(implementation = DoctorBaseResponse.class))),
             @ApiResponse(
                     responseCode = "404",
                     description = "Doctor not found",
@@ -52,7 +49,7 @@ public class DoctorController {
             )
     })
     @GetMapping("/{id}")
-    public DoctorGetResponse findById(@PathVariable Long id) {
+    public DoctorBaseResponse findById(@PathVariable Long id) {
         log.debug("Request to find a doctor by id {}", id);
         return service.findById(id);
     }
@@ -69,7 +66,7 @@ public class DoctorController {
                     schema = @Schema(implementation = PageResponse.class))
     )
     @GetMapping
-    public PageResponse<DoctorGetResponse> findAll(Pageable pageable) {
+    public PageResponse<DoctorBaseResponse> findAll(Pageable pageable) {
         log.debug("Request received to list all doctors");
         return service.findAll(pageable);
     }
@@ -84,7 +81,7 @@ public class DoctorController {
                     responseCode = "201",
                     description = "Doctor created successfully",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = DoctorPostResponse.class))),
+                            schema = @Schema(implementation = DoctorBaseResponse.class))),
 
             @ApiResponse(
                     responseCode = "400",
@@ -98,7 +95,7 @@ public class DoctorController {
                             schema = @Schema(implementation = ValidationError.class)))
     })
     @PostMapping
-    public ResponseEntity<DoctorPostResponse> save(@Valid @RequestBody DoctorPostRequest request) {
+    public ResponseEntity<DoctorBaseResponse> save(@Valid @RequestBody DoctorBaseRequest request) {
         log.debug("request to create new doctor");
 
         var response = service.save(request);
@@ -119,7 +116,7 @@ public class DoctorController {
                     responseCode = "201",
                     description = "Doctor updated successfully",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = DoctorPutResponse.class))),
+                            schema = @Schema(implementation = DoctorBaseResponse.class))),
 
             @ApiResponse(
                     responseCode = "400",
@@ -133,7 +130,7 @@ public class DoctorController {
                             schema = @Schema(implementation = ValidationError.class)))
     })
     @PutMapping("/{id}")
-    public ResponseEntity<DoctorPutResponse> update(@Valid @RequestBody DoctorPutRequest request, @PathVariable Long id) {
+    public ResponseEntity<DoctorBaseResponse> update(@Valid @RequestBody DoctorBaseRequest request, @PathVariable Long id) {
         log.debug("Request to update doctor with id {}", id);
 
         var response = service.update(request, id);

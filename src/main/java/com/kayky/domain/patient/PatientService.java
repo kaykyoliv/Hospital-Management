@@ -2,11 +2,8 @@ package com.kayky.domain.patient;
 
 import com.kayky.core.pagination.PageResponse;
 import com.kayky.core.pagination.PageUtils;
-import com.kayky.domain.patient.request.PatientPostRequest;
-import com.kayky.domain.patient.request.PatientPutRequest;
-import com.kayky.domain.patient.response.PatientGetResponse;
-import com.kayky.domain.patient.response.PatientPostResponse;
-import com.kayky.domain.patient.response.PatientPutResponse;
+import com.kayky.domain.patient.request.PatientBaseRequest;
+import com.kayky.domain.patient.response.PatientBaseResponse;
 import com.kayky.domain.user.UserValidator;
 import com.kayky.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +22,9 @@ public class PatientService {
     private final UserValidator userValidator;
 
     @Transactional(readOnly = true)
-    public PatientGetResponse findById(Long id) {
+    public PatientBaseResponse findById(Long id) {
         return patientRepository.findById(id)
-                .map(patientMapper::toPatientGetResponse)
+                .map(patientMapper::toPatientBaseResponse)
                 .orElseThrow(() -> {
                     log.warn("Patient not found with ID {}", id);
 
@@ -36,13 +33,13 @@ public class PatientService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<PatientGetResponse> findAll(Pageable pageable) {
+    public PageResponse<PatientBaseResponse> findAll(Pageable pageable) {
         var paginatedPatients = patientRepository.findAll(pageable);
-        return PageUtils.mapPage(paginatedPatients, patientMapper::toPatientGetResponse);
+        return PageUtils.mapPage(paginatedPatients, patientMapper::toPatientBaseResponse);
     }
 
     @Transactional
-    public PatientPostResponse save(PatientPostRequest postRequest) {
+    public PatientBaseResponse save(PatientBaseRequest postRequest) {
         userValidator.assertEmailDoesNotExist(postRequest.getEmail());
 
         var patientToSave = patientMapper.toEntity(postRequest);
@@ -50,11 +47,11 @@ public class PatientService {
 
         log.info("New patient saved with ID {}", patientSaved.getId());
 
-        return patientMapper.toPatientPostResponse(patientSaved);
+        return patientMapper.toPatientBaseResponse(patientSaved);
     }
 
     @Transactional
-    public PatientPutResponse update(PatientPutRequest putRequest, Long id) {
+    public PatientBaseResponse update(PatientBaseRequest putRequest, Long id) {
         var patientToUpdate = patientRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Cannot update: Patient not found with ID {}", id);
@@ -68,6 +65,6 @@ public class PatientService {
         var updatedPatient = patientRepository.save(patientToUpdate);
 
         log.info("Patient updated with ID {}", updatedPatient.getId());
-        return patientMapper.toPatientPutResponse(updatedPatient);
+        return patientMapper.toPatientBaseResponse(updatedPatient);
     }
 }

@@ -46,7 +46,7 @@ class PatientServiceTest {
     void findById_ShouldReturnPatientGetResponse_WhenPatientExists() {
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
 
-        var expectedResponse = PatientUtils.asGetResponse(savedPatient);
+        var expectedResponse = PatientUtils.asBaseResponse(savedPatient);
 
         when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedPatient));
 
@@ -75,7 +75,7 @@ class PatientServiceTest {
     @DisplayName("findAll: Should return PatientPageResponse when patients exist")
     void findAll_ShouldReturnPatientPageResponse_WhenPatientsExist() {
         PageRequest pageRequest = PageRequest.of(0, 3);
-        var patientList = PatientUtils.newPatientList();
+        var patientList = PatientUtils.PatientList();
         var pagedPatient = new PageImpl<>(patientList, pageRequest, patientList.size());
 
         when(repository.findAll(pageRequest)).thenReturn(pagedPatient);
@@ -87,7 +87,7 @@ class PatientServiceTest {
         assertThat(result.getCurrentPage()).isEqualTo(pagedPatient.getNumber());
 
         var expectedResponse = patientList.stream()
-                        .map(mapper::toPatientGetResponse).toList();
+                        .map(mapper::toPatientBaseResponse).toList();
 
         assertThat(result.getContent())
                 .usingRecursiveComparison()
@@ -99,10 +99,10 @@ class PatientServiceTest {
     @Test
     @DisplayName("save: Should return PostResponse when email is unique")
     void save_ShouldReturnPostResponse_WhenEmailIsUnique() {
-        var request = PatientUtils.asPostRequest();
+        var request = PatientUtils.asBaseRequest();
 
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
-        var expectedResponse = PatientUtils.asPostResponse(savedPatient);
+        var expectedResponse = PatientUtils.asBaseResponse(savedPatient);
 
         when(repository.save(any(Patient.class))).thenReturn(savedPatient);
 
@@ -117,7 +117,7 @@ class PatientServiceTest {
     @Test
     @DisplayName("save: Should throw EmailAlreadyExistsException when email is already in use")
     void save_ShouldThrowEmailAlreadyExistsException_WhenEmailAlreadyExists() {
-        var request = PatientUtils.asPostRequest();
+        var request = PatientUtils.asBaseRequest();
 
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
         var email = savedPatient.getEmail();
@@ -138,11 +138,11 @@ class PatientServiceTest {
     @Test
     @DisplayName("update: Should return PutResponse when update is valid")
     void update_ShouldReturnPutResponse_WhenUpdateIsValid() {
-        var putRequest = PatientUtils.asPutRequest();
+        var putRequest = PatientUtils.asBaseRequest();
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
         var updatedPatient = PatientUtils.updatedPatient();
 
-        var expectedResponse = PatientUtils.asPutResponse(updatedPatient);
+        var expectedResponse = PatientUtils.asBaseResponse(updatedPatient);
 
         when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedPatient));
         when(repository.save(any(Patient.class))).thenReturn(updatedPatient);
@@ -160,7 +160,7 @@ class PatientServiceTest {
     @Test
     @DisplayName("update: Should throw ResourceNotFoundException when patient does not exist")
     void update_ShouldThrowResourceNotFoundException_WhenPatientDoesNotExist() {
-        var request = PatientUtils.asPutRequest();
+        var request = PatientUtils.asBaseRequest();
 
         when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
@@ -176,7 +176,7 @@ class PatientServiceTest {
     void update_ShouldThrowEmailAlreadyExistsException_WhenEmailUsedByAnotherPatient() {
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
         var email = savedPatient.getEmail();
-        var request = PatientUtils.asPutRequest();
+        var request = PatientUtils.asBaseRequest();
 
         when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedPatient));
 
