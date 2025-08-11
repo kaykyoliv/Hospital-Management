@@ -1,5 +1,6 @@
 package com.kayky.domain.user;
 
+import com.kayky.enums.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -23,6 +24,9 @@ public abstract class User {
     @Column(unique = true, nullable = false)
     private String email;
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT true")
     private Boolean active = true;

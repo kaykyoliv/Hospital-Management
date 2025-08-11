@@ -27,9 +27,6 @@ public class Doctor extends Employee {
 
     private String officeNumber;
 
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
-
     @Column(columnDefinition = "BOOLEAN DEFAULT true")
     private Boolean availability = true;
 }

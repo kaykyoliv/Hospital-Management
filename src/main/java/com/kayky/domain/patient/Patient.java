@@ -19,8 +19,6 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class Patient extends User {
 
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
     private String address;
     private String bloodType;
 }

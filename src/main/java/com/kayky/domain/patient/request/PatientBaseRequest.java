@@ -18,10 +18,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class PatientBaseRequest extends UserBaseRequest {
 
-    @Schema(description = "Patient's gender", example = "MALE")
-    @NotNull(message = "Gender must be provided")
-    private Gender gender;
-
     @Schema(description = "Patient's full address", example = "123 Main Street, Apt 4B", maxLength = 200)
     @NotBlank(message = "Address must not be blank")
     @Size(max = 200, message = "Address must be at most 200 characters")

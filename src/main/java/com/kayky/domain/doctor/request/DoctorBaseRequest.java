@@ -30,16 +30,12 @@ public class DoctorBaseRequest extends EmployeeRequest {
 
     @Schema(description = "Phone number", example = "+5511987654321")
     @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^\\+55\\d{10,11}$", message = "Phone number must be valid")
+    @Pattern(regexp = "^\\+55\\s\\d{2}\\s\\d{8,9}$", message = "Phone number must be valid")
     private String phoneNumber;
 
     @Schema(description = "Office number", example = "101")
     @NotBlank(message = "Office number is required")
     private String officeNumber;
-
-    @Schema(description = "Gender of the doctor", example = "MALE")
-    @NotNull(message = "Gender is required")
-    private Gender gender;
 
     @Schema(description = "Availability status", example = "true")
     @NotNull(message = "Availability is required")

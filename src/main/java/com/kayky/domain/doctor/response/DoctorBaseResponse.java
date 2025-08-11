@@ -25,9 +25,6 @@ public class DoctorBaseResponse extends EmployeeResponse {
     @Schema(description = "Office number", example = "101")
     private String officeNumber;
 
-    @Schema(description = "Gender of the doctor", example = "MALE")
-    private Gender gender;
-
     @Schema(description = "Availability status", example = "true")
     private Boolean availability;
 }

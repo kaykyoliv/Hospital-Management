@@ -1,6 +1,8 @@
 package com.kayky.domain.user.response;
 
+import com.kayky.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -22,5 +24,8 @@ public abstract class UserBaseResponse {
 
     @Schema(description = "Email address of the user", example = "john.doe@example.com")
     private String email;
+
+    @Schema(description = "Patient's gender", example = "MALE")
+    private Gender gender;
 
 }
