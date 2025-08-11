@@ -1,6 +1,6 @@
 package com.kayky.domain.doctor;
 
-import com.kayky.domain.user.User;
+import com.kayky.domain.employee.Employee;
 import com.kayky.enums.Gender;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.*;
@@ -16,7 +16,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = true)
 @Tag(name = "Doctor", description = "Operations related to doctor management")
-public class Doctor extends User {
+public class Doctor extends Employee {
 
     private String specialty;
 

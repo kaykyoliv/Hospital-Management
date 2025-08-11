@@ -1,12 +1,13 @@
 package com.kayky.domain.doctor.request;
 
-import com.kayky.domain.user.request.UserBaseRequest;
+import com.kayky.domain.employee.request.EmployeeRequest;
 import com.kayky.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,7 +17,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-public class DoctorBaseRequest extends UserBaseRequest {
+public class DoctorBaseRequest extends EmployeeRequest {
 
     @Schema(description = "Doctor specialty", example = "Cardiology")
     @NotBlank(message = "Specialty is required")

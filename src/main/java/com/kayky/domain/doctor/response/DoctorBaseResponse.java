@@ -1,12 +1,9 @@
 package com.kayky.domain.doctor.response;
 
-import com.kayky.domain.user.response.UserBaseResponse;
+import com.kayky.domain.employee.response.EmployeeResponse;
 import com.kayky.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 @Getter
@@ -14,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class DoctorBaseResponse extends UserBaseResponse {
+public class DoctorBaseResponse extends EmployeeResponse {
 
     @Schema(description = "Doctor specialty", example = "Cardiology")
     private String specialty;
