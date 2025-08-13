@@ -4,5 +4,5 @@ public enum OperationStatus {
     SCHEDULED,
     IN_PROGRESS,
     COMPLETED,
-    CANCELLED
+    CANCELED
 }

@@ -23,7 +23,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("PatientServiceTest")
 class PatientServiceTest {
 
     private PatientService service;
@@ -42,8 +41,8 @@ class PatientServiceTest {
     }
 
     @Test
-    @DisplayName("findById: Should return PatientGetResponse when the patient exists")
-    void findById_ShouldReturnPatientGetResponse_WhenPatientExists() {
+    @DisplayName("findById: Should return PatientBaseResponse when the patient exists")
+    void findById_ShouldReturnPatientBaseResponse_WhenPatientExists() {
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
 
         var expectedResponse = PatientUtils.asBaseResponse(savedPatient);
@@ -72,8 +71,8 @@ class PatientServiceTest {
     }
 
     @Test
-    @DisplayName("findAll: Should return PatientPageResponse when patients exist")
-    void findAll_ShouldReturnPatientPageResponse_WhenPatientsExist() {
+    @DisplayName("findAll: Should return PageResponse when patients exist")
+    void findAll_ShouldReturnPageResponse_WhenPatientsExist() {
         PageRequest pageRequest = PageRequest.of(0, 3);
         var patientList = PatientUtils.PatientList();
         var pagedPatient = new PageImpl<>(patientList, pageRequest, patientList.size());
@@ -97,8 +96,8 @@ class PatientServiceTest {
     }
 
     @Test
-    @DisplayName("save: Should return PostResponse when email is unique")
-    void save_ShouldReturnPostResponse_WhenEmailIsUnique() {
+    @DisplayName("save: Should return PatientBaseResponse when email is unique")
+    void save_ShouldReturnPatientBaseResponse_WhenEmailIsUnique() {
         var request = PatientUtils.asBaseRequest();
 
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
@@ -136,8 +135,8 @@ class PatientServiceTest {
     }
 
     @Test
-    @DisplayName("update: Should return PutResponse when update is valid")
-    void update_ShouldReturnPutResponse_WhenUpdateIsValid() {
+    @DisplayName("update: Should return PatientBaseResponse when update is valid")
+    void update_ShouldReturnPatientBaseResponse_WhenUpdateIsValid() {
         var putRequest = PatientUtils.asBaseRequest();
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
         var updatedPatient = PatientUtils.updatedPatient();
