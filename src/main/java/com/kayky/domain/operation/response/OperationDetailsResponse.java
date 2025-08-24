@@ -1,10 +1,7 @@
 package com.kayky.domain.operation.response;
 
 import com.kayky.domain.operation.OperationStatus;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -13,6 +10,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class OperationDetailsResponse {
 
     private Long id;

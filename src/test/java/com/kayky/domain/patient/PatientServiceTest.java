@@ -74,7 +74,7 @@ class PatientServiceTest {
     @DisplayName("findAll: Should return PageResponse when patients exist")
     void findAll_ShouldReturnPageResponse_WhenPatientsExist() {
         PageRequest pageRequest = PageRequest.of(0, 3);
-        var patientList = PatientUtils.PatientList();
+        var patientList = PatientUtils.patientList();
         var pagedPatient = new PageImpl<>(patientList, pageRequest, patientList.size());
 
         when(repository.findAll(pageRequest)).thenReturn(pagedPatient);

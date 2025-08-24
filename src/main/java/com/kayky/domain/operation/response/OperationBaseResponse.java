@@ -4,10 +4,7 @@ import com.kayky.domain.doctor.response.DoctorBaseResponse;
 import com.kayky.domain.operation.OperationStatus;
 import com.kayky.domain.patient.request.PatientBaseRequest;
 import com.kayky.domain.patient.response.PatientBaseResponse;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class OperationBaseResponse {
 
     private Long id;

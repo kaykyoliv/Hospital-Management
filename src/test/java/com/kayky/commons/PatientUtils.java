@@ -25,7 +25,7 @@ public final class PatientUtils {
                 .build();
     }
 
-    public static List<Patient> PatientList() {
+    public static List<Patient> patientList() {
         var patient1 = Patient.builder()
                 .id(1L)
                 .firstName("John")
@@ -85,8 +85,8 @@ public final class PatientUtils {
     }
 
 
-    public static List<PatientBaseResponse> PatientBaseResponseList() {
-        return PatientList().stream()
+    public static List<PatientBaseResponse> patientBaseResponseList() {
+        return patientList().stream()
                 .map(PatientUtils::asBaseResponse)
                 .toList();
     }

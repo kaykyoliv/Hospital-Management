@@ -9,6 +9,7 @@ public final class TestConstants {
     public static final String PATIENT_NOT_FOUND = "Patient not found";
     public static final String DOCTOR_NOT_FOUND = "Doctor not found";
     public static final String USER_NOT_FOUND = "User not found";
+    public static final String OPERATION_NOT_FOUND = "Operation not found";
     public static final String EMAIL_ALREADY_EXIST = "Email %s already in use";
 
     public static final Long EXISTING_ID = 1L;

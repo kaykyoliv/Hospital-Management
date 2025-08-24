@@ -78,7 +78,7 @@ class PatientControllerTest {
     @DisplayName("GET /v1/patient - Should return page with patients")
     void findAll_ShouldReturnPatientPageResponse_WhenPatientsExist() throws Exception {
         PageRequest pageRequest = PageRequest.of(0, 3);
-        var patientList = PatientUtils.PatientBaseResponseList();
+        var patientList = PatientUtils.patientBaseResponseList();
         var pagedPatient = new PageImpl<>(patientList, pageRequest, patientList.size());
         var pageResponse = PageUtils.pageResponse(pagedPatient);
 
