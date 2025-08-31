@@ -144,10 +144,6 @@ class OperationServiceTest {
         verify(userValidator).assertIfUserExist(nonExistingId, nonExistingType);
     }
 
-    private static Stream<String> provideNonExistingTypes() {
-        return Stream.of("Doctor", "Patient");
-    }
-
     @Test
     @DisplayName("update: Should return OperationBaseResponse when update is valid")
     void update_ShouldReturnOperationBaseResponse_WhenUpdateIsValid() {
@@ -174,6 +170,42 @@ class OperationServiceTest {
         verify(userValidator).getDoctorIfExists(EXISTING_ID);
         verify(repository).save(any(Operation.class));
     }
+
+    @ParameterizedTest(name = "update: should throw ResourceNotFoundException when {0} does not exist")
+    @MethodSource("provideNonExistingTypes")
+    void update_ShouldThrowResourceNotFoundException_WhenNonExistingUser(String nonExistingType) {
+        var request = OperationUtils.asBaseRequest();
+        var savedOperation = OperationUtils.savedOperation();
+
+        when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedOperation));
+
+        if (nonExistingType.equals("Doctor")) {
+            when(userValidator.getDoctorIfExists(request.getDoctor().getId()))
+                    .thenThrow(new ResourceNotFoundException(
+                            "Doctor with id %d not found".formatted(request.getDoctor().getId())));
+        } else {
+            when(userValidator.getPatientIfExists(request.getPatient().getId()))
+                    .thenThrow(new ResourceNotFoundException(
+                            "Patient with id %d not found".formatted(request.getPatient().getId())));
+        }
+
+        assertThatThrownBy(() -> service.update(request, EXISTING_ID))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining(nonExistingType);
+
+        if (nonExistingType.equals("Doctor")) {
+            verify(userValidator).getDoctorIfExists(request.getDoctor().getId());
+        } else {
+            verify(userValidator).getPatientIfExists(request.getPatient().getId());
+        }
+
+        verify(repository).findById(EXISTING_ID);
+    }
+
+    private static Stream<String> provideNonExistingTypes() {
+        return Stream.of("Doctor", "Patient");
+    }
+
 
 
 }
