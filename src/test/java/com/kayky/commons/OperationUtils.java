@@ -4,8 +4,10 @@ import com.kayky.domain.operation.Operation;
 import com.kayky.domain.operation.Operation.OperationBuilder;
 import com.kayky.domain.operation.OperationProjection;
 import com.kayky.domain.operation.OperationStatus;
+import com.kayky.domain.operation.request.OperationBaseRequest;
 import com.kayky.domain.operation.response.OperationBaseResponse;
 import com.kayky.domain.operation.response.OperationDetailsResponse;
+import com.kayky.domain.patient.Patient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -110,6 +112,16 @@ public class OperationUtils {
                 .build();
     }
 
+    public static OperationBaseRequest asBaseRequest() {
+        return OperationBaseRequest.builder()
+                .description("Cirurgia cardíaca de alta complexidade")
+                .scheduledAt(LocalDateTime.of(2025, 9, 10, 14, 30))
+                .doctor(DoctorUtils.asBaseResponse(DoctorUtils.savedDoctor(1L)))
+                .patient(PatientUtils.asBaseResponse(PatientUtils.savedPatient(1L)))
+                .status(OperationStatus.SCHEDULED)
+                .build();
+    }
+
     // ========== PROJECTIONS ==========
 
     private static OperationProjection createOperationProjection(Long id, String description, LocalDateTime scheduledAt, String doctorFirstName, String patientFirstName, OperationStatus status) {
@@ -156,6 +168,7 @@ public class OperationUtils {
         List<OperationProjection> projections = operationProjectionList();
         return new PageImpl<>(projections, PageRequest.of(0, 10), projections.size());
     }
+
 
     // ========== UTILITY METHODS ==========
 

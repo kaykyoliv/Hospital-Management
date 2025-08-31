@@ -21,8 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class OperationService {
 
     private final OperationRepository repository;
-    private final PatientRepository patientRepository;
-    private final DoctorRepository doctorRepository;
     private final UserValidator userValidator;
 
     private final OperationMapper mapper;
@@ -66,13 +64,8 @@ public class OperationService {
                             return new ResourceNotFoundException("Operation not found");
                         });
 
-        userValidator.assertIfUserExist(request.getPatient().getId(), "Patient");
-        userValidator.assertIfUserExist(request.getDoctor().getId(), "Doctor");
-
-        var patient = patientRepository.findById(request.getPatient().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
-        var doctor = doctorRepository.findById(request.getDoctor().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
+        var patient = userValidator.getPatientIfExists(request.getPatient().getId());
+        var doctor = userValidator.getDoctorIfExists(request.getDoctor().getId());
 
         mapper.updateOperationFromRequest(request, operationToUpdate);
 
