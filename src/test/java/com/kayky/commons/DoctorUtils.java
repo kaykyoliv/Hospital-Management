@@ -63,6 +63,7 @@ public final class DoctorUtils {
 
     public static List<Doctor> doctorList() {
         Doctor doctor1 = Doctor.builder()
+                .id(1L)
                 .firstName("Robert")
                 .lastName("Williams")
                 .email("robert.williams@example.com")
@@ -77,6 +78,7 @@ public final class DoctorUtils {
                 .build();
 
         Doctor doctor2 = Doctor.builder()
+                .id(2L)
                 .firstName("Emily")
                 .lastName("Johnson")
                 .email("emily.johnson@example.com")
@@ -91,6 +93,7 @@ public final class DoctorUtils {
                 .build();
 
         Doctor doctor3 = Doctor.builder()
+                .id(3L)
                 .firstName("Michael")
                 .lastName("Brown")
                 .email("michael.brown@example.com")
@@ -107,7 +110,7 @@ public final class DoctorUtils {
         return Arrays.asList(doctor1, doctor2, doctor3);
     }
 
-    public List<DoctorBaseResponse> asBaseResponseList(){
+    public static List<DoctorBaseResponse> asBaseResponseList(){
        return  doctorList().stream()
                .map(DoctorUtils::asBaseResponse)
                .toList();

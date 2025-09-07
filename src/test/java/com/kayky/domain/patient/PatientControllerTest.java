@@ -29,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PatientControllerTest {
 
     private static final String BASE_URI = "/v1/patient";
+    private static final String PATH_ID = BASE_URI + "/{id}";
 
     @Autowired
     private MockMvc mockMvc;
@@ -46,7 +47,7 @@ class PatientControllerTest {
 
         var expectedJsonResponse = FileUtils.readResourceFile("patient/get/patient-by-id-200.json");
 
-        mockMvc.perform(get(BASE_URI + "/{id}", response.getId())
+        mockMvc.perform(get(PATH_ID, response.getId())
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -65,7 +66,7 @@ class PatientControllerTest {
         BDDMockito.when(service.findById(NON_EXISTING_ID))
                 .thenThrow(new ResourceNotFoundException(expectedErrorMessage));
 
-        mockMvc.perform(get(BASE_URI + "/{id}", NON_EXISTING_ID))
+        mockMvc.perform(get(PATH_ID, NON_EXISTING_ID))
                 .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage))
@@ -77,10 +78,9 @@ class PatientControllerTest {
     @Test
     @DisplayName("GET /v1/patient - Should return page with patients")
     void findAll_ShouldReturnPatientPageResponse_WhenPatientsExist() throws Exception {
-        PageRequest pageRequest = PageRequest.of(0, 3);
         var patientList = PatientUtils.patientBaseResponseList();
-        var pagedPatient = new PageImpl<>(patientList, pageRequest, patientList.size());
-        var pageResponse = PageUtils.pageResponse(pagedPatient);
+        var patientPage = PageUtils.toPage(patientList);
+        var pageResponse = PageUtils.pageResponse(patientPage);
 
         var expectedJsonResponse =  FileUtils.readResourceFile("patient/get/all-paged-patients-200.json");
 
@@ -155,7 +155,7 @@ class PatientControllerTest {
 
         BDDMockito.when(service.update(any(PatientBaseRequest.class), eq(EXISTING_ID))).thenReturn(expectedResponse);
 
-        mockMvc.perform(put(BASE_URI + "/{id}", EXISTING_ID)
+        mockMvc.perform(put(PATH_ID, EXISTING_ID)
                     .accept(MediaType.APPLICATION_JSON)
                     .content(request)
                     .contentType(MediaType.APPLICATION_JSON))
@@ -179,7 +179,7 @@ class PatientControllerTest {
         BDDMockito.when(service.update(any(PatientBaseRequest.class), eq(NON_EXISTING_ID)))
                 .thenThrow(new ResourceNotFoundException(expectedErrorMessage));
 
-        mockMvc.perform(put(BASE_URI + "/{id}", NON_EXISTING_ID)
+        mockMvc.perform(put(PATH_ID, NON_EXISTING_ID)
                     .accept(MediaType.APPLICATION_JSON)
                     .content(request)
                     .contentType(MediaType.APPLICATION_JSON))
@@ -204,7 +204,7 @@ class PatientControllerTest {
         BDDMockito.when(service.update(any(PatientBaseRequest.class), eq(EXISTING_ID)))
                 .thenThrow(new EmailAlreadyExistsException(expectedErrorMessage));
 
-        mockMvc.perform(put(BASE_URI + "/{id}", EXISTING_ID)
+        mockMvc.perform(put(PATH_ID, EXISTING_ID)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(request)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -215,8 +215,4 @@ class PatientControllerTest {
 
         BDDMockito.verify(service).update(any(PatientBaseRequest.class), eq(EXISTING_ID));
     }
-
-
-
-
-    }
+}

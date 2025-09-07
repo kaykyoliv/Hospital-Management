@@ -1,7 +1,12 @@
 package com.kayky.commons;
 
 import com.kayky.core.pagination.PageResponse;
+import com.kayky.domain.operation.OperationProjection;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+
+import java.util.List;
 
 public class PageUtils {
 
@@ -15,5 +20,9 @@ public class PageUtils {
                 .totalElements(page.getTotalElements())
                 .totalPages(page.getTotalPages())
                 .build();
+    }
+
+    public static <T> Page<T> toPage(List<T> list) {
+        return new PageImpl<>(list, PageRequest.of(0, 10), list.size());
     }
 }

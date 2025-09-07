@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 @SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(of = "id")
 public class Operation {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
