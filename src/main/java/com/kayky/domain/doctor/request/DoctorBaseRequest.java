@@ -28,9 +28,9 @@ public class DoctorBaseRequest extends EmployeeRequest {
     @Size(max = 20, message = "CRM must be at most 20 characters")
     private String crm;
 
-    @Schema(description = "Phone number", example = "+5511987654321")
+    @Schema(description = "Phone number", example = "+55 11 98765-4321")
     @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^\\+55\\s\\d{2}\\s\\d{8,9}$", message = "Phone number must be valid")
+    @Pattern(regexp = "^\\+55\\s\\d{2}\\s\\d{4,5}-\\d{4}$", message = "Phone number must be valid")
     private String phoneNumber;
 
     @Schema(description = "Office number", example = "101")
