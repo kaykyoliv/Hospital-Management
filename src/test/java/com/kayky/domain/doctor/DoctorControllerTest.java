@@ -195,7 +195,7 @@ class DoctorControllerTest {
         BDDMockito.verify(service).update(any(DoctorBaseRequest.class), eq(NON_EXISTING_ID));
     }
 
-    @Test
+    @Test 
     @DisplayName("PUT /v1/doctor/{id}  - Should return 400 when email already exists")
     void update_ShouldThrowEmailAlreadyExistsException_WhenEmailAlreadyExists() throws Exception {
 

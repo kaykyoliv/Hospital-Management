@@ -1,0 +1,27 @@
+{
+  "id": 1,
+  "description": "updated",
+  "scheduledAt": "2025-09-10T14:30:00",
+  "doctor": {
+    "id": 1,
+    "firstName": "Robert updated",
+    "lastName": "Williams updated",
+    "email": "robert.williams@example.com",
+    "gender": "MALE",
+    "specialty": "Cardiology",
+    "crm": "CRM-12345",
+    "phoneNumber": "+55 19 99999-0001",
+    "officeNumber": "Room 101",
+    "availability": true
+  },
+  "patient": {
+    "id": 1,
+    "firstName": "Robert",
+    "lastName": "Williams",
+    "email": "robert.williams@example.com",
+    "gender": "MALE",
+    "address": "101 Oak Lane, Newtown",
+    "bloodType": "AB-"
+  },
+  "status": "SCHEDULED"
+}

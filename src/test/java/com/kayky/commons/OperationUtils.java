@@ -44,6 +44,14 @@ public class OperationUtils {
         return createOperationBuilder(EXISTING_ID).build();
     }
 
+    public static Operation updatedOperation() {
+        return createOperationBuilder(EXISTING_ID)
+                .description("updated")
+                .doctor(DoctorUtils.updatedDoctor())
+                .build();
+    }
+
+
 
     public static List<Operation> operationList() {
         return List.of(
