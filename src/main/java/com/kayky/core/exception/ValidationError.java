@@ -1,4 +1,4 @@
-package com.kayky.exception;
+package com.kayky.core.exception;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

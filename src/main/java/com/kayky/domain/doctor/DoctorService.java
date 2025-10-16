@@ -5,7 +5,7 @@ import com.kayky.core.pagination.PageUtils;
 import com.kayky.domain.doctor.request.DoctorBaseRequest;
 import com.kayky.domain.doctor.response.DoctorBaseResponse;
 import com.kayky.domain.user.UserValidator;
-import com.kayky.exception.ResourceNotFoundException;
+import com.kayky.core.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;

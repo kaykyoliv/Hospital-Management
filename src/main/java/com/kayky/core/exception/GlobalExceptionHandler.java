@@ -1,4 +1,4 @@
-package com.kayky.exception;
+package com.kayky.core.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.servlet.http.HttpServletRequest;

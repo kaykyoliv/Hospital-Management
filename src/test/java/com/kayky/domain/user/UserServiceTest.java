@@ -1,7 +1,7 @@
 package com.kayky.domain.user;
 
 import com.kayky.commons.PatientUtils;
-import com.kayky.exception.ResourceNotFoundException;
+import com.kayky.core.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

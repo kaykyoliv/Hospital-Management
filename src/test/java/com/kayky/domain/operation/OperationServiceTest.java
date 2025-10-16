@@ -4,7 +4,7 @@ import com.kayky.commons.DoctorUtils;
 import com.kayky.commons.OperationUtils;
 import com.kayky.commons.PatientUtils;
 import com.kayky.domain.user.UserValidator;
-import com.kayky.exception.ResourceNotFoundException;
+import com.kayky.core.exception.ResourceNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -2,8 +2,8 @@ package com.kayky.domain.doctor;
 
 import com.kayky.commons.DoctorUtils;
 import com.kayky.domain.user.UserValidator;
-import com.kayky.exception.EmailAlreadyExistsException;
-import com.kayky.exception.ResourceNotFoundException;
+import com.kayky.core.exception.EmailAlreadyExistsException;
+import com.kayky.core.exception.ResourceNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

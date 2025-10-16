@@ -4,7 +4,7 @@ import com.kayky.commons.FileUtils;
 import com.kayky.commons.OperationUtils;
 import com.kayky.commons.PageUtils;
 import com.kayky.domain.operation.request.OperationBaseRequest;
-import com.kayky.exception.ResourceNotFoundException;
+import com.kayky.core.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

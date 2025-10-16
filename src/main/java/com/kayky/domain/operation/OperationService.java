@@ -2,13 +2,11 @@ package com.kayky.domain.operation;
 
 import com.kayky.core.pagination.PageResponse;
 import com.kayky.core.pagination.PageUtils;
-import com.kayky.domain.doctor.DoctorRepository;
 import com.kayky.domain.operation.request.OperationBaseRequest;
 import com.kayky.domain.operation.response.OperationBaseResponse;
 import com.kayky.domain.operation.response.OperationDetailsResponse;
-import com.kayky.domain.patient.PatientRepository;
 import com.kayky.domain.user.UserValidator;
-import com.kayky.exception.ResourceNotFoundException;
+import com.kayky.core.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
