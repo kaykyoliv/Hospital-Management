@@ -7,7 +7,6 @@ import com.kayky.domain.operation.OperationStatus;
 import com.kayky.domain.operation.request.OperationBaseRequest;
 import com.kayky.domain.operation.response.OperationBaseResponse;
 import com.kayky.domain.operation.response.OperationDetailsResponse;
-import com.kayky.domain.patient.Patient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
