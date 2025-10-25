@@ -1,8 +1,6 @@
 package com.kayky.domain.report;
 
 import com.kayky.core.pagination.PageResponse;
-import com.kayky.domain.patient.request.PatientBaseRequest;
-import com.kayky.domain.patient.response.PatientBaseResponse;
 import com.kayky.domain.report.request.ReportBaseRequest;
 import com.kayky.domain.report.response.ReportBaseResponse;
 import jakarta.validation.Valid;
@@ -49,5 +47,14 @@ public class ReportController {
                 .buildAndExpand(response.id()).toUri();
 
         return ResponseEntity.created(uri).body(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ReportBaseResponse> update(@Valid @RequestBody ReportBaseRequest request, @PathVariable Long id) {
+        log.debug("Request to update a report");
+
+        var response = service.update(request, id);
+
+        return ResponseEntity.ok(response);
     }
 }

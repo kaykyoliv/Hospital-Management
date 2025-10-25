@@ -4,8 +4,11 @@ import com.kayky.core.exception.ReportAlreadyExistsException;
 import com.kayky.core.exception.ResourceNotFoundException;
 import com.kayky.core.pagination.PageResponse;
 import com.kayky.core.pagination.PageUtils;
+import com.kayky.domain.doctor.Doctor;
 import com.kayky.domain.doctor.DoctorRepository;
+import com.kayky.domain.operation.Operation;
 import com.kayky.domain.operation.OperationRepository;
+import com.kayky.domain.patient.Patient;
 import com.kayky.domain.patient.PatientRepository;
 import com.kayky.domain.report.request.ReportBaseRequest;
 import com.kayky.domain.report.response.ReportBaseResponse;
@@ -45,7 +48,46 @@ public class ReportService {
 
 
     @Transactional
-    public ReportBaseResponse save(ReportBaseRequest request) {
+    public ReportBaseResponse save(ReportBaseRequest postRequest) {
+        var request = validateReportRequest(postRequest);
+
+        if (reportRepository.existsByOperationId(request.operation.getId())) {
+            throw new ReportAlreadyExistsException(request.operation.getId());
+        }
+
+        var reportToSave = reportMapper.toEntity(postRequest, request.patient(), request.doctor(), request.operation());
+        var savedReport = reportRepository.save(reportToSave);
+
+        return reportMapper.toReportBaseResponse(savedReport);
+    }
+
+    @Transactional
+    public ReportBaseResponse update(ReportBaseRequest putRequest, Long id) {
+
+        var reportToUpdate = reportRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Report not found"));
+
+        var request = validateReportRequest(putRequest);
+
+        if (reportRepository.existsByOperationId(request.operation.getId())
+                && !reportToUpdate.getOperation().getId().equals(request.operation.getId())) {
+            throw new ReportAlreadyExistsException(request.operation.getId());
+        }
+
+        reportMapper.updateReportFromRequest(putRequest,
+                request.patient(),
+                request.doctor(),
+                request.operation(),
+                reportToUpdate
+        );
+
+        var updatedReport = reportRepository.save(reportToUpdate);
+
+        return reportMapper.toReportBaseResponse(updatedReport);
+
+    }
+
+    private ValidationResult validateReportRequest(ReportBaseRequest request) {
         var patient = patientRepository.findById(request.patientId())
                 .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
 
@@ -55,10 +97,6 @@ public class ReportService {
         var operation = operationRepository.findById(request.operationId())
                 .orElseThrow(() -> new ResourceNotFoundException("Operation not found"));
 
-        if (reportRepository.existsByOperationId(operation.getId())) {
-            throw new ReportAlreadyExistsException(operation.getId());
-        }
-
         if (!operation.getPatient().getId().equals(patient.getId())) {
             throw new IllegalArgumentException("Operation patient does not match request patient");
         }
@@ -67,9 +105,10 @@ public class ReportService {
             throw new IllegalArgumentException("Operation doctor does not match request doctor");
         }
 
-        var reportToSave = reportMapper.toEntity(request, patient, doctor, operation);
-        var savedReport = reportRepository.save(reportToSave);
-
-        return reportMapper.toReportBaseResponse(savedReport);
+        return new ValidationResult(patient, doctor, operation);
     }
+
+    private record ValidationResult(Patient patient, Doctor doctor, Operation operation) {
+    }
+
 }

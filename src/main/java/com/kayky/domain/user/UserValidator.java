@@ -37,21 +37,33 @@ public class UserValidator {
     }
 
     public Patient getPatientIfExists(Long id) {
-        return repository.findById(id)
-                .map(Patient.class::cast)
+        var user = repository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Patient with id {} not found", id);
                     return new ResourceNotFoundException("Patient with id %d not found".formatted(id));
                 });
+
+        if (!(user instanceof Patient patient)) {
+            log.warn("User with id {} is not a Patient", id);
+            throw new IllegalArgumentException("ID %d does not belong to a Patient".formatted(id));
+        }
+
+        return patient;
     }
 
     public Doctor getDoctorIfExists(Long id) {
-        return repository.findById(id)
-                .map(Doctor.class::cast)
+        var user = repository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Doctor with id {} not found", id);
                     return new ResourceNotFoundException("Doctor with id %d not found".formatted(id));
                 });
+
+        if (!(user instanceof Doctor doctor)) {
+            log.warn("User with id {} is not a Doctor", id);
+            throw new IllegalArgumentException("ID %d does not belong to a Doctor".formatted(id));
+        }
+
+        return doctor;
     }
 
 }

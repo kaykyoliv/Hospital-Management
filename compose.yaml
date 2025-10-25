@@ -3,6 +3,7 @@ services:
     image: mysql:8.0
     container_name: hospital-db
     environment:
+      MYSQL_ROOT_PASSWORD: ${ENV_MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${ENV_MYSQL_USER}
       MYSQL_PASSWORD: ${ENV_MYSQL_PASSWORD}
       MYSQL_DATABASE: hospital_db

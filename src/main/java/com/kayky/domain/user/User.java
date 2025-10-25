@@ -28,6 +28,7 @@ public abstract class User {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @Builder.Default
     @Column(columnDefinition = "BOOLEAN DEFAULT true")
     private Boolean active = true;
 }

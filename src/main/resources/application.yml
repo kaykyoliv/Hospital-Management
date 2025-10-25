@@ -2,7 +2,7 @@ spring:
   application:
     name: hospital-management
   datasource:
-    url: jdbc:mysql://mysql:3306/hospital_db?useTimezone=true&serverTimezone=UTC&createDatabaseIfNotExist=true
+    url: jdbc:mysql://mysql:3307/hospital_db?useTimezone=true&serverTimezone=UTC&createDatabaseIfNotExist=true
     username: ${ENV_MYSQL_USER}
     password: ${ENV_MYSQL_PASSWORD}
 
