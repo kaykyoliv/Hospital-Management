@@ -1,5 +1,6 @@
 package com.kayky.domain.report;
 
+import com.kayky.core.exception.OperationMismatchException;
 import com.kayky.core.exception.ReportAlreadyExistsException;
 import com.kayky.core.exception.ResourceNotFoundException;
 import com.kayky.core.pagination.PageResponse;
@@ -109,11 +110,11 @@ public class ReportService {
                 .orElseThrow(() -> new ResourceNotFoundException("Operation not found"));
 
         if (!operation.getPatient().getId().equals(patient.getId())) {
-            throw new IllegalArgumentException("Operation patient does not match request patient");
+            throw new OperationMismatchException("Operation patient does not match request patient");
         }
 
         if (doctor != null && !operation.getDoctor().getId().equals(doctor.getId())) {
-            throw new IllegalArgumentException("Operation doctor does not match request doctor");
+            throw new OperationMismatchException("Operation doctor does not match request doctor");
         }
 
         return new ValidationResult(patient, doctor, operation);

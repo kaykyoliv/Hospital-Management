@@ -32,6 +32,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(buildError(status, e.getMessage(), request));
     }
 
+    @ExceptionHandler(OperationMismatchException.class)
+    public ResponseEntity<ApiError> handleOperationMismatch(OperationMismatchException e, HttpServletRequest request) {
+        var status = HttpStatus.BAD_REQUEST;
+
+        return ResponseEntity.status(status).body(buildError(status, e.getMessage(), request));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationError> handleMethodArgumentNotValid(MethodArgumentNotValidException e, HttpServletRequest request){
         var status = HttpStatus.UNPROCESSABLE_ENTITY;
