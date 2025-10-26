@@ -84,7 +84,18 @@ public class ReportService {
         var updatedReport = reportRepository.save(reportToUpdate);
 
         return reportMapper.toReportBaseResponse(updatedReport);
+    }
 
+    @Transactional
+    public void delete(Long id){
+        assertIfOperationExist(id);
+        reportRepository.deleteById(id);
+    }
+
+    private void assertIfOperationExist(Long id){
+        if(!reportRepository.existsById(id)){
+            throw new ResourceNotFoundException("Report not found");
+        }
     }
 
     private ValidationResult validateReportRequest(ReportBaseRequest request) {

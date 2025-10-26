@@ -57,4 +57,13 @@ public class ReportController {
 
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id){
+        log.debug("Request to delete a report");
+
+        service.delete(id);
+
+        return ResponseEntity.noContent().build();
+    }
 }
