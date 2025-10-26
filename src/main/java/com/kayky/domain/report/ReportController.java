@@ -1,8 +1,6 @@
 package com.kayky.domain.report;
 
 import com.kayky.core.exception.ApiError;
-import com.kayky.core.exception.EmailAlreadyExistsException;
-import com.kayky.core.exception.OperationMismatchException;
 import com.kayky.core.exception.ValidationError;
 import com.kayky.core.pagination.PageResponse;
 import com.kayky.domain.report.request.ReportBaseRequest;

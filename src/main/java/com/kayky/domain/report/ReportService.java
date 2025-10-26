@@ -13,6 +13,7 @@ import com.kayky.domain.patient.Patient;
 import com.kayky.domain.patient.PatientRepository;
 import com.kayky.domain.report.request.ReportBaseRequest;
 import com.kayky.domain.report.response.ReportBaseResponse;
+import com.kayky.domain.report.validator.ReportValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -25,9 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReportService {
 
     private final ReportRepository reportRepository;
-    private final PatientRepository patientRepository;
-    private final DoctorRepository doctorRepository;
-    private final OperationRepository operationRepository;
+    private final ReportValidator reportValidator;
     private final ReportMapper reportMapper;
 
     @Transactional(readOnly = true)
@@ -50,13 +49,13 @@ public class ReportService {
 
     @Transactional
     public ReportBaseResponse save(ReportBaseRequest postRequest) {
-        var request = validateReportRequest(postRequest);
+        var validation = reportValidator.validate(postRequest);
 
-        if (reportRepository.existsByOperationId(request.operation.getId())) {
-            throw new ReportAlreadyExistsException(request.operation.getId());
+        if (reportRepository.existsByOperationId(validation.operation().getId())) {
+            throw new ReportAlreadyExistsException(validation.operation().getId());
         }
 
-        var reportToSave = reportMapper.toEntity(postRequest, request.patient(), request.doctor(), request.operation());
+        var reportToSave = reportMapper.toEntity(postRequest, validation.patient(), validation.doctor(), validation.operation());
         var savedReport = reportRepository.save(reportToSave);
 
         return reportMapper.toReportBaseResponse(savedReport);
@@ -68,17 +67,17 @@ public class ReportService {
         var reportToUpdate = reportRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Report not found"));
 
-        var request = validateReportRequest(putRequest);
+        var validation = reportValidator.validate(putRequest);
 
-        if (reportRepository.existsByOperationId(request.operation.getId())
-                && !reportToUpdate.getOperation().getId().equals(request.operation.getId())) {
-            throw new ReportAlreadyExistsException(request.operation.getId());
+        if (reportRepository.existsByOperationId(validation.operation().getId())
+                && !reportToUpdate.getOperation().getId().equals(validation.operation().getId())) {
+            throw new ReportAlreadyExistsException(validation.operation().getId());
         }
 
         reportMapper.updateReportFromRequest(putRequest,
-                request.patient(),
-                request.doctor(),
-                request.operation(),
+                validation.patient(),
+                validation.doctor(),
+                validation.operation(),
                 reportToUpdate
         );
 
@@ -98,29 +97,4 @@ public class ReportService {
             throw new ResourceNotFoundException("Report not found");
         }
     }
-
-    private ValidationResult validateReportRequest(ReportBaseRequest request) {
-        var patient = patientRepository.findById(request.patientId())
-                .orElseThrow(() -> new ResourceNotFoundException("Patient not found"));
-
-        var doctor = doctorRepository.findById(request.doctorId())
-                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found"));
-
-        var operation = operationRepository.findById(request.operationId())
-                .orElseThrow(() -> new ResourceNotFoundException("Operation not found"));
-
-        if (!operation.getPatient().getId().equals(patient.getId())) {
-            throw new OperationMismatchException("Operation patient does not match request patient");
-        }
-
-        if (doctor != null && !operation.getDoctor().getId().equals(doctor.getId())) {
-            throw new OperationMismatchException("Operation doctor does not match request doctor");
-        }
-
-        return new ValidationResult(patient, doctor, operation);
-    }
-
-    private record ValidationResult(Patient patient, Doctor doctor, Operation operation) {
-    }
-
 }
