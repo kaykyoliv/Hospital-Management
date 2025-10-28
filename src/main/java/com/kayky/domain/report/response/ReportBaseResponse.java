@@ -1,10 +1,12 @@
 package com.kayky.domain.report.response;
 
 import com.kayky.domain.report.ReportStatus;
+import lombok.Builder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Builder
 public record ReportBaseResponse(
         Long id,
         String title,

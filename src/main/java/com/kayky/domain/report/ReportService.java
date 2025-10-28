@@ -1,16 +1,9 @@
 package com.kayky.domain.report;
 
-import com.kayky.core.exception.OperationMismatchException;
 import com.kayky.core.exception.ReportAlreadyExistsException;
 import com.kayky.core.exception.ResourceNotFoundException;
 import com.kayky.core.pagination.PageResponse;
 import com.kayky.core.pagination.PageUtils;
-import com.kayky.domain.doctor.Doctor;
-import com.kayky.domain.doctor.DoctorRepository;
-import com.kayky.domain.operation.Operation;
-import com.kayky.domain.operation.OperationRepository;
-import com.kayky.domain.patient.Patient;
-import com.kayky.domain.patient.PatientRepository;
 import com.kayky.domain.report.request.ReportBaseRequest;
 import com.kayky.domain.report.response.ReportBaseResponse;
 import com.kayky.domain.report.validator.ReportValidator;
