@@ -1,6 +1,7 @@
 package com.kayky.domain.report;
 
 import com.kayky.commons.ReportUtils;
+import com.kayky.core.exception.ResourceNotFoundException;
 import com.kayky.domain.doctor.DoctorMapper;
 import com.kayky.domain.operation.OperationMapper;
 import com.kayky.domain.patient.PatientMapper;
@@ -17,8 +18,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static com.kayky.commons.TestConstants.EXISTING_ID;
+import static com.kayky.commons.TestConstants.*;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ReportServiceTest {
@@ -44,9 +46,9 @@ class ReportServiceTest {
     void findById_ShouldReturnReportBaseRequest_WhenReportExists(){
         var savedReport = ReportUtils.savedReport();
 
-        BDDMockito.when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedReport));
+        when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedReport));
 
-        BDDMockito.when(mapper.toReportBaseResponse(savedReport))
+        when(mapper.toReportBaseResponse(savedReport))
                 .thenReturn(ReportUtils.asBaseResponse(savedReport));
 
 
@@ -60,5 +62,19 @@ class ReportServiceTest {
 
         verify(repository).findById(EXISTING_ID);
     }
+
+    @Test
+    @DisplayName("findById: Should throw ResourceNotFoundException when the Report does not exist")
+    void findById_ShouldThrowResourceNotFoundException_WhenReportDoesNotExist(){
+
+        when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> service.findById(NON_EXISTING_ID))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage(REPORT_NOT_FOUND);
+
+        verify(repository).findById(NON_EXISTING_ID);
+    }
+
 
 }
