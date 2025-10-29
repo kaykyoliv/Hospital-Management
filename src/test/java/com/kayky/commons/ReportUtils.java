@@ -3,9 +3,13 @@ package com.kayky.commons;
 import com.kayky.domain.report.Report;
 import com.kayky.domain.report.ReportStatus;
 import com.kayky.domain.report.response.ReportBaseResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.kayky.commons.TestConstants.EXISTING_ID;
 
@@ -26,7 +30,7 @@ public class ReportUtils {
 
     }
 
-    private Report createReport(Long id, String title,  String description, String diagnosis, String treatmentPlan, LocalDate reportDate){
+    private static Report createReport(Long id, String title,  String description, String diagnosis, String treatmentPlan, LocalDate reportDate){
         return createReportBuilder(id)
                 .title(title)
                 .description(description)
@@ -38,6 +42,17 @@ public class ReportUtils {
 
     public static Report savedReport(){
         return createReportBuilder(EXISTING_ID).build();
+    }
+
+    public static List<Report> reportList() {
+        return List.of(
+                createReport(1L, "Annual Checkup", "Routine health examination", "Healthy", "No treatment needed",
+                        LocalDate.of(2026, 12, 5)),
+                createReport(2L, "Knee Injury", "Patient reported pain after running", "Ligament strain", "Physical therapy for 6 weeks",
+                        LocalDate.of(2026, 11, 10)),
+                createReport(3L, "Flu Symptoms", "Fever, cough, and sore throat", "Influenza", "Rest and hydration",
+                        LocalDate.of(2026, 10, 20))
+        );
     }
 
     public static ReportBaseResponse asBaseResponse(Report report){
@@ -65,6 +80,12 @@ public class ReportUtils {
                 ))
                 .build();
     }
+
+    public static List<ReportBaseResponse> baseResponseList(){
+         return reportList().stream().map(ReportUtils::asBaseResponse).toList();
+    }
+
+
 
 
 }

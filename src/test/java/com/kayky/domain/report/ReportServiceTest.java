@@ -1,5 +1,6 @@
 package com.kayky.domain.report;
 
+import com.kayky.commons.PageUtils;
 import com.kayky.commons.ReportUtils;
 import com.kayky.core.exception.ResourceNotFoundException;
 import com.kayky.domain.doctor.DoctorMapper;
@@ -15,10 +16,14 @@ import org.mapstruct.factory.Mappers;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
 import static com.kayky.commons.TestConstants.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -56,7 +61,7 @@ class ReportServiceTest {
 
         var expectedResponse = ReportUtils.asBaseResponse(savedReport);
 
-        Assertions.assertThat(response)
+        assertThat(response)
                 .usingRecursiveComparison()
                 .isEqualTo(expectedResponse);
 
@@ -76,5 +81,27 @@ class ReportServiceTest {
         verify(repository).findById(NON_EXISTING_ID);
     }
 
+    @Test
+    @DisplayName("findAll: Should return PageResponse when reports exist")
+    void findALl_ShouldReturnPageResponse_WhenReportExist(){
+        PageRequest pageRequest = PageRequest.of(0, 3);
+        var reportList = ReportUtils.reportList();
+        var pagedReports = PageUtils.toPage(reportList);
+
+        when(repository.findAll(pageRequest)).thenReturn(pagedReports);
+
+        when(mapper.toReportBaseResponse(any(Report.class)))
+                .thenAnswer(invocation -> ReportUtils.asBaseResponse(invocation.getArgument(0)));
+
+        var result = service.findAll(pageRequest);
+
+        assertThat(result.getTotalElements()).isEqualTo(pagedReports.getTotalElements());
+        assertThat(result.getTotalPages()).isEqualTo(pagedReports.getTotalPages());
+        assertThat(result.getCurrentPage()).isEqualTo(pagedReports.getNumber());
+
+        var expectedResponse = ReportUtils.baseResponseList();
+
+        assertThat(result.getContent()).usingRecursiveComparison().isEqualTo(expectedResponse);
+    }
 
 }
