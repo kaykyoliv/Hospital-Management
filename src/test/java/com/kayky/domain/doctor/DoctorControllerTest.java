@@ -130,7 +130,7 @@ class DoctorControllerTest {
 
         var postRequest= DoctorUtils.asBaseRequest();
 
-        var expectedErrorMessage = EMAIL_ALREADY_EXIST.formatted(postRequest.getEmail());
+        var expectedErrorMessage = EMAIL_ALREADY_EXISTS.formatted(postRequest.getEmail());
 
         BDDMockito.when(service.save(any(DoctorBaseRequest.class)))
                 .thenThrow(new EmailAlreadyExistsException(expectedErrorMessage));
@@ -203,7 +203,7 @@ class DoctorControllerTest {
         var expectedJsonResponse = FileUtils.readResourceFile("doctor/put/response-email-already-exists-400.json");
 
         var putRequest= DoctorUtils.asBaseRequest();
-        var expectedErrorMessage = EMAIL_ALREADY_EXIST.formatted(putRequest.getEmail());
+        var expectedErrorMessage = EMAIL_ALREADY_EXISTS.formatted(putRequest.getEmail());
 
         BDDMockito.when(service.update(any(DoctorBaseRequest.class), eq(EXISTING_ID)))
                 .thenThrow(new EmailAlreadyExistsException(expectedErrorMessage));

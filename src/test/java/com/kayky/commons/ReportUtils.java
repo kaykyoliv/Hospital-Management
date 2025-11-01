@@ -2,7 +2,9 @@ package com.kayky.commons;
 
 import com.kayky.domain.report.Report;
 import com.kayky.domain.report.ReportStatus;
+import com.kayky.domain.report.request.ReportBaseRequest;
 import com.kayky.domain.report.response.ReportBaseResponse;
+import com.kayky.domain.report.validator.ReportValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -24,8 +26,8 @@ public class ReportUtils {
                 .treatmentPlan("Continue physiotherapy sessions twice a week")
                 .reportDate(LocalDate.of(2026, 7,4))
                 .status(ReportStatus.FINALIZED)
-                .patient(PatientUtils.savedPatient(id))
-                .doctor(DoctorUtils.savedDoctor(id))
+                .patient(PatientUtils.savedPatient(1L))
+                .doctor(DoctorUtils.savedDoctor(2L))
                 .operation(OperationUtils.savedOperation());
 
     }
@@ -85,7 +87,23 @@ public class ReportUtils {
          return reportList().stream().map(ReportUtils::asBaseResponse).toList();
     }
 
+    public static ReportBaseRequest asBaseRequest(){
+        return ReportBaseRequest.builder()
+                .title("Pediatric Post-op Review")
+                .description("Patient is stable and responding well to treatment")
+                .diagnosis("Minor fracture treated successfully")
+                .treatmentPlan("Continue physiotherapy sessions twice a week")
+                .reportDate(LocalDate.of(2026, 7,4))
+                .status(ReportStatus.FINALIZED)
+                .patientId(1L)
+                .doctorId(2L)
+                .operationId(1L)
+                .build();
+    }
 
+    public static ReportValidator.ValidationResult validationResult(){
+        return new ReportValidator.ValidationResult(PatientUtils.savedPatient(1L), DoctorUtils.savedDoctor(2L), OperationUtils.savedOperation());
+    }
 
 
 }

@@ -128,13 +128,13 @@ class DoctorServiceTest {
 
         request.setEmail(email);
 
-        doThrow(new EmailAlreadyExistsException(EMAIL_ALREADY_EXIST.formatted(email)))
+        doThrow(new EmailAlreadyExistsException(EMAIL_ALREADY_EXISTS.formatted(email)))
                 .when(userValidator)
                 .assertEmailDoesNotExist(email);
 
         assertThatThrownBy(() -> service.save(request))
                 .isInstanceOf(EmailAlreadyExistsException.class)
-                .hasMessage(EMAIL_ALREADY_EXIST.formatted(email));
+                .hasMessage(EMAIL_ALREADY_EXISTS.formatted(email));
 
         verify(repository, times(0)).save(any());
     }
@@ -184,13 +184,13 @@ class DoctorServiceTest {
 
         when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedDoctor));
 
-        doThrow(new EmailAlreadyExistsException(EMAIL_ALREADY_EXIST.formatted(email)))
+        doThrow(new EmailAlreadyExistsException(EMAIL_ALREADY_EXISTS.formatted(email)))
                 .when(userValidator)
                 .assertEmailDoesNotExist(request.getEmail(), EXISTING_ID);
 
         assertThatThrownBy(() -> service.update(request, EXISTING_ID))
                 .isInstanceOf(EmailAlreadyExistsException.class)
-                .hasMessage(EMAIL_ALREADY_EXIST.formatted(email));
+                .hasMessage(EMAIL_ALREADY_EXISTS.formatted(email));
 
         verify(userValidator).assertEmailDoesNotExist(request.getEmail(), EXISTING_ID);
     }

@@ -3,9 +3,11 @@ package com.kayky.domain.report.request;
 import com.kayky.domain.report.ReportStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
 import java.time.LocalDate;
 
+@Builder
 public record ReportBaseRequest(
 
         @NotBlank
