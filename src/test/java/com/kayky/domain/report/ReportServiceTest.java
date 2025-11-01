@@ -4,18 +4,19 @@ import com.kayky.commons.PageUtils;
 import com.kayky.commons.ReportUtils;
 import com.kayky.core.exception.ReportAlreadyExistsException;
 import com.kayky.core.exception.ResourceNotFoundException;
-import com.kayky.domain.report.request.ReportBaseRequest;
 import com.kayky.domain.report.validator.ReportValidator;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static com.kayky.commons.TestConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,7 +81,7 @@ class ReportServiceTest {
 
     @Test
     @DisplayName("findAll: Should return PageResponse when reports exist")
-    void findALl_ShouldReturnPageResponse_WhenReportExist() {
+    void findAll_ShouldReturnPageResponse_WhenReportExist() {
         PageRequest pageRequest = PageRequest.of(0, 3);
         var reportList = ReportUtils.reportList();
         var pagedReports = PageUtils.toPage(reportList);
@@ -137,5 +138,21 @@ class ReportServiceTest {
                 .hasMessage(REPORT_ALREADY_EXISTS.formatted(request.operationId()));
     }
 
+    @ParameterizedTest(name = "save: should throw ResourceNotFoundException when {0} does not exist")
+    @MethodSource("provideNonExistingTypes")
+    void save_ShouldThrowResourceNotFoundException_WhenNonExistingType(String nonExistingType) {
+        var request = ReportUtils.asBaseRequest();
+
+        when(reportValidator.validate(request))
+                .thenThrow(new ResourceNotFoundException(nonExistingType + " not found"));
+
+        assertThatThrownBy(() -> service.save(request))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining(nonExistingType);
+    }
+
+    private static Stream<String> provideNonExistingTypes() {
+        return Stream.of("Patient", "Doctor", "Operation");
+    }
 
 }
