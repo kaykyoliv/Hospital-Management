@@ -11,8 +11,14 @@ public final class TestConstants {
     public static final String USER_NOT_FOUND = "User not found";
     public static final String OPERATION_NOT_FOUND = "Operation not found";
     public static final String REPORT_NOT_FOUND = "Report not found";
-    public static final String EMAIL_ALREADY_EXISTS = "Email %s already in use";
     public static final String USER_NOT_FOUND_SAVE_OPERATION = "%s with id %d not found";
+
+    public static final String OPERATION_PATIENT_MISMATCH =
+            "Operation patient (id=%d) does not match request patient (id=%d)";
+    public static final String OPERATION_DOCTOR_MISMATCH =
+            "Operation doctor (id=%d) does not match request doctor (id=%d)";
+
+    public static final String EMAIL_ALREADY_EXISTS = "Email %s already in use";
     public static final String REPORT_ALREADY_EXISTS = "Report already exists for operation with ID: %d";
 
     public static final Long EXISTING_ID = 1L;

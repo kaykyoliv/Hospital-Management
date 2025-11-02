@@ -1,7 +1,9 @@
 package com.kayky.domain.report;
 
+import com.kayky.commons.OperationUtils;
 import com.kayky.commons.PageUtils;
 import com.kayky.commons.ReportUtils;
+import com.kayky.core.exception.OperationMismatchException;
 import com.kayky.core.exception.ReportAlreadyExistsException;
 import com.kayky.core.exception.ResourceNotFoundException;
 import com.kayky.domain.report.validator.ReportValidator;
@@ -154,5 +156,7 @@ class ReportServiceTest {
     private static Stream<String> provideNonExistingTypes() {
         return Stream.of("Patient", "Doctor", "Operation");
     }
+
+
 
 }
