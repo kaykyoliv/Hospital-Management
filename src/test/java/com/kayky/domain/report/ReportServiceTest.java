@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.kayky.commons.ReportUtils.asBaseRequest;
 import static com.kayky.commons.TestConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -110,7 +111,7 @@ class ReportServiceTest {
         var validatorResult = ReportUtils.validationResult();
         var savedReport = ReportUtils.savedReport();
 
-        var request = ReportUtils.asBaseRequest();
+        var request = asBaseRequest();
         var expectedResponse = ReportUtils.asBaseResponse(savedReport);
 
         when(reportValidator.validate(request)).thenReturn(validatorResult);
@@ -128,7 +129,7 @@ class ReportServiceTest {
     @Test
     @DisplayName("save: should throw ReportAlreadyExistsException when report already exists")
     void save_ShouldThrow_WhenReportAlreadyExists() {
-        var request = ReportUtils.asBaseRequest();
+        var request = asBaseRequest();
         var validatorResult = ReportUtils.validationResult();
 
         when(reportValidator.validate(request)).thenReturn(validatorResult);
@@ -143,7 +144,7 @@ class ReportServiceTest {
     @ParameterizedTest(name = "save: should throw ResourceNotFoundException when {0} does not exist")
     @MethodSource("provideNonExistingTypes")
     void save_ShouldThrowResourceNotFoundException_WhenNonExistingType(String nonExistingType) {
-        var request = ReportUtils.asBaseRequest();
+        var request = asBaseRequest();
 
         when(reportValidator.validate(request))
                 .thenThrow(new ResourceNotFoundException(nonExistingType + " not found"));
@@ -153,10 +154,143 @@ class ReportServiceTest {
                 .hasMessageContaining(nonExistingType);
     }
 
+    @Test
+    @DisplayName("save: propagates OperationMismatchException from validator")
+    void save_ShouldPropagateOperationMismatchException_WhenOperationPatientDoesNotMatch() {
+        var request = ReportUtils.asBaseRequest();
+        var savedOperation = OperationUtils.savedOperation();
+
+        when(reportValidator.validate(request))
+                .thenThrow(new OperationMismatchException(String.format(OPERATION_PATIENT_MISMATCH, savedOperation.getPatient().getId(), request.patientId())));
+
+        assertThatThrownBy(() -> service.save(request))
+                .isInstanceOf(OperationMismatchException.class)
+                .hasMessageContaining("Operation patient");
+
+        verify(reportValidator).validate(request);
+    }
+
+    @Test
+    @DisplayName("save: propagates OperationMismatchException from validator")
+    void save_ShouldPropagateOperationMismatchException_WhenOperationDoctorDoesNotMatch() {
+        var request = ReportUtils.asBaseRequest();
+        var savedOperation = OperationUtils.savedOperation();
+
+        when(reportValidator.validate(request))
+                .thenThrow(new OperationMismatchException(String.format(OPERATION_DOCTOR_MISMATCH, savedOperation.getPatient().getId(), request.patientId())));
+
+        assertThatThrownBy(() -> service.save(request))
+                .isInstanceOf(OperationMismatchException.class)
+                .hasMessageContaining("Operation doctor");
+
+        verify(reportValidator).validate(request);
+    }
+
+
+    @Test
+    @DisplayName("update: Should return ReportBaseResponse when update is valid")
+    void update_ShouldReturnReportBaseResponse_WhenUpdateIsValid() {
+        var validatorResult = ReportUtils.validationResult();
+        var savedReport = ReportUtils.savedReport();
+
+        var request = ReportUtils.asBaseRequest();
+        var expectedResponse = ReportUtils.asBaseResponse(savedReport);
+
+        when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedReport));
+
+        when(reportValidator.validate(request)).thenReturn(validatorResult);
+        when(repository.existsByOperationId(validatorResult.operation().getId())).thenReturn(false);
+
+        when(repository.save(any(Report.class))).thenReturn(savedReport);
+
+        when(mapper.toReportBaseResponse(savedReport)).thenReturn(expectedResponse);
+
+        var result = service.update(request, EXISTING_ID);
+
+        assertThat(result).usingRecursiveComparison().isEqualTo(expectedResponse);
+
+        verify(reportValidator).validate(request);
+        verify(repository).save(any(Report.class));
+        verify(mapper).toReportBaseResponse(savedReport);
+    }
+
+    @ParameterizedTest(name = "update: should throw ResourceNotFoundException when {0} does not exist")
+    @MethodSource("provideNonExistingTypes")
+    void update_ShouldThrowResourceNotFoundException_WhenNonExistingType(String nonExistingType) {
+        var request = ReportUtils.asBaseRequest();
+        var savedReport = ReportUtils.savedReport();
+
+        when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedReport));
+
+        when(reportValidator.validate(request))
+                .thenThrow(new ResourceNotFoundException(nonExistingType + " not found"));
+
+        assertThatThrownBy(() -> service.update(request, EXISTING_ID))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining(nonExistingType);
+
+    }
+
+    @Test
+    @DisplayName("update: should throw ReportAlreadyExistsException when report already exists")
+    void update_ShouldThrow_WhenReportAlreadyExists() {
+        var request = asBaseRequest();
+        var validatorResult = ReportUtils.validationResult();
+        var savedReport = ReportUtils.savedReport();
+        savedReport.getOperation().setId(NON_EXISTING_ID);
+
+        when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedReport));
+        when(reportValidator.validate(request)).thenReturn(validatorResult);
+
+        when(repository.existsByOperationId(validatorResult.operation().getId())).thenReturn(true);
+
+        assertThatThrownBy(() -> service.update(request, EXISTING_ID))
+                .isInstanceOf(ReportAlreadyExistsException.class)
+                .hasMessage(REPORT_ALREADY_EXISTS.formatted(request.operationId()));
+    }
+
     private static Stream<String> provideNonExistingTypes() {
         return Stream.of("Patient", "Doctor", "Operation");
     }
 
 
+    @Test
+    @DisplayName("update: propagates OperationMismatchException from validator")
+    void update_ShouldPropagateOperationMismatchException_WhenOperationPatientDoesNotMatch() {
+        var request = ReportUtils.asBaseRequest();
+        var savedOperation = OperationUtils.savedOperation();
 
+        var savedReport = ReportUtils.savedReport();
+
+        when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedReport));
+
+        when(reportValidator.validate(request))
+                .thenThrow(new OperationMismatchException(String.format(OPERATION_PATIENT_MISMATCH, savedOperation.getPatient().getId(), request.patientId())));
+
+        assertThatThrownBy(() -> service.update(request, EXISTING_ID))
+                .isInstanceOf(OperationMismatchException.class)
+                .hasMessageContaining("Operation patient");
+
+        verify(reportValidator).validate(request);
+    }
+
+    @Test
+    @DisplayName("update: propagates OperationMismatchException from validator")
+    void update_ShouldPropagateOperationMismatchException_WhenOperationDoctorDoesNotMatch() {
+        var request = ReportUtils.asBaseRequest();
+        var savedOperation = OperationUtils.savedOperation();
+
+        var savedReport = ReportUtils.savedReport();
+
+        when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedReport));
+
+        when(reportValidator.validate(request))
+                .thenThrow(new OperationMismatchException(String.format(OPERATION_DOCTOR_MISMATCH, savedOperation.getPatient().getId(), request.patientId())));
+
+        assertThatThrownBy(() -> service.update(request, EXISTING_ID))
+                .isInstanceOf(OperationMismatchException.class)
+                .hasMessageContaining("Operation doctor");
+
+        verify(reportValidator).validate(request);
+    }
 }
