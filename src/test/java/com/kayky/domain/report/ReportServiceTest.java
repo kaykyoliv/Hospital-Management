@@ -25,8 +25,7 @@ import static com.kayky.commons.TestConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReportServiceTest {
@@ -292,5 +291,28 @@ class ReportServiceTest {
                 .hasMessageContaining("Operation doctor");
 
         verify(reportValidator).validate(request);
+    }
+
+
+    @Test
+    @DisplayName("delete: should remove report when ID exists")
+    void delete_ShouldRemoveReport_WhenSuccessful() {
+        when(repository.existsById(EXISTING_ID)).thenReturn(true);
+        doNothing().when(repository).deleteById(EXISTING_ID);
+
+        service.delete(EXISTING_ID);
+
+        verify(repository).existsById(EXISTING_ID);
+        verify(repository).deleteById(EXISTING_ID);
+    }
+
+    @Test
+    @DisplayName("delete: should throw ResourceNotFoundException when ID does not exist")
+    void delete_ShouldThrowResourceNotFoundException_WhenIdDoesNotExists() {
+        when(repository.existsById(NON_EXISTING_ID)).thenReturn(false);
+
+        assertThatThrownBy(() -> service.delete(NON_EXISTING_ID))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage(REPORT_NOT_FOUND);
     }
 }
