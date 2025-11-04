@@ -6,6 +6,7 @@ import com.kayky.commons.ReportUtils;
 import com.kayky.core.exception.OperationMismatchException;
 import com.kayky.core.exception.ReportAlreadyExistsException;
 import com.kayky.core.exception.ResourceNotFoundException;
+import com.kayky.domain.report.request.ReportBaseRequest;
 import com.kayky.domain.report.validator.ReportValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,6 +46,28 @@ class ReportServiceTest {
     void setUp() {
         service = new ReportService(repository, reportValidator, mapper);
     }
+
+    /// HELPERS
+
+    private ReportValidator.ValidationResult mockValidatorResult(ReportBaseRequest request){
+        var validationResult = ReportUtils.validationResult();
+        when(reportValidator.validate(request)).thenReturn(validationResult);
+        return validationResult;
+    }
+
+    private void mockNoExistingReport(ReportValidator.ValidationResult validatorResult) {
+        when(repository.existsByOperationId(validatorResult.operation().getId())).thenReturn(false);
+    }
+
+    private void mockExistingReport(ReportValidator.ValidationResult validatorResult) {
+        when(repository.existsByOperationId(validatorResult.operation().getId())).thenReturn(true);
+    }
+
+    private void mockValidatorWithException(ReportBaseRequest request, RuntimeException exception) {
+        when(reportValidator.validate(request)).thenThrow(exception);
+    }
+
+    /// TESTS
 
     @Test
     @DisplayName("findById: Should return ReportBaseResponse when the report exists")
@@ -107,14 +130,15 @@ class ReportServiceTest {
     @Test
     @DisplayName("save: should return ReportBaseResponse when data is valid")
     void save_ShouldReturnReportBaseResponse_WhenDataIsValid() {
-        var validatorResult = ReportUtils.validationResult();
         var savedReport = ReportUtils.savedReport();
 
         var request = asBaseRequest();
         var expectedResponse = ReportUtils.asBaseResponse(savedReport);
 
-        when(reportValidator.validate(request)).thenReturn(validatorResult);
-        when(repository.existsByOperationId(validatorResult.operation().getId())).thenReturn(false);
+        var validatorResult = mockValidatorResult(request);
+
+        mockNoExistingReport(validatorResult);
+
         when(mapper.toEntity(request, validatorResult.patient(), validatorResult.doctor(), validatorResult.operation()))
                 .thenReturn(savedReport);
         when(repository.save(savedReport)).thenReturn(savedReport);
@@ -129,11 +153,9 @@ class ReportServiceTest {
     @DisplayName("save: should throw ReportAlreadyExistsException when report already exists")
     void save_ShouldThrow_WhenReportAlreadyExists() {
         var request = asBaseRequest();
-        var validatorResult = ReportUtils.validationResult();
+        var validatorResult = mockValidatorResult(request);
 
-        when(reportValidator.validate(request)).thenReturn(validatorResult);
-
-        when(repository.existsByOperationId(validatorResult.operation().getId())).thenReturn(true);
+        mockExistingReport(validatorResult);
 
         assertThatThrownBy(() -> service.save(request))
                 .isInstanceOf(ReportAlreadyExistsException.class)
@@ -159,8 +181,9 @@ class ReportServiceTest {
         var request = ReportUtils.asBaseRequest();
         var savedOperation = OperationUtils.savedOperation();
 
-        when(reportValidator.validate(request))
-                .thenThrow(new OperationMismatchException(String.format(OPERATION_PATIENT_MISMATCH, savedOperation.getPatient().getId(), request.patientId())));
+        var exception = new OperationMismatchException(String.format(OPERATION_PATIENT_MISMATCH, savedOperation.getPatient().getId(), request.patientId()));
+
+        mockValidatorWithException(request, exception);
 
         assertThatThrownBy(() -> service.save(request))
                 .isInstanceOf(OperationMismatchException.class)
@@ -175,8 +198,9 @@ class ReportServiceTest {
         var request = ReportUtils.asBaseRequest();
         var savedOperation = OperationUtils.savedOperation();
 
-        when(reportValidator.validate(request))
-                .thenThrow(new OperationMismatchException(String.format(OPERATION_DOCTOR_MISMATCH, savedOperation.getPatient().getId(), request.patientId())));
+        var exception = new OperationMismatchException(String.format(OPERATION_DOCTOR_MISMATCH, savedOperation.getDoctor().getId(), request.doctorId()));
+
+        mockValidatorWithException(request, exception);
 
         assertThatThrownBy(() -> service.save(request))
                 .isInstanceOf(OperationMismatchException.class)
@@ -189,16 +213,16 @@ class ReportServiceTest {
     @Test
     @DisplayName("update: Should return ReportBaseResponse when update is valid")
     void update_ShouldReturnReportBaseResponse_WhenUpdateIsValid() {
-        var validatorResult = ReportUtils.validationResult();
         var savedReport = ReportUtils.savedReport();
 
         var request = ReportUtils.asBaseRequest();
         var expectedResponse = ReportUtils.asBaseResponse(savedReport);
 
+        var validatorResult = mockValidatorResult(request);
+
         when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedReport));
 
-        when(reportValidator.validate(request)).thenReturn(validatorResult);
-        when(repository.existsByOperationId(validatorResult.operation().getId())).thenReturn(false);
+        mockNoExistingReport(validatorResult);
 
         when(repository.save(any(Report.class))).thenReturn(savedReport);
 
@@ -234,14 +258,15 @@ class ReportServiceTest {
     @DisplayName("update: should throw ReportAlreadyExistsException when report already exists")
     void update_ShouldThrow_WhenReportAlreadyExists() {
         var request = asBaseRequest();
-        var validatorResult = ReportUtils.validationResult();
+
         var savedReport = ReportUtils.savedReport();
         savedReport.getOperation().setId(NON_EXISTING_ID);
 
-        when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedReport));
-        when(reportValidator.validate(request)).thenReturn(validatorResult);
+        var validatorResult = mockValidatorResult(request);
 
-        when(repository.existsByOperationId(validatorResult.operation().getId())).thenReturn(true);
+        when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedReport));
+
+        mockExistingReport(validatorResult);
 
         assertThatThrownBy(() -> service.update(request, EXISTING_ID))
                 .isInstanceOf(ReportAlreadyExistsException.class)
@@ -263,8 +288,9 @@ class ReportServiceTest {
 
         when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedReport));
 
-        when(reportValidator.validate(request))
-                .thenThrow(new OperationMismatchException(String.format(OPERATION_PATIENT_MISMATCH, savedOperation.getPatient().getId(), request.patientId())));
+        var exception = new OperationMismatchException(String.format(OPERATION_PATIENT_MISMATCH, savedOperation.getPatient().getId(), request.patientId()));
+
+        mockValidatorWithException(request, exception);
 
         assertThatThrownBy(() -> service.update(request, EXISTING_ID))
                 .isInstanceOf(OperationMismatchException.class)
@@ -283,8 +309,9 @@ class ReportServiceTest {
 
         when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedReport));
 
-        when(reportValidator.validate(request))
-                .thenThrow(new OperationMismatchException(String.format(OPERATION_DOCTOR_MISMATCH, savedOperation.getPatient().getId(), request.patientId())));
+        var exception = new OperationMismatchException(String.format(OPERATION_DOCTOR_MISMATCH, savedOperation.getDoctor().getId(), request.doctorId()));
+
+        mockValidatorWithException(request, exception);
 
         assertThatThrownBy(() -> service.update(request, EXISTING_ID))
                 .isInstanceOf(OperationMismatchException.class)

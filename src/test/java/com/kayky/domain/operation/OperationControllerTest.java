@@ -33,7 +33,6 @@ class OperationControllerTest {
     private static final String BASE_URI = "/v1/operation";
     private static final String PATH_ID = BASE_URI + "/{id}";
 
-
     @Autowired
     private MockMvc mockMvc;
 
