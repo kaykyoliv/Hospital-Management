@@ -4,12 +4,12 @@ import com.kayky.commons.FileUtils;
 import com.kayky.commons.PageUtils;
 import com.kayky.commons.ReportUtils;
 import com.kayky.core.exception.ResourceNotFoundException;
+import com.kayky.domain.report.request.ReportBaseRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -17,8 +17,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static com.kayky.commons.TestConstants.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -36,7 +38,7 @@ class ReportControllerTest {
 
     @Test
     @DisplayName("GET /v1/report/{id} - Should return 200 with report data when report exists")
-    void findById_ShouldReturnReportGetResponse_WhenOperationExists() throws Exception{
+    void findById_ShouldReturnReportGetResponse_WhenOperationExists() throws Exception {
 
         var savedReport = ReportUtils.savedReport();
         var response = ReportUtils.asBaseResponse(savedReport);
@@ -75,7 +77,6 @@ class ReportControllerTest {
     }
 
 
-
     @Test
     @DisplayName("GET /v1/operation - Should return page with reports")
     void findAll_ShouldReturnOperationPageResponse_WhenReportExist() throws Exception {
@@ -89,9 +90,33 @@ class ReportControllerTest {
 
         mockMvc.perform(get(BASE_URI))
                 .andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedJsonResponse));
 
         BDDMockito.verify(service).findAll(any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("POST /v1/report - Should return 201 Created when report is saved successfully")
+    void save_ShouldReturn201Created_WhenRequestIsValid() throws Exception {
+        var request = FileUtils.readResourceFile("report/post/request-create-report-201.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("report/post/response-created-report-200.json");
+
+        var savedReport = ReportUtils.savedReport();
+        var expectedResponse = ReportUtils.asBaseResponse(savedReport);
+
+        when(service.save(any(ReportBaseRequest.class))).thenReturn(expectedResponse);
+
+        mockMvc.perform(post(BASE_URI)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedJsonResponse));
+
+        verify(service).save(any(ReportBaseRequest.class));
     }
 }
