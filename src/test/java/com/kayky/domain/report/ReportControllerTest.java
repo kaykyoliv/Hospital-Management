@@ -1,6 +1,7 @@
 package com.kayky.domain.report;
 
 import com.kayky.commons.FileUtils;
+import com.kayky.commons.PageUtils;
 import com.kayky.commons.ReportUtils;
 import com.kayky.core.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.DisplayName;
@@ -8,11 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static com.kayky.commons.TestConstants.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -68,5 +72,26 @@ class ReportControllerTest {
                 .andExpect(content().json(expectedJsonResponse));
 
         BDDMockito.verify(service).findById(NON_EXISTING_ID);
+    }
+
+
+
+    @Test
+    @DisplayName("GET /v1/operation - Should return page with reports")
+    void findAll_ShouldReturnOperationPageResponse_WhenReportExist() throws Exception {
+        var reportList = ReportUtils.baseResponseList();
+        var reportPage = PageUtils.toPage(reportList);
+        var pageResponse = PageUtils.pageResponse(reportPage);
+
+        var expectedJsonResponse = FileUtils.readResourceFile("report/get/all-paged-reports-200.json");
+
+        when(service.findAll(any(Pageable.class))).thenReturn(pageResponse);
+
+        mockMvc.perform(get(BASE_URI))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedJsonResponse));
+
+        BDDMockito.verify(service).findAll(any(Pageable.class));
     }
 }

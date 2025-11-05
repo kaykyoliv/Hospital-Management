@@ -1,0 +1,76 @@
+{
+  "content": [
+    {
+      "id": 1,
+      "title": "Annual Checkup",
+      "description": "Routine health examination",
+      "diagnosis": "Healthy",
+      "treatmentPlan": "No treatment needed",
+      "reportDate": "2026-12-05",
+      "status": "FINALIZED",
+      "patient": {
+        "id": 1,
+        "name": "Robert"
+      },
+      "doctor": {
+        "id": 2,
+        "name": "Robert"
+      },
+      "operation": {
+        "id": 1,
+        "description": "Cirurgia cardíaca de alta complexidade",
+        "scheduledAt": "2025-09-10T14:30:00",
+        "status": "SCHEDULED"
+      }
+    },
+    {
+      "id": 2,
+      "title": "Knee Injury",
+      "description": "Patient reported pain after running",
+      "diagnosis": "Ligament strain",
+      "treatmentPlan": "Physical therapy for 6 weeks",
+      "reportDate": "2026-11-10",
+      "status": "FINALIZED",
+      "patient": {
+        "id": 1,
+        "name": "Robert"
+      },
+      "doctor": {
+        "id": 2,
+        "name": "Robert"
+      },
+      "operation": {
+        "id": 1,
+        "description": "Cirurgia cardíaca de alta complexidade",
+        "scheduledAt": "2025-09-10T14:30:00",
+        "status": "SCHEDULED"
+      }
+    },
+    {
+      "id": 3,
+      "title": "Flu Symptoms",
+      "description": "Fever, cough, and sore throat",
+      "diagnosis": "Influenza",
+      "treatmentPlan": "Rest and hydration",
+      "reportDate": "2026-10-20",
+      "status": "FINALIZED",
+      "patient": {
+        "id": 1,
+        "name": "Robert"
+      },
+      "doctor": {
+        "id": 2,
+        "name": "Robert"
+      },
+      "operation": {
+        "id": 1,
+        "description": "Cirurgia cardíaca de alta complexidade",
+        "scheduledAt": "2025-09-10T14:30:00",
+        "status": "SCHEDULED"
+      }
+    }
+  ],
+  "currentPage": 0,
+  "totalElements": 3,
+  "totalPages": 1
+}
