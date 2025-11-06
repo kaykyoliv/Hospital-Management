@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ReportAlreadyExistsException.class)
     public ResponseEntity<ApiError> handleReportAlreadyExists(ReportAlreadyExistsException e, HttpServletRequest request) {
-        var status = HttpStatus.BAD_REQUEST;
+        var status = HttpStatus.CONFLICT;
 
         return ResponseEntity.status(status).body(buildError(status, e.getMessage(), request));
     }

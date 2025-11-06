@@ -3,6 +3,7 @@ package com.kayky.domain.report;
 import com.kayky.commons.FileUtils;
 import com.kayky.commons.PageUtils;
 import com.kayky.commons.ReportUtils;
+import com.kayky.core.exception.ReportAlreadyExistsException;
 import com.kayky.core.exception.ResourceNotFoundException;
 import com.kayky.domain.report.request.ReportBaseRequest;
 import org.junit.jupiter.api.DisplayName;
@@ -114,6 +115,27 @@ class ReportControllerTest {
                         .content(request))
                 .andDo(print())
                 .andExpect(status().isCreated())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedJsonResponse));
+
+        verify(service).save(any(ReportBaseRequest.class));
+    }
+
+    @Test
+    @DisplayName("POST /v1/report - Should return 409 when report already exists")
+    void save_ShouldReturn409_WhenReportAlreadyExists() throws Exception {
+        var request = FileUtils.readResourceFile("report/post/request-create-report-201.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("report/post/report-already-exists-409.json");
+
+        when(service.save(any(ReportBaseRequest.class)))
+                .thenThrow(new ReportAlreadyExistsException(EXISTING_ID));
+
+        mockMvc.perform(post(BASE_URI)
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andDo(print())
+                .andExpect(status().isConflict())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedJsonResponse));
 
