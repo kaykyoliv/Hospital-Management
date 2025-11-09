@@ -1,0 +1,5 @@
+{
+  "status": 404,
+  "error": "Report not found",
+  "path": "/v1/report/999"
+}

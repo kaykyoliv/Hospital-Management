@@ -1,7 +1,7 @@
 {
   "status": 422,
   "error": "Validation failed",
-  "path": "/v1/report",
+  "path": "/v1/report/1",
   "fieldErrors": [
     {
       "fieldName": "title",

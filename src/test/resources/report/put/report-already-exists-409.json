@@ -1,5 +1,5 @@
 {
   "status": 409,
   "error": "Report already exists for operation with ID: 1",
-  "path": "/v1/report"
+  "path": "/v1/report/1"
 }

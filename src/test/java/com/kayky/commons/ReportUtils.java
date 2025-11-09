@@ -46,6 +46,12 @@ public class ReportUtils {
         return createReportBuilder(EXISTING_ID).build();
     }
 
+    public static Report updatedReport(){
+        return createReportBuilder(EXISTING_ID)
+                .title("updated")
+                .build();
+    }
+
     public static List<Report> reportList() {
         return List.of(
                 createReport(1L, "Annual Checkup", "Routine health examination", "Healthy", "No treatment needed",
