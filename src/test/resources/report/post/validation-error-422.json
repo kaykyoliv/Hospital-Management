@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-11-09T00:25:31.431030400Z",
+  "status": 422,
+  "error": "Validation failed",
+  "path": "/v1/report",
+  "fieldErrors": [
+    {
+      "fieldName": "title",
+      "message": "must not be blank"
+    }
+  ]
+}

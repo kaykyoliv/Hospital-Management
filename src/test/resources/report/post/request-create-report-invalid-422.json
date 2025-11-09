@@ -1,0 +1,11 @@
+{
+  "title": "",
+  "description": "Patient is stable and responding well to treatment",
+  "diagnosis": "Minor fracture treated successfully",
+  "treatmentPlan": "Continue physiotherapy sessions twice a week",
+  "reportDate": "2026-07-04",
+  "status": "FINALIZED",
+  "patientId": 1,
+  "doctorId": 2,
+  "operationId": 1
+}
