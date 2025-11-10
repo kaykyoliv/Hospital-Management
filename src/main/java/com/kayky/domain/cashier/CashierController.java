@@ -1,16 +1,19 @@
 package com.kayky.domain.cashier;
 
 import com.kayky.core.pagination.PageResponse;
+import com.kayky.domain.cashier.request.CashierBaseRequest;
 import com.kayky.domain.cashier.response.CashierBaseResponse;
+import com.kayky.domain.patient.request.PatientBaseRequest;
 import com.kayky.domain.patient.response.PatientBaseResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping(value = "v1/cashier")
@@ -32,5 +35,19 @@ public class CashierController {
     public PageResponse<CashierBaseResponse> findAllPaged(Pageable pageable) {
         log.debug("Request received to list all cashiers");
         return service.findAll(pageable);
+    }
+
+    @PostMapping
+    public ResponseEntity<CashierBaseResponse> save(@Valid @RequestBody CashierBaseRequest request) {
+        log.debug("Request to create new cashier");
+
+        var response = service.save(request);
+
+        URI uri = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(response.id()).toUri();
+
+        return ResponseEntity.created(uri).body(response);
     }
 }

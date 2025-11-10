@@ -3,7 +3,9 @@ package com.kayky.domain.cashier;
 import com.kayky.core.exception.ResourceNotFoundException;
 import com.kayky.core.pagination.PageResponse;
 import com.kayky.core.pagination.PageUtils;
+import com.kayky.domain.cashier.request.CashierBaseRequest;
 import com.kayky.domain.cashier.response.CashierBaseResponse;
+import com.kayky.domain.user.UserValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -17,13 +19,14 @@ public class CashierService {
 
     private final CashierRepository cashierRepository;
     private final CashierMapper cashierMapper;
+    private final UserValidator userValidator;
 
    @Transactional(readOnly = true)
    public CashierBaseResponse findById(Long id){
        return cashierRepository.findById(id)
                .map(cashierMapper::toCashierBaseResponse)
                .orElseThrow(() -> {
-                   log.warn("Patient not found with ID {}", id);
+                   log.warn("Cashier not found with ID {}", id);
 
                    return new ResourceNotFoundException("Cashier not found");
                });
@@ -31,7 +34,20 @@ public class CashierService {
 
     @Transactional(readOnly = true)
     public PageResponse<CashierBaseResponse> findAll(Pageable pageable) {
-        var paginatedPatients = cashierRepository.findAll(pageable);
-        return PageUtils.mapPage(paginatedPatients, cashierMapper::toCashierBaseResponse);
+        var paginatedCashiers = cashierRepository.findAll(pageable);
+        return PageUtils.mapPage(paginatedCashiers, cashierMapper::toCashierBaseResponse);
     }
+
+    @Transactional
+    public CashierBaseResponse save(CashierBaseRequest request){
+       userValidator.assertEmailDoesNotExist(request.email());
+
+       var cashierToSave = cashierMapper.toEntity(request);
+       var savedCashier = cashierRepository.save(cashierToSave);
+
+        log.info("New cashier saved with ID {}", savedCashier.getId());
+
+       return cashierMapper.toCashierBaseResponse(savedCashier);
+    }
+
 }
