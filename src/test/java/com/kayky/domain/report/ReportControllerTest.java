@@ -7,7 +7,6 @@ import com.kayky.core.exception.OperationMismatchException;
 import com.kayky.core.exception.ReportAlreadyExistsException;
 import com.kayky.core.exception.ResourceNotFoundException;
 import com.kayky.domain.report.request.ReportBaseRequest;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
@@ -40,7 +39,7 @@ class ReportControllerTest {
 
     @Test
     @DisplayName("GET /v1/report/{id} - Should return 200 with report data when report exists")
-    void findById_ShouldReturnReportGetResponse_WhenOperationExists() throws Exception {
+    void findById_ShouldReturnReportGetResponse_WhenReportExists() throws Exception {
 
         var savedReport = ReportUtils.savedReport();
         var response = ReportUtils.asBaseResponse(savedReport);
@@ -54,7 +53,7 @@ class ReportControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedJsonResponse));
 
-        BDDMockito.verify(service).findById(EXISTING_ID);
+        verify(service).findById(EXISTING_ID);
     }
 
 
@@ -73,13 +72,13 @@ class ReportControllerTest {
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage))
                 .andExpect(content().json(expectedJsonResponse));
 
-        BDDMockito.verify(service).findById(NON_EXISTING_ID);
+        verify(service).findById(NON_EXISTING_ID);
     }
 
 
     @Test
-    @DisplayName("GET /v1/operation - Should return page with reports")
-    void findAll_ShouldReturnOperationPageResponse_WhenReportExist() throws Exception {
+    @DisplayName("GET /v1/report - Should return page with reports")
+    void findAll_ShouldReturnReportPageResponse_WhenReportExist() throws Exception {
         var reportList = ReportUtils.baseResponseList();
         var reportPage = PageUtils.toPage(reportList);
         var pageResponse = PageUtils.pageResponse(reportPage);
@@ -93,7 +92,7 @@ class ReportControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedJsonResponse));
 
-        BDDMockito.verify(service).findAll(any(Pageable.class));
+        verify(service).findAll(any(Pageable.class));
     }
 
     @Test
@@ -119,8 +118,8 @@ class ReportControllerTest {
     }
 
     @Test
-    @DisplayName("POST /v1/report - Should return 400 when operation data is inconsistent")
-    void save_ShouldReturn400_WhenOperationsDataIsInvalid() throws Exception {
+    @DisplayName("POST /v1/report - Should return 400 when report data is inconsistent")
+    void save_ShouldReturn400_WhenReportsDataIsInvalid() throws Exception {
         var request = FileUtils.readResourceFile("report/post/request-create-report-201.json");
         var expectedJsonResponse = FileUtils.readResourceFile("report/post/operation-mismatch-400.json");
 
@@ -218,8 +217,8 @@ class ReportControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /v1/report/{id} - Should return 400 when operation data is inconsistent")
-    void update_ShouldReturn400_WhenOperationsDataIsInvalid() throws Exception {
+    @DisplayName("PUT /v1/report/{id} - Should return 400 when report data is inconsistent")
+    void update_ShouldReturn400_WhenReportDataIsInvalid() throws Exception {
         var request = FileUtils.readResourceFile("report/put/request-update-report-200.json");
         var expectedJsonResponse = FileUtils.readResourceFile("report/put/operation-mismatch-400.json");
 
@@ -319,6 +318,34 @@ class ReportControllerTest {
                 .andExpect(content().json(expectedJsonResponse));
 
         verify(service, never()).update(any(), anyLong());
+    }
+
+    @Test
+    @DisplayName("DELETE /v1/report/{id} - Should return 204 No Content when report is deleted successfully")
+    void delete_ShouldReturn204NoContent_WhenReportExists() throws Exception {
+        doNothing().when(service).delete(EXISTING_ID);
+
+        mockMvc.perform(delete(PATH_ID, EXISTING_ID)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        verify(service).delete(EXISTING_ID);
+    }
+
+    @Test
+    @DisplayName("DELETE /v1/report/{id} - Should return 404 Not Found when report does not exist")
+    void delete_ShouldReturn404NotFound_WhenReportDoesNotExist() throws Exception {
+        var expectedErrorMessage = REPORT_NOT_FOUND;
+
+        BDDMockito.doThrow(new ResourceNotFoundException(expectedErrorMessage))
+                .when(service).delete(NON_EXISTING_ID);
+
+        mockMvc.perform(delete(PATH_ID, NON_EXISTING_ID)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value(expectedErrorMessage));
+
+        verify(service).delete(NON_EXISTING_ID);
     }
 
 }
