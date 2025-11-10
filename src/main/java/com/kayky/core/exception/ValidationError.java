@@ -18,7 +18,7 @@ public class ValidationError extends ApiError{
     }
 
     public void addError(String fieldName, String message){
-        errors.removeIf(error -> error.getFieldName().equals(fieldName));
+        errors.removeIf(error -> error.fieldName().equals(fieldName));
         errors.add(new FieldMessageError(fieldName, message));
     }
 }
