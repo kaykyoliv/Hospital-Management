@@ -50,4 +50,22 @@ public class CashierService {
        return cashierMapper.toCashierBaseResponse(savedCashier);
     }
 
+    @Transactional
+    public CashierBaseResponse update(CashierBaseRequest putRequest, Long id) {
+        var cashierToUpdate = cashierRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Cannot update: Cashier not found with ID {}", id);
+                    return new ResourceNotFoundException("Cashier not found");
+                });
+
+
+        userValidator.assertEmailDoesNotExist(putRequest.email(), id);
+
+        cashierMapper.updateCashierFromRequest(putRequest, cashierToUpdate);
+        var updatedCashier = cashierRepository.save(cashierToUpdate);
+
+        log.info("Cashier updated with ID {}", updatedCashier.getId());
+        return cashierMapper.toCashierBaseResponse(updatedCashier);
+    }
+
 }

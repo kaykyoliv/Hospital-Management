@@ -3,8 +3,6 @@ package com.kayky.domain.cashier;
 import com.kayky.core.pagination.PageResponse;
 import com.kayky.domain.cashier.request.CashierBaseRequest;
 import com.kayky.domain.cashier.response.CashierBaseResponse;
-import com.kayky.domain.patient.request.PatientBaseRequest;
-import com.kayky.domain.patient.response.PatientBaseResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,5 +47,14 @@ public class CashierController {
                 .buildAndExpand(response.id()).toUri();
 
         return ResponseEntity.created(uri).body(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CashierBaseResponse> update(@Valid @RequestBody CashierBaseRequest request, @PathVariable Long id) {
+        log.debug("Request to update cashier with id {}", id);
+
+        var response = service.update(request, id);
+
+        return ResponseEntity.ok(response);
     }
 }
