@@ -5,7 +5,7 @@
   "fieldErrors": [
     {
       "fieldName": "title",
-      "message": "must not be blank"
+      "message": "size must be between 3 and 120"
     }
   ]
 }

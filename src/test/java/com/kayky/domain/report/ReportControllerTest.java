@@ -7,6 +7,7 @@ import com.kayky.core.exception.OperationMismatchException;
 import com.kayky.core.exception.ReportAlreadyExistsException;
 import com.kayky.core.exception.ResourceNotFoundException;
 import com.kayky.domain.report.request.ReportBaseRequest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
@@ -21,7 +22,6 @@ import static com.kayky.commons.TestConstants.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = ReportController.class)
@@ -36,6 +36,14 @@ class ReportControllerTest {
     @MockitoBean
     private ReportService service;
 
+    String validUpdateRequest;
+    String validCreateRequest;
+
+    @BeforeEach
+    void setup() {
+        validUpdateRequest = FileUtils.readResourceFile("report/put/request-update-report-200.json");
+        validCreateRequest = FileUtils.readResourceFile("report/post/request-create-report-201.json");
+    }
 
     @Test
     @DisplayName("GET /v1/report/{id} - Should return 200 with report data when report exists")
@@ -98,7 +106,6 @@ class ReportControllerTest {
     @Test
     @DisplayName("POST /v1/report - Should return 201 Created when report is saved successfully")
     void save_ShouldReturn201Created_WhenRequestIsValid() throws Exception {
-        var request = FileUtils.readResourceFile("report/post/request-create-report-201.json");
         var expectedJsonResponse = FileUtils.readResourceFile("report/post/response-created-report-200.json");
 
         var savedReport = ReportUtils.savedReport();
@@ -109,7 +116,7 @@ class ReportControllerTest {
         mockMvc.perform(post(BASE_URI)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
+                        .content(validCreateRequest))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedJsonResponse));
@@ -120,7 +127,6 @@ class ReportControllerTest {
     @Test
     @DisplayName("POST /v1/report - Should return 400 when report data is inconsistent")
     void save_ShouldReturn400_WhenReportsDataIsInvalid() throws Exception {
-        var request = FileUtils.readResourceFile("report/post/request-create-report-201.json");
         var expectedJsonResponse = FileUtils.readResourceFile("report/post/operation-mismatch-400.json");
 
         var expectedErrorMessage = OPERATION_PATIENT_MISMATCH.formatted(1L, 2L);
@@ -131,7 +137,7 @@ class ReportControllerTest {
         mockMvc.perform(post(BASE_URI)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
+                        .content(validCreateRequest))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedJsonResponse));
@@ -142,8 +148,7 @@ class ReportControllerTest {
 
     @Test
     @DisplayName("POST /v1/report - Should return 404 when related resource does not exist")
-    void save__ShouldReturn404_WhenPatientDoesNotExist() throws Exception {
-        var request = FileUtils.readResourceFile("report/post/request-create-report-201.json");
+    void save_ShouldReturn404_WhenPatientDoesNotExist() throws Exception {
         var expectedJsonResponse = FileUtils.readResourceFile("report/post/resource-not-found-404.json");
 
         when(service.save(any(ReportBaseRequest.class)))
@@ -152,7 +157,7 @@ class ReportControllerTest {
         mockMvc.perform(post(BASE_URI)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
+                        .content(validCreateRequest))
                 .andExpect(status().isNotFound())
                 .andExpect(content().json(expectedJsonResponse));
 
@@ -162,7 +167,6 @@ class ReportControllerTest {
     @Test
     @DisplayName("POST /v1/report - Should return 409 when report already exists")
     void save_ShouldReturn409_WhenReportAlreadyExists() throws Exception {
-        var request = FileUtils.readResourceFile("report/post/request-create-report-201.json");
         var expectedJsonResponse = FileUtils.readResourceFile("report/post/report-already-exists-409.json");
 
         when(service.save(any(ReportBaseRequest.class)))
@@ -171,7 +175,7 @@ class ReportControllerTest {
         mockMvc.perform(post(BASE_URI)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
+                        .content(validCreateRequest))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.error").value(REPORT_ALREADY_EXISTS.formatted(EXISTING_ID)))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -197,7 +201,6 @@ class ReportControllerTest {
     @Test
     @DisplayName("PUT /v1/report/{id} - Should return 200 OK when report is updated successfully")
     void update_ShouldReturn200OK_WhenRequestIsValid() throws Exception {
-        var request = FileUtils.readResourceFile("report/put/request-update-report-200.json");
         var expectedJsonResponse = FileUtils.readResourceFile("report/put/response-updated-report-200.json");
 
         var updatedReport = ReportUtils.updatedReport();
@@ -208,7 +211,7 @@ class ReportControllerTest {
         mockMvc.perform(put(PATH_ID, EXISTING_ID)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
+                        .content(validUpdateRequest))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedJsonResponse));
@@ -219,7 +222,6 @@ class ReportControllerTest {
     @Test
     @DisplayName("PUT /v1/report/{id} - Should return 400 when report data is inconsistent")
     void update_ShouldReturn400_WhenReportDataIsInvalid() throws Exception {
-        var request = FileUtils.readResourceFile("report/put/request-update-report-200.json");
         var expectedJsonResponse = FileUtils.readResourceFile("report/put/operation-mismatch-400.json");
 
         var expectedErrorMessage = OPERATION_PATIENT_MISMATCH.formatted(1L, 2L);
@@ -230,7 +232,7 @@ class ReportControllerTest {
         mockMvc.perform(put(PATH_ID, EXISTING_ID)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
+                        .content(validUpdateRequest))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedJsonResponse));
@@ -241,7 +243,6 @@ class ReportControllerTest {
     @Test
     @DisplayName("PUT /v1/report/{id} - Should return 404 when report is not found")
     void update_ShouldReturn404_WhenReportDoesNotExist() throws Exception {
-        var request = FileUtils.readResourceFile("report/put/request-update-report-200.json");
         var expectedJsonResponse = FileUtils.readResourceFile("report/put/report-not-found-404.json");
 
         var expectedErrorMessage = REPORT_NOT_FOUND;
@@ -252,7 +253,7 @@ class ReportControllerTest {
         mockMvc.perform(put(PATH_ID, NON_EXISTING_ID)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
+                        .content(validUpdateRequest))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage))
                 .andExpect(content().json(expectedJsonResponse));
@@ -263,7 +264,6 @@ class ReportControllerTest {
     @Test
     @DisplayName("PUT /v1/report/{id} - Should return 404 when related resource does not exist")
     void update_ShouldReturn404_WhenPatientDoesNotExist() throws Exception {
-        var request = FileUtils.readResourceFile("report/put/request-update-report-200.json");
         var expectedJsonResponse = FileUtils.readResourceFile("report/put/resource-not-found-404.json");
 
         var expectedErrorMessage = PATIENT_NOT_FOUND;
@@ -274,7 +274,7 @@ class ReportControllerTest {
         mockMvc.perform(put(PATH_ID, NON_EXISTING_ID)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
+                        .content(validUpdateRequest))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage))
                 .andExpect(content().json(expectedJsonResponse));
@@ -285,7 +285,6 @@ class ReportControllerTest {
     @Test
     @DisplayName("PUT /v1/report/{id} - Should return 409 when report already exists")
     void update_ShouldReturn409_WhenReportAlreadyExists() throws Exception {
-        var request = FileUtils.readResourceFile("report/put/request-update-report-200.json");
         var expectedJsonResponse = FileUtils.readResourceFile("report/put/report-already-exists-409.json");
 
         when(service.update(any(ReportBaseRequest.class), eq(EXISTING_ID)))
@@ -294,7 +293,7 @@ class ReportControllerTest {
         mockMvc.perform(put(PATH_ID, EXISTING_ID)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
+                        .content(validUpdateRequest))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.error").value(REPORT_ALREADY_EXISTS.formatted(EXISTING_ID)))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
