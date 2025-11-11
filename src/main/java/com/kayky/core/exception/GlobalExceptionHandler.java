@@ -46,6 +46,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(buildError(status, e.getMessage(), request));
     }
 
+    @ExceptionHandler(ReceiptAlreadyExistsException.class)
+    public ResponseEntity<ApiError> handleReceiptAlreadyExists(ReceiptAlreadyExistsException e, HttpServletRequest request) {
+        var status = HttpStatus.CONFLICT;
+
+        return ResponseEntity.status(status).body(buildError(status, e.getMessage(), request));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationError> handleMethodArgumentNotValid(MethodArgumentNotValidException e, HttpServletRequest request){
         var status = HttpStatus.UNPROCESSABLE_ENTITY;

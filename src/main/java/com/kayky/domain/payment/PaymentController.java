@@ -44,17 +44,17 @@ public class PaymentController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping
-    public ResponseEntity<PaymentBaseResponse> save(@Valid @RequestBody PaymentBaseRequest request) {
-        log.debug("Request to create new payment");
+@PostMapping
+public ResponseEntity<PaymentBaseResponse> save(@Valid @RequestBody PaymentBaseRequest request) {
+    log.debug("Request to create new payment");
 
-        var response = service.save(request);
+    var response = service.save(request);
 
-        URI uri = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(response.id()).toUri();
+    URI uri = ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(response.id()).toUri();
 
-        return ResponseEntity.created(uri).body(response);
-    }
+    return ResponseEntity.created(uri).body(response);
+}
 }
