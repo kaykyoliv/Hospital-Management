@@ -58,7 +58,6 @@ public class CashierService {
                     return new ResourceNotFoundException("Cashier not found");
                 });
 
-
         userValidator.assertEmailDoesNotExist(putRequest.email(), id);
 
         cashierMapper.updateCashierFromRequest(putRequest, cashierToUpdate);
