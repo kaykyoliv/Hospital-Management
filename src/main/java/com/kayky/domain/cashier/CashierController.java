@@ -59,7 +59,7 @@ public class CashierController {
 
     @Operation(
             summary = "List all cashiers",
-            description = "Returns a paginated list off all registered cashiers"
+            description = "Returns a paginated list of all registered cashiers"
     )
     @ApiResponse(
             responseCode = "200",
