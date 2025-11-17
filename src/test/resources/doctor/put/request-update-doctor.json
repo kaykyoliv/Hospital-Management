@@ -8,5 +8,9 @@
   "crm": "CRM-12345",
   "phoneNumber": "+55 19 99999-0001",
   "officeNumber": "Room 101",
-  "availability": true
+  "availability": true,
+
+  "registrationNumber": "DOC-9842",
+  "department": "Cardiology",
+  "salary": 18500.00
 }
