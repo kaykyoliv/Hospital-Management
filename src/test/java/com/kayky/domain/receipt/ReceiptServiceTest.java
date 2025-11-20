@@ -2,10 +2,13 @@ package com.kayky.domain.receipt;
 
 import com.kayky.commons.PaymentUtils;
 import com.kayky.commons.ReceiptUtils;
+import com.kayky.core.exception.ReceiptAlreadyExistsException;
+import com.kayky.core.exception.ResourceNotFoundException;
 import com.kayky.domain.payment.PaymentRepository;
 import com.kayky.domain.receipt.generator.ReceiptNumberGenerator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -16,9 +19,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.*;
 import java.util.Optional;
 
-import static com.kayky.commons.TestConstants.EXISTING_ID;
+import static com.kayky.commons.TestConstants.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.when;
+import static org.mockito.Mockito.verify;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -50,6 +54,7 @@ public class ReceiptServiceTest {
     }
 
     @Test
+    @DisplayName("Should emit receipt successfully when payment exists and no receipt yet")
     void shouldEmitReceiptSuccessfully() {
         var now = LocalDateTime.now(fixedClock);
 
@@ -71,4 +76,32 @@ public class ReceiptServiceTest {
 
         Assertions.assertThat(result).usingRecursiveComparison().isEqualTo(expectedResponse);
     }
+
+    @Test
+    @DisplayName("Should throw ResourceNotFoundException when payment does not exist")
+    void emit_ShouldThrowResourceNotFound_WhenPaymentDoesNotExist(){
+        when(paymentRepository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> service.emit(NON_EXISTING_ID))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage(PAYMENT_NOT_FOUND);
+
+        verify(paymentRepository).findById(NON_EXISTING_ID);
+    }
+
+    @Test
+    @DisplayName("Should throw ReceiptAlreadyExistsException when receipt already exists for payment")
+    void emit_ShouldThrowReceiptAlreadyExists_WhenPaymentDoesNotExist(){
+        var payment = PaymentUtils.savedPayment(EXISTING_ID);
+
+        when(paymentRepository.findById(payment.getId())).thenReturn(Optional.of(payment));
+        when(receiptRepository.existsByPaymentId(payment.getId())).thenReturn(true);
+
+        Assertions.assertThatThrownBy(() -> service.emit(EXISTING_ID))
+                .isInstanceOf(ReceiptAlreadyExistsException.class)
+                .hasMessage(RECEIPT_ALREADY_EXISTS.formatted(payment.getId()));
+
+        verify(paymentRepository).findById(EXISTING_ID);
+    }
+
 }

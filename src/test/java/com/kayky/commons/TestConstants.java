@@ -12,6 +12,7 @@ public final class TestConstants {
     public static final String OPERATION_NOT_FOUND = "Operation not found";
     public static final String REPORT_NOT_FOUND = "Report not found";
     public static final String USER_NOT_FOUND_SAVE_OPERATION = "%s with id %d not found";
+    public static final String PAYMENT_NOT_FOUND = "Payment not found";
 
     public static final String OPERATION_PATIENT_MISMATCH =
             "Operation patient (id=%d) does not match request patient (id=%d)";
@@ -20,6 +21,7 @@ public final class TestConstants {
 
     public static final String EMAIL_ALREADY_EXISTS = "Email %s already in use";
     public static final String REPORT_ALREADY_EXISTS = "Report already exists for operation with ID: %d";
+    public static final String RECEIPT_ALREADY_EXISTS = "Receipt already exists for payment id %d";
 
     public static final Long EXISTING_ID = 1L;
     public static final Long NON_EXISTING_ID = 999L;
