@@ -55,11 +55,5 @@ public class Payment {
 
     @PrePersist
     public void prePersist() {
-        if (this.paymentDate == null) {
-            this.paymentDate = LocalDateTime.now();
-        }
-        if (this.status == null) {
-            this.status = PaymentStatus.PAID;
-        }
     }
 }

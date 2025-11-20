@@ -1,10 +1,12 @@
 package com.kayky.domain.receipt.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Builder
 @Schema(name = "ReceiptBaseResponse", description = "Represents the basic information of an issued receipt")
 public record ReceiptBaseResponse(
         @Schema(description = "Unique identifier of the receipt",
