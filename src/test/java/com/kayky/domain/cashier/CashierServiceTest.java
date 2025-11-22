@@ -129,4 +129,47 @@ class CashierServiceTest {
         verifyNoInteractions(cashierRepository);
     }
 
+    @Test
+    @DisplayName("update: should return CashierBaseResponse when data is valid")
+    void update_ShouldReturnCashierBaseResponse_WhenDataIsValid() {
+        var cashierId = EXISTING_ID;
+        var savedCashier = CashierUtils.savedCashier(cashierId);
+
+        var expectedResponse = CashierUtils.asBaseResponse(savedCashier);
+        var request = CashierUtils.asBaseRequest();
+
+        when(cashierRepository.findById(cashierId)).thenReturn(Optional.of(savedCashier));
+        doNothing().when(userValidator).assertEmailDoesNotExist(request.email(), cashierId);
+
+        when(cashierRepository.save(any(Cashier.class))).thenReturn(savedCashier);
+
+        var result = service.update(request, cashierId);
+
+        assertThat(result).usingRecursiveComparison().isEqualTo(expectedResponse);
+
+        verify(userValidator).assertEmailDoesNotExist(request.email(), cashierId);
+    }
+
+    @Test
+    @DisplayName("update: Should throw EmailAlreadyExistsException when email is already in use")
+    void update_ShouldThrowEmailAlreadyExistsException_WhenEmailAlreadyExists() {
+        var cashierId = EXISTING_ID;
+        var savedCashier = CashierUtils.savedCashier(cashierId);
+        var request = CashierUtils.asBaseRequest();
+        var email = request.email();
+
+        when(cashierRepository.findById(cashierId)).thenReturn(Optional.of(savedCashier));
+
+        doThrow(new EmailAlreadyExistsException(EMAIL_ALREADY_EXISTS.formatted(email)))
+                .when(userValidator)
+                .assertEmailDoesNotExist(email, cashierId);
+
+        assertThatThrownBy(() -> service.update(request, cashierId))
+                .isInstanceOf(EmailAlreadyExistsException.class)
+                .hasMessage(EMAIL_ALREADY_EXISTS.formatted(email));
+
+        verify(userValidator).assertEmailDoesNotExist(email, cashierId);
+        verify(cashierRepository).findById(cashierId);
+    }
+
 }
