@@ -131,7 +131,7 @@ class PatientServiceTest {
                 .isInstanceOf(EmailAlreadyExistsException.class)
                 .hasMessage(EMAIL_ALREADY_EXISTS.formatted(email));
 
-        verify(repository, times(0)).save(any());
+        verifyNoInteractions(repository);
     }
 
     @Test

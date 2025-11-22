@@ -3,9 +3,11 @@ package com.kayky.domain.cashier.request;
 import com.kayky.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 
+@Builder
 public record CashierBaseRequest(
 
         @Schema(description = "Cashier first name", example = "John")

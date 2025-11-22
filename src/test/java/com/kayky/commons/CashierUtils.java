@@ -1,6 +1,7 @@
 package com.kayky.commons;
 
 import com.kayky.domain.cashier.Cashier;
+import com.kayky.domain.cashier.request.CashierBaseRequest;
 import com.kayky.domain.cashier.response.CashierBaseResponse;
 import com.kayky.enums.Gender;
 
@@ -83,5 +84,18 @@ public class CashierUtils {
 
     public static List<CashierBaseResponse> baseResponseList(){
         return cashierList().stream().map(CashierUtils::asBaseResponse).toList();
+    }
+
+    public static CashierBaseRequest asBaseRequest() {
+        return CashierBaseRequest.builder()
+                .firstName("Maria")
+                .lastName("Silva")
+                .email("maria.silva@example.com")
+                .password("password123")
+                .gender(Gender.FEMALE)
+                .registrationNumber("REG-001")
+                .department("Finance")
+                .salary(new BigDecimal("3500.00"))
+                .build();
     }
 }

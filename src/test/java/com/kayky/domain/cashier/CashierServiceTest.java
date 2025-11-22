@@ -2,7 +2,7 @@ package com.kayky.domain.cashier;
 
 import com.kayky.commons.CashierUtils;
 import com.kayky.commons.PageUtils;
-import com.kayky.commons.CashierUtils;
+import com.kayky.core.exception.EmailAlreadyExistsException;
 import com.kayky.core.exception.ResourceNotFoundException;
 import com.kayky.domain.user.UserValidator;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,15 +17,14 @@ import org.springframework.data.domain.PageRequest;
 import java.util.Optional;
 
 import static com.kayky.commons.TestConstants.*;
-import static com.kayky.commons.TestConstants.NON_EXISTING_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CashierServiceTest {
-    
+
     private CashierService service;
 
     @Mock
@@ -33,9 +32,9 @@ class CashierServiceTest {
     private final CashierMapper cashierMapper = Mappers.getMapper(CashierMapper.class);
     @Mock
     private UserValidator userValidator;
-    
+
     @BeforeEach
-    void setUp(){
+    void setUp() {
         service = new CashierService(cashierRepository, cashierMapper, userValidator);
     }
 
@@ -91,6 +90,43 @@ class CashierServiceTest {
         assertThat(result.getContent()).usingRecursiveComparison().isEqualTo(expectedResponse);
 
         verify(cashierRepository).findAll(pageRequest);
+    }
+
+    @Test
+    @DisplayName("save: should return CashierBaseResponse when data is valid")
+    void save_ShouldReturnCashierBaseResponse_WhenDataIsValid() {
+        var savedCashier = CashierUtils.savedCashier(EXISTING_ID);
+
+        var expectedResponse = CashierUtils.asBaseResponse(savedCashier);
+        var request = CashierUtils.asBaseRequest();
+
+        doNothing().when(userValidator).assertEmailDoesNotExist(request.email());
+
+        when(cashierRepository.save(any(Cashier.class))).thenReturn(savedCashier);
+
+        var result = service.save(request);
+
+        assertThat(result).usingRecursiveComparison().isEqualTo(expectedResponse);
+
+        verify(userValidator).assertEmailDoesNotExist(request.email());
+    }
+
+    @Test
+    @DisplayName("save: Should throw EmailAlreadyExistsException when email is already in use")
+    void save_ShouldThrowEmailAlreadyExistsException_WhenEmailAlreadyExists() {
+        var request = CashierUtils.asBaseRequest();
+        var email = request.email();
+
+        doThrow(new EmailAlreadyExistsException(EMAIL_ALREADY_EXISTS.formatted(email)))
+                .when(userValidator)
+                .assertEmailDoesNotExist(email);
+
+        assertThatThrownBy(() -> service.save(request))
+                .isInstanceOf(EmailAlreadyExistsException.class)
+                .hasMessage(EMAIL_ALREADY_EXISTS.formatted(email));
+
+        verify(userValidator).assertEmailDoesNotExist(email);
+        verifyNoInteractions(cashierRepository);
     }
 
 }
