@@ -3,11 +3,12 @@ package com.kayky.domain.payment.response;
 import com.kayky.domain.payment.enums.PaymentMethod;
 import com.kayky.domain.payment.enums.PaymentStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-
+@Builder
 @Schema(
         description = "Response object containing details about a processed payment"
 )

@@ -14,9 +14,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.*;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 import static com.kayky.commons.TestConstants.*;
@@ -79,7 +80,7 @@ public class ReceiptServiceTest {
 
     @Test
     @DisplayName("Should throw ResourceNotFoundException when payment does not exist")
-    void emit_ShouldThrowResourceNotFound_WhenPaymentDoesNotExist(){
+    void emit_ShouldThrowResourceNotFound_WhenPaymentDoesNotExist() {
         when(paymentRepository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() -> service.emit(NON_EXISTING_ID))
@@ -91,7 +92,7 @@ public class ReceiptServiceTest {
 
     @Test
     @DisplayName("Should throw ReceiptAlreadyExistsException when receipt already exists for payment")
-    void emit_ShouldThrowReceiptAlreadyExists_WhenPaymentDoesNotExist(){
+    void emit_ShouldThrowReceiptAlreadyExists_WhenPaymentDoesNotExist() {
         var payment = PaymentUtils.savedPayment(EXISTING_ID);
 
         when(paymentRepository.findById(payment.getId())).thenReturn(Optional.of(payment));
