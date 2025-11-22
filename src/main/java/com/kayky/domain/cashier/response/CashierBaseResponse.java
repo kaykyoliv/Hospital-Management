@@ -2,9 +2,11 @@ package com.kayky.domain.cashier.response;
 
 import com.kayky.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 
+@Builder
 public record CashierBaseResponse(
         @Schema(
                 description = "Unique identifier of the cashier",
