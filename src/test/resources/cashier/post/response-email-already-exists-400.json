@@ -1,0 +1,5 @@
+{
+  "status": 400,
+  "error": "Email maria.silva@example.com already in use",
+  "path": "/v1/cashier"
+}

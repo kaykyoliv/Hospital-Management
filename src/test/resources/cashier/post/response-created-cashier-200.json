@@ -1,0 +1,11 @@
+{
+  "id": 1,
+  "firstName": "Maria",
+  "lastName": "Silva",
+  "email": "maria.silva@example.com",
+  "gender": "FEMALE",
+  "registrationNumber": "REG-001",
+  "department": "Finance",
+  "salary": 3500.00,
+  "active": true
+}
