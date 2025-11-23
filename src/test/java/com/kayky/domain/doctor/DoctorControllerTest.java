@@ -47,7 +47,6 @@ class DoctorControllerTest {
 
         mockMvc.perform(get(PATH_ID, response.getId())
                         .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedResponse));
 
@@ -67,7 +66,6 @@ class DoctorControllerTest {
 
         mockMvc.perform(get(PATH_ID, NON_EXISTING_ID)
                 .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage))
                 .andExpect(content().json(expectedJsonResponse));
@@ -87,7 +85,6 @@ class DoctorControllerTest {
         BDDMockito.when(service.findAll(any(Pageable.class))).thenReturn(pageResponse);
 
         mockMvc.perform(get(BASE_URI))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedJsonResponse));
@@ -112,7 +109,6 @@ class DoctorControllerTest {
                         .content(request)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedJsonResponse))
@@ -164,7 +160,6 @@ class DoctorControllerTest {
                     .content(request)
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedJsonResponse));
@@ -187,7 +182,6 @@ class DoctorControllerTest {
                         .content(request)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage))
                 .andExpect(content().json(expectedJsonResponse));

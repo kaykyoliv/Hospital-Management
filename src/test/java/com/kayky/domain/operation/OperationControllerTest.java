@@ -53,7 +53,6 @@ class OperationControllerTest {
 
         mockMvc.perform(get(PATH_ID, response.getId())
                         .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedResponse));
 
@@ -71,7 +70,6 @@ class OperationControllerTest {
 
         mockMvc.perform(get(PATH_ID, NON_EXISTING_ID)
                         .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage))
                 .andExpect(content().json(expectedJsonResponse));
@@ -92,7 +90,6 @@ class OperationControllerTest {
         BDDMockito.when(service.findAll(any(Pageable.class))).thenReturn(pageResponse);
 
         mockMvc.perform(get(BASE_URI))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedJsonResponse));
@@ -115,7 +112,6 @@ class OperationControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
-                .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(content().json(expectedJsonResponse));
 
@@ -162,7 +158,6 @@ class OperationControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedJsonResponse));
 
@@ -199,7 +194,6 @@ class OperationControllerTest {
         BDDMockito.doNothing().when(service).delete(EXISTING_ID);
 
         mockMvc.perform(delete(PATH_ID, EXISTING_ID))
-                .andDo(print())
                 .andExpect(status().isNoContent());
 
         BDDMockito.verify(service).delete(EXISTING_ID);
@@ -215,7 +209,6 @@ class OperationControllerTest {
 
         mockMvc.perform(delete(PATH_ID, NON_EXISTING_ID)
                         .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage));
 

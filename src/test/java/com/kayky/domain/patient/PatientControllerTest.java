@@ -47,7 +47,6 @@ class PatientControllerTest {
 
         mockMvc.perform(get(PATH_ID, response.getId())
                         .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedJsonResponse));
 
@@ -65,7 +64,6 @@ class PatientControllerTest {
                 .thenThrow(new ResourceNotFoundException(expectedErrorMessage));
 
         mockMvc.perform(get(PATH_ID, NON_EXISTING_ID))
-                .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage))
                 .andExpect(content().json(expectedJsonResponse));
@@ -85,7 +83,6 @@ class PatientControllerTest {
         BDDMockito.when(service.findAll(any(Pageable.class))).thenReturn(pageResponse);
 
         mockMvc.perform(get(BASE_URI))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedJsonResponse));
@@ -108,7 +105,6 @@ class PatientControllerTest {
                     .content(request)
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedJsonResponse))
@@ -134,7 +130,6 @@ class PatientControllerTest {
                     .content(request)
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage))
                 .andExpect(content().json(expectedJsonResponse));
@@ -157,7 +152,6 @@ class PatientControllerTest {
                     .accept(MediaType.APPLICATION_JSON)
                     .content(request)
                     .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedJsonResponse));
@@ -181,7 +175,6 @@ class PatientControllerTest {
                     .accept(MediaType.APPLICATION_JSON)
                     .content(request)
                     .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(content().json(expectedJsonResponse))
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage));
@@ -206,7 +199,6 @@ class PatientControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .content(request)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json(expectedJsonResponse))
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage));

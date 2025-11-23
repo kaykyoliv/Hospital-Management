@@ -38,7 +38,6 @@ class UserControllerTest {
         doNothing().when(service).activateUser(EXISTING_ID);
 
         mockMvc.perform(patch(BASE_URI + "/{id}/activate", EXISTING_ID))
-                .andDo(print())
                 .andExpect(status().isNoContent());
 
         verify(service).activateUser(EXISTING_ID);
@@ -50,7 +49,6 @@ class UserControllerTest {
         doNothing().when(service).deactivateUser(EXISTING_ID);
 
         mockMvc.perform(patch(BASE_URI + "/{id}/deactivate", EXISTING_ID))
-                .andDo(print())
                 .andExpect(status().isNoContent());
 
         verify(service).deactivateUser(EXISTING_ID);
@@ -65,7 +63,6 @@ class UserControllerTest {
                 .activateUser(NON_EXISTING_ID);
 
         mockMvc.perform(patch(BASE_URI + "/{id}/activate", NON_EXISTING_ID))
-                .andDo(print())
                 .andExpect(status().isNotFound());
     }
 
@@ -79,7 +76,6 @@ class UserControllerTest {
                 .deactivateUser(NON_EXISTING_ID);
 
         mockMvc.perform(patch(BASE_URI + "/{id}/deactivate", NON_EXISTING_ID))
-                .andDo(print())
                 .andExpect(status().isNotFound());
     }
 
@@ -92,7 +88,6 @@ class UserControllerTest {
                 .activateUser(EXISTING_ID);
 
         mockMvc.perform(patch(BASE_URI + "/{id}/activate", EXISTING_ID))
-                .andDo(print())
                 .andExpect(status().isBadRequest());
     }
 
@@ -104,7 +99,6 @@ class UserControllerTest {
                 .deactivateUser(EXISTING_ID);
 
         mockMvc.perform(patch(BASE_URI + "/{id}/deactivate", EXISTING_ID))
-                .andDo(print())
                 .andExpect(status().isBadRequest());
     }
 
