@@ -1,0 +1,40 @@
+{
+  "content": [
+    {
+      "id": 1,
+      "patientId": 1,
+      "patientName": "Robert Williams",
+      "cashierId": 1,
+      "cashierName": "Maria Silva",
+      "amount": 150.00,
+      "paymentMethod": "CREDIT_CARD",
+      "status": "PAID",
+      "paymentDate": "2025-01-10T15:00:00"
+    },
+    {
+      "id": 2,
+      "patientId": 2,
+      "patientName": "Robert Williams",
+      "cashierId": 1,
+      "cashierName": "Maria Silva",
+      "amount": 320.50,
+      "paymentMethod": "DEBIT_CARD",
+      "status": "PENDING",
+      "paymentDate": "2025-02-05T11:30:00"
+    },
+    {
+      "id": 3,
+      "patientId": 3,
+      "patientName": "Robert Williams",
+      "cashierId": 2,
+      "cashierName": "Maria Silva",
+      "amount": 89.99,
+      "paymentMethod": "CASH",
+      "status": "CANCELLED",
+      "paymentDate": "2025-03-01T09:45:00"
+    }
+  ],
+  "currentPage": 0,
+  "totalElements": 3,
+  "totalPages": 1
+}

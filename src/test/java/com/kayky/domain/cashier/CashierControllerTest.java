@@ -44,7 +44,7 @@ class CashierControllerTest {
         validUpdateRequest = FileUtils.readResourceFile("cashier/put/request-update-cashier-200.json");
     }
 
-    private String expectedJsonResponse(String resourcePath) {
+    private String loadExpectedJson(String resourcePath) {
         return FileUtils.readResourceFile(resourcePath);
     }
 
@@ -75,7 +75,7 @@ class CashierControllerTest {
         mockMvc.perform(get(PATH_ID, cashierId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json(expectedJsonResponse("cashier/get/cashier-by-id-200.json")))
+                .andExpect(content().json(loadExpectedJson("cashier/get/cashier-by-id-200.json")))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
         verify(service).findById(EXISTING_ID);
@@ -91,7 +91,7 @@ class CashierControllerTest {
         mockMvc.perform(get(PATH_ID, NON_EXISTING_ID)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(content().json(expectedJsonResponse("cashier/get/cashier-by-id-404.json")))
+                .andExpect(content().json(loadExpectedJson("cashier/get/cashier-by-id-404.json")))
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
@@ -111,7 +111,7 @@ class CashierControllerTest {
         mockMvc.perform(get(BASE_URI))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(expectedJsonResponse("cashier/get/all-paged-cashiers-200.json")));
+                .andExpect(content().json(loadExpectedJson("cashier/get/all-paged-cashiers-200.json")));
 
 
         verify(service).findAll(any(Pageable.class));
@@ -128,7 +128,7 @@ class CashierControllerTest {
         performPostRequest(validCreateRequest)
                 .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(expectedJsonResponse("cashier/post/response-created-cashier-200.json")));
+                .andExpect(content().json(loadExpectedJson("cashier/post/response-created-cashier-200.json")));
 
         verify(service).save(any(CashierBaseRequest.class));
     }
@@ -146,7 +146,7 @@ class CashierControllerTest {
         performPostRequest(validCreateRequest)
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(expectedJsonResponse("cashier/post/response-email-already-exists-400.json")))
+                .andExpect(content().json(loadExpectedJson("cashier/post/response-email-already-exists-400.json")))
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage));
 
         verify(service).save(any(CashierBaseRequest.class));
@@ -159,7 +159,7 @@ class CashierControllerTest {
 
         performPostRequest(invalidRequest)
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(content().json(expectedJsonResponse("cashier/post/validation-error-422.json")));
+                .andExpect(content().json(loadExpectedJson("cashier/post/validation-error-422.json")));
     }
 
 
@@ -174,7 +174,7 @@ class CashierControllerTest {
         performPutRequest(EXISTING_ID, validUpdateRequest)
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(expectedJsonResponse("cashier/put/response-updated-cashier-200.json")));
+                .andExpect(content().json(loadExpectedJson("cashier/put/response-updated-cashier-200.json")));
 
         verify(service).update(any(CashierBaseRequest.class), eq(EXISTING_ID));
     }
@@ -190,7 +190,7 @@ class CashierControllerTest {
         performPutRequest(NON_EXISTING_ID, validUpdateRequest)
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage))
-                .andExpect(content().json(expectedJsonResponse("cashier/put/cashier-not-found-404.json")));
+                .andExpect(content().json(loadExpectedJson("cashier/put/cashier-not-found-404.json")));
 
         verify(service).update(any(CashierBaseRequest.class), eq(NON_EXISTING_ID));
     }
@@ -208,7 +208,7 @@ class CashierControllerTest {
         performPutRequest(EXISTING_ID, validUpdateRequest)
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(expectedJsonResponse("cashier/put/response-email-already-exists-400.json")))
+                .andExpect(content().json(loadExpectedJson("cashier/put/response-email-already-exists-400.json")))
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage));
 
         verify(service).update(any(CashierBaseRequest.class), eq(EXISTING_ID));
@@ -222,7 +222,7 @@ class CashierControllerTest {
         performPutRequest(EXISTING_ID, invalidRequest)
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(expectedJsonResponse("cashier/put/validation-error-422.json")));
+                .andExpect(content().json(loadExpectedJson("cashier/put/validation-error-422.json")));
 
         verify(service, never()).update(any(), anyLong());
     }

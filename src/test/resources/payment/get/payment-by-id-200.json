@@ -1,0 +1,11 @@
+{
+  "id": 1,
+  "patientId": 1,
+  "patientName": "Robert Williams",
+  "cashierId": 1,
+  "cashierName": "Maria Silva",
+  "amount": 150.00,
+  "paymentMethod": "CREDIT_CARD",
+  "status": "PAID",
+  "paymentDate": "2025-01-10T15:00:00"
+}
