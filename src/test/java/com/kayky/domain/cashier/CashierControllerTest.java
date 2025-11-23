@@ -3,29 +3,24 @@ package com.kayky.domain.cashier;
 import com.kayky.commons.CashierUtils;
 import com.kayky.commons.FileUtils;
 import com.kayky.commons.PageUtils;
-import com.kayky.commons.PatientUtils;
 import com.kayky.core.exception.EmailAlreadyExistsException;
 import com.kayky.core.exception.ResourceNotFoundException;
 import com.kayky.domain.cashier.request.CashierBaseRequest;
-import com.kayky.domain.patient.request.PatientBaseRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static com.kayky.commons.TestConstants.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = CashierController.class)
@@ -41,10 +36,26 @@ class CashierControllerTest {
     private CashierService service;
 
     private String validCreateRequest;
+    private String validUpdateRequest;
 
     @BeforeEach
     void setUp() {
         validCreateRequest = FileUtils.readResourceFile("cashier/post/request-create-cashier-201.json");
+        validUpdateRequest = FileUtils.readResourceFile("cashier/put/request-update-cashier-200.json");
+    }
+
+    private ResultActions performPostRequest(String jsonContent) throws Exception {
+        return mockMvc.perform(post(BASE_URI)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonContent));
+    }
+
+    private ResultActions performPutRequest(Long id, String jsonContent) throws Exception {
+        return mockMvc.perform(put(PATH_ID, id)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonContent));
     }
 
     @Test
@@ -115,10 +126,7 @@ class CashierControllerTest {
 
         when(service.save(any(CashierBaseRequest.class))).thenReturn(response);
 
-        mockMvc.perform(post(BASE_URI)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(validCreateRequest))
+        performPostRequest(validCreateRequest)
                 .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedJsonResponse));
@@ -129,18 +137,15 @@ class CashierControllerTest {
     @Test
     @DisplayName("POST /v1/cashier - Should return 400 when email already exists")
     void save_ShouldThrowEmailAlreadyExistsException_WhenEmailAlreadyExists() throws Exception {
-        var expectedJsonResponse =  FileUtils.readResourceFile("cashier/post/response-email-already-exists-400.json");
-        var postRequest= CashierUtils.asBaseRequest();
+        var expectedJsonResponse = FileUtils.readResourceFile("cashier/post/response-email-already-exists-400.json");
+        var postRequest = CashierUtils.asBaseRequest();
 
         var expectedErrorMessage = EMAIL_ALREADY_EXISTS.formatted(postRequest.email());
 
         when(service.save(any(CashierBaseRequest.class)))
                 .thenThrow(new EmailAlreadyExistsException(expectedErrorMessage));
 
-        mockMvc.perform(post(BASE_URI)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(validCreateRequest))
+        performPostRequest(validCreateRequest)
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(expectedJsonResponse))
@@ -155,12 +160,80 @@ class CashierControllerTest {
         var invalidRequest = FileUtils.readResourceFile("cashier/post/request-create-cashier-invalid-422.json");
         var expectedJsonResponse = FileUtils.readResourceFile("cashier/post/validation-error-422.json");
 
-        mockMvc.perform(post(BASE_URI)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(invalidRequest))
-                .andDo(print())
+        performPostRequest(invalidRequest)
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(content().json(expectedJsonResponse));
+    }
+
+
+    @Test
+    @DisplayName("PUT /v1/cashier/{id} - Should return 200 OK when cashier is updated successfully")
+    void update_ShouldReturn200OK_WhenRequestIsValid() throws Exception {
+        var expectedJsonResponse = FileUtils.readResourceFile("cashier/put/response-updated-cashier-200.json");
+
+        var updatedCashier = CashierUtils.updatedCashier();
+        var response = CashierUtils.asBaseResponse(updatedCashier);
+
+        when(service.update(any(CashierBaseRequest.class), eq(response.id()))).thenReturn(response);
+
+        performPutRequest(EXISTING_ID, validUpdateRequest)
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedJsonResponse));
+
+        verify(service).update(any(CashierBaseRequest.class), eq(EXISTING_ID));
+    }
+
+    @Test
+    @DisplayName("PUT /v1/cashier/{id} - Should return 404 when cashier is not found")
+    void update_ShouldReturn404_WhenCashierDoesNotExist() throws Exception {
+        var expectedJsonResponse = FileUtils.readResourceFile("cashier/put/cashier-not-found-404.json");
+
+        var expectedErrorMessage = CASHIER_NOT_FOUND;
+
+        when(service.update(any(CashierBaseRequest.class), eq(NON_EXISTING_ID)))
+                .thenThrow(new ResourceNotFoundException(expectedErrorMessage));
+
+        performPutRequest(NON_EXISTING_ID, validUpdateRequest)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value(expectedErrorMessage))
+                .andExpect(content().json(expectedJsonResponse));
+
+        verify(service).update(any(CashierBaseRequest.class), eq(NON_EXISTING_ID));
+    }
+
+    @Test
+    @DisplayName("PUT /v1/cashier/1 - Should return 400 when email already exists")
+    void update_ShouldThrowEmailAlreadyExistsException_WhenEmailAlreadyExists() throws Exception {
+        var expectedJsonResponse = FileUtils.readResourceFile("cashier/put/response-email-already-exists-400.json");
+
+        var postRequest = CashierUtils.asBaseRequest();
+
+        var expectedErrorMessage = EMAIL_ALREADY_EXISTS.formatted(postRequest.email());
+
+        when(service.update(any(CashierBaseRequest.class), eq(EXISTING_ID)))
+                .thenThrow(new EmailAlreadyExistsException(expectedErrorMessage));
+
+        performPutRequest(EXISTING_ID, validUpdateRequest)
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedJsonResponse))
+                .andExpect(jsonPath("$.error").value(expectedErrorMessage));
+
+        verify(service).update(any(CashierBaseRequest.class), eq(EXISTING_ID));
+    }
+
+    @Test
+    @DisplayName("PUT /v1/cashier/{id} - Should return 422 when request is invalid")
+    void update_ShouldReturn422_WhenRequestIsInvalid() throws Exception {
+        var invalidRequest = FileUtils.readResourceFile("cashier/put/request-update-cashier-invalid-422.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("cashier/put/validation-error-422.json");
+
+        performPutRequest(EXISTING_ID, invalidRequest)
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(expectedJsonResponse));
+
+        verify(service, never()).update(any(), anyLong());
     }
 }
