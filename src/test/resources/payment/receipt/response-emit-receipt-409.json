@@ -1,0 +1,5 @@
+{
+  "status": 409,
+  "error": "Receipt already exists for payment id 1",
+  "path": "/v1/payment/1/receipt"
+}
