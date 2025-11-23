@@ -77,6 +77,12 @@ public class PaymentUtils {
         return paymentList().stream().map(PaymentUtils::asBaseResponse).toList();
     }
 
+    public static List<PaymentBaseResponse> paymentsForPatient(Long patientId) {
+        return baseResponseList().stream()
+                .filter(p -> p.patientId().equals(patientId))
+                .toList();
+    }
+
 
     public static PaymentBaseRequest asBaseRequest() {
         return PaymentBaseRequest.builder()

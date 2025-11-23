@@ -41,6 +41,11 @@ class PaymentControllerTest {
         return FileUtils.readResourceFile(resourcePath);
     }
 
+    private String urlForPatientPayments(Long patientId) {
+        return BASE_URI + "/patients/" + patientId + "/payments";
+    }
+
+
     @Test
     @DisplayName("GET /v1/payment/{id} - Should return 200 with payment data when payment exists")
     void findById_ShouldReturnPaymentGetResponse_WhenPaymentExists() throws Exception {
@@ -92,5 +97,39 @@ class PaymentControllerTest {
 
 
         verify(service).findAll(any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("GET /v1/payment/patients/{patientId}/payments - Should return list of payments when patient exists")
+    void findByPatient_ShouldReturnPaymentList_WhenPatientExists() throws Exception{
+
+        var patientId = EXISTING_ID;
+        var patientPayments  = PaymentUtils.paymentsForPatient(patientId);
+
+        when(service.findByPatient(patientId)).thenReturn(patientPayments);
+
+        mockMvc.perform(get(urlForPatientPayments(patientId)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(loadExpectedJson("payment/get/payments-by-patient-200.json")));
+
+        verify(service).findByPatient(patientId);
+    }
+
+    @Test
+    @DisplayName("GET /v1/payment/patients/{patientId}/payments - Should return 404 when patient is not found")
+    void findByPatient_ShouldThrowResourceNotFoundException_WhenPatientDoesNotExist() throws Exception {
+        var expectedErrorMessage = PATIENT_NOT_FOUND;
+
+        when(service.findByPatient(NON_EXISTING_ID)).thenThrow(new ResourceNotFoundException(expectedErrorMessage));
+
+        mockMvc.perform(get(urlForPatientPayments(NON_EXISTING_ID))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(content().json(loadExpectedJson("payment/get/payments-by-patient-404.json")))
+                .andExpect(jsonPath("$.error").value(expectedErrorMessage))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+
+        verify(service).findByPatient(NON_EXISTING_ID);
     }
 }
