@@ -86,6 +86,33 @@
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-testcontainers</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>mysql</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<version>5.5.6</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.javacrumbs.json-unit</groupId>
+			<artifactId>json-unit-assertj</artifactId>
+			<version>4.1.1</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -140,26 +167,22 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.12</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>${maven-failsafe-plugin.version}</version>
+				<configuration>
+					<argLine>-Dspring.profiles.active=itest</argLine>
+					<includes>
+						<include>**/*IT.java</include>
+						<include>**/*IntegrationTest.java</include>
+					</includes>
+				</configuration>
 				<executions>
 					<execution>
-						<id>pre-test</id>
 						<goals>
-							<goal>prepare-agent</goal>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
 						</goals>
-					</execution>
-
-					<execution>
-						<id>post-test</id>
-						<phase>test</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>target/jacoco-report</outputDirectory>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>

@@ -28,13 +28,13 @@ public final class PatientUtils {
     public static List<Patient> patientList() {
         var patient1 = Patient.builder()
                 .id(1L)
-                .firstName("John")
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .password("hashed_password_1")
+                .firstName("Robert")
+                .lastName("Williams")
+                .email("robert.williams@example.com")
+                .password("hashed_password_4")
                 .active(true)
                 .gender(Gender.MALE)
-                .address("123 Main St, Anytown")
+                .address("101 Oak Lane, Newtown")
                 .bloodType("AB-")
                 .build();
 
