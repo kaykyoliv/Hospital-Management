@@ -94,7 +94,7 @@ class PatientControllerTest {
     @DisplayName("POST /v1/patient - Should return 201 Created when patient is saved successfully")
     void save_ShouldReturnPostResponse_WhenEmailIsUnique() throws Exception {
         var request = FileUtils.readResourceFile("patient/post/request-create-patient-201.json");
-        var expectedJsonResponse =  FileUtils.readResourceFile("patient/post/response-created-patient-200.json");
+        var expectedJsonResponse =  FileUtils.readResourceFile("patient/post/response-created-patient-201.json");
 
         var patient = PatientUtils.savedPatient(EXISTING_ID);
         var expectedResponse = PatientUtils.asBaseResponse(patient);

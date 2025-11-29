@@ -28,13 +28,4 @@ public class FileUtils {
             throw new RuntimeException("Failed to read resource file: " + filePath, e);
         }
     }
-
-    public static Map<String, Object> readResourceAsJson(String path) {
-        try {
-            var json = readResourceFile(path);
-            return mapper.readValue(json, new TypeReference<>() {});
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to parse JSON file: " + path, e);
-        }
-    }
 }
