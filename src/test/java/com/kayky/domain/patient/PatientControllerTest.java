@@ -189,8 +189,9 @@ class PatientControllerTest {
         var request = FileUtils.readResourceFile("patient/put/request-update-patient.json");
         var expectedJsonResponse = FileUtils.readResourceFile("patient/put/response-email-already-exists-400.json");
 
-        var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
-        var expectedErrorMessage = EMAIL_ALREADY_EXISTS.formatted(savedPatient.getEmail());
+        var savedPatient = PatientUtils.patientList();
+
+        var expectedErrorMessage = EMAIL_ALREADY_EXISTS.formatted(savedPatient.get(1).getEmail());
 
         BDDMockito.when(service.update(any(PatientBaseRequest.class), eq(EXISTING_ID)))
                 .thenThrow(new EmailAlreadyExistsException(expectedErrorMessage));

@@ -98,7 +98,7 @@ class DoctorControllerTest {
     void save_ShouldReturnPostResponse_WhenEmailIsUnique() throws Exception {
 
         var request =  FileUtils.readResourceFile("doctor/post/request-create-doctor-201.json");
-        var expectedJsonResponse =  FileUtils.readResourceFile("doctor/post/response-created-doctor-200.json");
+        var expectedJsonResponse =  FileUtils.readResourceFile("doctor/post/response-created-doctor-201.json");
 
         var savedDoctor = DoctorUtils.savedDoctor(EXISTING_ID);
         var expectedResponse = DoctorUtils.asBaseResponse(savedDoctor);

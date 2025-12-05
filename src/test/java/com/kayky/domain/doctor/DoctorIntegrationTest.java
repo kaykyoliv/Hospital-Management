@@ -1,6 +1,7 @@
 package com.kayky.domain.doctor;
 
 import com.kayky.config.BaseIntegrationTest;
+import com.kayky.domain.doctor.response.DoctorBaseResponse;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -10,6 +11,7 @@ import net.javacrumbs.jsonunit.core.Option;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -19,6 +21,7 @@ import static com.kayky.commons.FileUtils.readResourceFile;
 import static com.kayky.commons.TestConstants.EXISTING_ID;
 import static com.kayky.commons.TestConstants.NON_EXISTING_ID;
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Sql(value = "/doctor/sql/cleanup-doctor-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(value = "/doctor/sql/doctor-test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -26,6 +29,7 @@ import static io.restassured.RestAssured.given;
 public class DoctorIntegrationTest extends BaseIntegrationTest {
 
     private static final String GET = "doctor/get/";
+    private static final String POST = "doctor/post/";
 
     private ApiClient api() {
         return new ApiClient(port);
@@ -75,6 +79,52 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
         }
     }
 
+    @Nested
+    @DisplayName("POST /v1/doctor")
+    class PostEndpoints {
+        @Test
+        @DisplayName("POST /v1/doctor - Should return 201 with doctor data when request is valid")
+        @Sql(value = "/doctor/sql/cleanup-doctor-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+        void shouldReturn201_WhenRequestIsValida_onPost(){
+            var request = readResourceFile(POST + "request-create-doctor-201.json");
+            var expectedResponse = readResourceFile(POST + "response-created-doctor-201.json");
+
+            var response = api().post("", request, HttpStatus.CREATED);
+
+            assertThat(response.header(HttpHeaders.LOCATION))
+                    .matches(".*/v1/doctor/\\d+$");
+
+            var doctor = response.as(DoctorBaseResponse.class);
+            var json = response.asString();
+
+            assertThat(doctor.getId()).isPositive();
+
+            assertJson(json, expectedResponse, "id");
+        }
+
+        @Test
+        @DisplayName("POST /v1/doctor - Should return 400 when email already exists")
+        void shouldReturn400_whenEmailAlreadyExists_onPost(){
+            var request = readResourceFile(POST + "request-create-doctor-201.json");
+            var expectedResponse = readResourceFile(POST + "response-email-already-exists-400.json");
+
+            var response = api().post("", request, HttpStatus.BAD_REQUEST).asString();
+
+            assertJson(response, expectedResponse, "timestamp");
+        }
+
+        @DisplayName("POST /v1/doctor - Should return 422 when request is invalid")
+        @Test
+        void shouldReturn422_whenRequestIsInvalid_onPost() {
+            var request = readResourceFile(POST + "request-create-doctor-invalid-422.json");
+            var expectedResponse = readResourceFile(POST + "validation-error-422.json");
+
+            var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
+
+            assertJson(response, expectedResponse, "timestamp");
+        }
+    }
+
     record ApiClient(int port) {
         private static final String BASE_URI = "http://localhost:%d/v1/doctor";
 
@@ -98,6 +148,24 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
             return get(path, status, Map.of());
         }
 
+        ExtractableResponse<Response> post(String path, String body, HttpStatus status){
+            return baseRequest()
+                    .body(body)
+                    .post(path)
+                    .then()
+                    .statusCode(status.value())
+                    .extract();
+        }
+
+        ExtractableResponse<Response> put(String path, String body, HttpStatus status, Map<String, ?> pathParams) {
+            return baseRequest()
+                    .pathParams(pathParams)
+                    .body(body)
+                    .put(path)
+                    .then()
+                    .statusCode(status.value())
+                    .extract();
+        }
 
     }
 
