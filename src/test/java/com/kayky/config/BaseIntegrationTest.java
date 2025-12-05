@@ -1,10 +1,12 @@
 package com.kayky.config;
 
 import io.restassured.RestAssured;
+import io.restassured.http.Method;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -13,10 +15,14 @@ import org.springframework.test.context.ActiveProfiles;
 public abstract class BaseIntegrationTest {
 
     @LocalServerPort
-    private int port;
+    protected int port;
 
     @BeforeEach
     void setupRestAssured() {
         RestAssured.port = port;
+    }
+
+    protected Method toRestAssuredMethod(HttpMethod method) {
+        return Method.valueOf(method.name());
     }
 }
