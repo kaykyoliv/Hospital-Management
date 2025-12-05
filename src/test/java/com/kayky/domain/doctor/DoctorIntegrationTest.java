@@ -30,6 +30,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
 
     private static final String GET = "doctor/get/";
     private static final String POST = "doctor/post/";
+    private static final String PUT = "doctor/put/";
 
     private ApiClient api() {
         return new ApiClient(port);
@@ -124,7 +125,59 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
             assertJson(response, expectedResponse, "timestamp");
         }
     }
+    @Nested
+    @DisplayName("PUT /v1/doctor/{id}")
+    class PutEndpoints {
+        @Test
+        @DisplayName("PUT /v1/doctor - Should return 200 with updated doctor data when request is valid")
+        void shouldReturn200_whenRequestIsValid_onPut() {
+            var request = readResourceFile(PUT + "request-update-doctor.json");
+            var expectedResponse = readResourceFile(PUT + "response-updated-doctor.json");
 
+            var response = api().put("/{id}", request, HttpStatus.OK, Map.of("id", EXISTING_ID)).asString();
+
+            JsonAssertions.assertThatJson(response)
+                    .whenIgnoringPaths("id")
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo(expectedResponse)
+                    .node("id").isEqualTo(EXISTING_ID);
+        }
+
+        @Test
+        @DisplayName("PUT /v1/doctor - Should return 404 when doctor does not exist")
+        void shouldReturn404_whenDoctorDoesNotExist_onPut() {
+            var request = readResourceFile(PUT + "request-update-doctor.json");
+            var expectedResponse = readResourceFile(PUT + "response-doctor-not-found-404.json");
+
+            var response = api().put("/{id}", request, HttpStatus.NOT_FOUND, Map.of("id", NON_EXISTING_ID)).asString();
+
+            assertJson(response, expectedResponse, "id");
+        }
+
+        @Test
+        @DisplayName("PUT /v1/doctor - Should return 400 when email already exists")
+        void shouldReturn400_whenEmailAlreadyExists_onPut() {
+            var request = readResourceFile(PUT + "request-email-already-exists.json");
+            var expectedResponse = readResourceFile(PUT + "response-email-already-exists-400.json");
+
+            var response = api().put("/{id}", request, HttpStatus.BAD_REQUEST, Map.of("id", EXISTING_ID)).asString();
+
+            assertJson(response, expectedResponse, "id", "timestamp");
+        }
+
+
+        @Test
+        @DisplayName("PUT /v1/doctor - Should return 422 when request is invalid")
+        void shouldReturn422_whenRequestIsInvalid_onPut() {
+            var request = readResourceFile(PUT + "request-update-doctor-invalid-422.json");
+            var expectedResponse = readResourceFile(PUT + "validation-error-422.json");
+
+            var response = api().put("/{id}", request, HttpStatus.UNPROCESSABLE_ENTITY, Map.of("id", EXISTING_ID)).asString();
+
+            assertJson(response, expectedResponse, "timestamp");
+        }
+    }
+    
     record ApiClient(int port) {
         private static final String BASE_URI = "http://localhost:%d/v1/doctor";
 
