@@ -65,7 +65,7 @@ public class PatientIntegrationTest extends BaseIntegrationTest {
         void shouldReturnPagedPatients_whenPatientsExist() {
             var expectedResponse = readResourceFile(GET + "all-paged-patients-200.json");
 
-            var response = api().get("", HttpStatus.OK, Map.of()).asString();
+            var response = api().get("", HttpStatus.OK).asString();
 
             JsonAssertions.assertThatJson(response)
                     .whenIgnoringPaths("content[*].id")
@@ -110,7 +110,7 @@ public class PatientIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("POST /v1/patient - Should return 400 when email already exists")
         void shouldReturn400_whenEmailAlreadyExists_onPost() {
-            var request = readResourceFile(POST + "request-create-patient-201.json");
+            var request = readResourceFile(POST + "request-email-already-exists.json");
             var expectedResponse = readResourceFile(POST + "response-email-already-exists-400.json");
 
             var response = api().post("", request, HttpStatus.BAD_REQUEST).asString();
@@ -202,6 +202,10 @@ public class PatientIntegrationTest extends BaseIntegrationTest {
                     .then()
                     .statusCode(status.value())
                     .extract();
+        }
+
+        ExtractableResponse<Response> get(String path, HttpStatus status) {
+            return get(path, status, Map.of());
         }
 
         ExtractableResponse<Response> post(String path, String body, HttpStatus status) {

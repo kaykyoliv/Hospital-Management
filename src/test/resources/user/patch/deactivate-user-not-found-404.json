@@ -1,0 +1,5 @@
+{
+  "status": 404,
+  "error": "User not found",
+  "path": "/v1/user/999/deactivate"
+}

@@ -86,7 +86,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("POST /v1/doctor - Should return 201 with doctor data when request is valid")
         @Sql(value = "/doctor/sql/cleanup-doctor-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-        void shouldReturn201_WhenRequestIsValida_onPost(){
+        void shouldReturn201_WhenRequestIsValid_onPost(){
             var request = readResourceFile(POST + "request-create-doctor-201.json");
             var expectedResponse = readResourceFile(POST + "response-created-doctor-201.json");
 
@@ -106,7 +106,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("POST /v1/doctor - Should return 400 when email already exists")
         void shouldReturn400_whenEmailAlreadyExists_onPost(){
-            var request = readResourceFile(POST + "request-create-doctor-201.json");
+            var request = readResourceFile(POST + "request-email-already-exists.json");
             var expectedResponse = readResourceFile(POST + "response-email-already-exists-400.json");
 
             var response = api().post("", request, HttpStatus.BAD_REQUEST).asString();

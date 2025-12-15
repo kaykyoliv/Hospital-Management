@@ -1,0 +1,5 @@
+{
+  "status": 400,
+  "error": "Bad Request",
+  "path": "/v1/user/3/deactivate"
+}
