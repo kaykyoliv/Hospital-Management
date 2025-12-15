@@ -21,8 +21,4 @@ public abstract class BaseIntegrationTest {
     void setupRestAssured() {
         RestAssured.port = port;
     }
-
-    protected Method toRestAssuredMethod(HttpMethod method) {
-        return Method.valueOf(method.name());
-    }
 }
