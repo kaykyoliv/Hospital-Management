@@ -49,7 +49,7 @@ class OperationControllerTest {
 
         BDDMockito.when(service.findById(EXISTING_ID)).thenReturn(response);
 
-        var expectedResponse = FileUtils.readResourceFile("operation/get/operation-by-id-200.json");
+        var expectedResponse = FileUtils.readResourceFile("operation/controller/get/operation-by-id-200.json");
 
         mockMvc.perform(get(PATH_ID, response.getId())
                         .accept(MediaType.APPLICATION_JSON))
@@ -62,7 +62,7 @@ class OperationControllerTest {
     @Test
     @DisplayName("GET /v1/operation/{id} - Should return 404 when operation is not found")
     void findById_ShouldThrowResourceNotFoundException_WhenOperationDoesNotExist() throws Exception {
-        var expectedJsonResponse = FileUtils.readResourceFile("operation/get/operation-not-found-404.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("operation/controller/get/operation-not-found-404.json");
 
         var expectedErrorMessage = OPERATION_NOT_FOUND;
 
@@ -85,7 +85,7 @@ class OperationControllerTest {
         var operationPage = PageUtils.toPage(operationList);
         var pageResponse = PageUtils.pageResponse(operationPage);
 
-        var expectedJsonResponse = FileUtils.readResourceFile("operation/get/all-paged-operations-200.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("operation/controller/get/all-paged-operations-200.json");
 
         BDDMockito.when(service.findAll(any(Pageable.class))).thenReturn(pageResponse);
 
@@ -100,8 +100,8 @@ class OperationControllerTest {
     @Test
     @DisplayName("POST /v1/operation - Should return 201 Created when operation is saved successfully")
     void save_ShouldReturn201Created_WhenRequestIsValid() throws Exception {
-        var request = FileUtils.readResourceFile("operation/post/request-create-operation-201.json");
-        var expectedJsonResponse = FileUtils.readResourceFile("operation/post/response-created-operation-200.json");
+        var request = FileUtils.readResourceFile("operation/controller/post/request-create-operation-201.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("operation/controller/post/response-created-operation-201.json");
 
         var savedOperation = OperationUtils.savedOperation();
         var expectedResponse = OperationUtils.asBaseResponse(savedOperation);
@@ -122,16 +122,14 @@ class OperationControllerTest {
     @ParameterizedTest(name = "POST /v1/operation: should return 404 when {0} does not exist")
     @MethodSource("provideNonExistingTypes")
     void save_ShouldReturn404_WhenNonExistingUser(String nonExistingType) throws Exception {
-        var jsonRequest = FileUtils.readResourceFile("operation/post/request-create-operation-201.json");
+        var jsonRequest = FileUtils.readResourceFile("operation/controller/post/request-create-operation-201.json");
         var request = OperationUtils.asBaseRequest();
 
         var nonExistingId = nonExistingType.equals("Doctor") ?
-                request.getDoctor().getId() : request.getPatient().getId();
-        var nonExistingName = nonExistingType.equals("Doctor") ?
-                request.getDoctor().getFirstName() : request.getPatient().getFirstName();
+                request.getDoctorId() : request.getPatientId();
 
         doThrow(new ResourceNotFoundException(
-                USER_NOT_FOUND_SAVE_OPERATION.formatted(nonExistingName, nonExistingId)))
+                USER_NOT_FOUND_SAVE_OPERATION.formatted(nonExistingType, nonExistingId)))
                 .when(service).save(any(OperationBaseRequest.class));
 
         mockMvc.perform(post(BASE_URI)
@@ -139,14 +137,14 @@ class OperationControllerTest {
                         .content(jsonRequest))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error")
-                        .value(USER_NOT_FOUND_SAVE_OPERATION.formatted(nonExistingName, nonExistingId)));
+                        .value(USER_NOT_FOUND_SAVE_OPERATION.formatted(nonExistingType, nonExistingId)));
     }
 
     @Test
     @DisplayName("PUT /v1/operation/{id} - Should return 200 OK when operation is updated successfully")
     void update_ShouldReturn200OK_WhenRequestIsValid() throws Exception {
-        var request = FileUtils.readResourceFile("operation/put/request-update-operation.json");
-        var expectedJsonResponse = FileUtils.readResourceFile("operation/put/response-updated-operation.json");
+        var request = FileUtils.readResourceFile("operation/controller/put/request-update-operation.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("operation/controller/put/response-updated-operation.json");
 
         var updatedOperation = OperationUtils.updatedOperation();
         var expectedResponse = OperationUtils.asBaseResponse(updatedOperation);
@@ -168,16 +166,14 @@ class OperationControllerTest {
     @ParameterizedTest(name = "PUT /v1/operation/id - Should return 404 when {0} does not exist")
     @MethodSource("provideNonExistingTypes")
     void update_ShouldReturn404_WhenNonExistingUser(String nonExistingType) throws Exception {
-        var jsonRequest = FileUtils.readResourceFile("operation/put/request-update-operation.json");
+        var jsonRequest = FileUtils.readResourceFile("operation/controller/put/request-update-operation.json");
         var request = OperationUtils.asBaseRequest();
 
         var nonExistingId = nonExistingType.equals("Doctor") ?
-                request.getDoctor().getId() : request.getPatient().getId();
-        var nonExistingName = nonExistingType.equals("Doctor") ?
-                request.getDoctor().getFirstName() : request.getPatient().getFirstName();
+                request.getDoctorId() : request.getPatientId();
 
         doThrow(new ResourceNotFoundException(
-                USER_NOT_FOUND_SAVE_OPERATION.formatted(nonExistingName, nonExistingId)))
+                USER_NOT_FOUND_SAVE_OPERATION.formatted(nonExistingType, nonExistingId)))
                 .when(service).update(any(OperationBaseRequest.class), eq(NON_EXISTING_ID));
 
         mockMvc.perform(put(PATH_ID, NON_EXISTING_ID)
@@ -185,7 +181,7 @@ class OperationControllerTest {
                         .content(jsonRequest))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error")
-                        .value(USER_NOT_FOUND_SAVE_OPERATION.formatted(nonExistingName, nonExistingId)));
+                        .value(USER_NOT_FOUND_SAVE_OPERATION.formatted(nonExistingType, nonExistingId)));
     }
 
     @Test

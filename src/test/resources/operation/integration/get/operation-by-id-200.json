@@ -1,0 +1,27 @@
+{
+  "id": 1,
+  "description": "Cirurgia cardíaca de alta complexidade",
+  "scheduledAt": "2025-09-10T14:30:00",
+  "doctor": {
+    "id": 1,
+    "firstName": "Robert",
+    "lastName": "Williams",
+    "email": "robert.williams@example.com",
+    "gender": "MALE",
+    "specialty": "Cardiology",
+    "crm": "CRM-1001",
+    "phoneNumber": "+55 11 99999-0001",
+    "officeNumber": "Room 101",
+    "availability": true
+  },
+  "patient": {
+    "id": 2,
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.doe@example.com",
+    "gender": "MALE",
+    "address": "Street A, 123",
+    "bloodType": "A+"
+  },
+  "status": "SCHEDULED"
+}

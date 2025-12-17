@@ -1,12 +1,12 @@
 package com.kayky.domain.operation;
 
+import com.kayky.core.exception.ResourceNotFoundException;
 import com.kayky.core.pagination.PageResponse;
 import com.kayky.core.pagination.PageUtils;
 import com.kayky.domain.operation.request.OperationBaseRequest;
 import com.kayky.domain.operation.response.OperationBaseResponse;
 import com.kayky.domain.operation.response.OperationDetailsResponse;
 import com.kayky.domain.user.UserValidator;
-import com.kayky.core.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +24,7 @@ public class OperationService {
     private final OperationMapper mapper;
 
     @Transactional(readOnly = true)
-    public OperationBaseResponse findById(Long id){
+    public OperationBaseResponse findById(Long id) {
         return repository.findById(id)
                 .map(mapper::toOperationBaseResponse)
                 .orElseThrow(() -> {
@@ -35,17 +35,24 @@ public class OperationService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<OperationDetailsResponse> findAll(Pageable pageable){
+    public PageResponse<OperationDetailsResponse> findAll(Pageable pageable) {
         var page = repository.findAllProjected(pageable);
         return PageUtils.mapPage(page, mapper::toOperationDetailsResponse);
     }
 
     @Transactional
-    public OperationBaseResponse save(OperationBaseRequest request){
-        userValidator.assertIfUserExist(request.getPatient().getId(), "Patient");
-        userValidator.assertIfUserExist(request.getDoctor().getId(), "Doctor");
+    public OperationBaseResponse save(OperationBaseRequest request) {
+        userValidator.assertIfUserExist(request.getPatientId(), "Patient");
+        userValidator.assertIfUserExist(request.getDoctorId(), "Doctor");
+
+        var patient = userValidator.getPatientIfExists(request.getPatientId());
+        var doctor = userValidator.getDoctorIfExists(request.getDoctorId());
 
         var operationToSave = mapper.toEntity(request);
+
+        operationToSave.setDoctor(doctor);
+        operationToSave.setPatient(patient);
+
         var savedOperation = repository.save(operationToSave);
 
         log.info("New operation saved with ID {}", savedOperation.getId());
@@ -54,16 +61,16 @@ public class OperationService {
     }
 
     @Transactional
-    public OperationBaseResponse update(OperationBaseRequest request, Long id){
+    public OperationBaseResponse update(OperationBaseRequest request, Long id) {
         var operationToUpdate = repository.findById(id)
-                        .orElseThrow(()-> {
-                            log.warn("Cannot update: Operation not found with ID {}", id);
+                .orElseThrow(() -> {
+                    log.warn("Cannot update: Operation not found with ID {}", id);
 
-                            return new ResourceNotFoundException("Operation not found");
-                        });
+                    return new ResourceNotFoundException("Operation not found");
+                });
 
-        var patient = userValidator.getPatientIfExists(request.getPatient().getId());
-        var doctor = userValidator.getDoctorIfExists(request.getDoctor().getId());
+        var patient = userValidator.getPatientIfExists(request.getPatientId());
+        var doctor = userValidator.getDoctorIfExists(request.getDoctorId());
 
         mapper.updateOperationFromRequest(request, operationToUpdate);
 
@@ -77,13 +84,13 @@ public class OperationService {
     }
 
     @Transactional
-    public void delete(Long id){
+    public void delete(Long id) {
         assertIfOperationExist(id);
         repository.deleteById(id);
     }
 
-    private void assertIfOperationExist(Long id){
-        if(!repository.existsById(id)){
+    private void assertIfOperationExist(Long id) {
+        if (!repository.existsById(id)) {
             throw new ResourceNotFoundException("Operation not found");
         }
     }

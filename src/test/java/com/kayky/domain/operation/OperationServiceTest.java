@@ -99,12 +99,16 @@ class OperationServiceTest {
     @DisplayName("save: Should return OperationBaseResponse when correct data")
     void save_ShouldReturnOperationBaseResponse_WhenCorrectData() {
         var request = OperationUtils.asBaseRequest();
-
+        var patient = PatientUtils.savedPatient(EXISTING_ID);
+        var doctor = DoctorUtils.savedDoctor(EXISTING_ID);
         var savedOperation = OperationUtils.savedOperation();
         var expectedResponse = OperationUtils.asBaseResponse(savedOperation);
 
-        doNothing().when(userValidator).assertIfUserExist(request.getPatient().getId(), "Patient");
-        doNothing().when(userValidator).assertIfUserExist(request.getDoctor().getId(), "Doctor");
+        doNothing().when(userValidator).assertIfUserExist(request.getPatientId(), "Patient");
+        doNothing().when(userValidator).assertIfUserExist(request.getDoctorId(), "Doctor");
+
+        when(userValidator.getDoctorIfExists(EXISTING_ID)).thenReturn(doctor);
+        when(userValidator.getPatientIfExists(EXISTING_ID)).thenReturn(patient);
 
         when(repository.save(any(Operation.class))).thenReturn(savedOperation);
 
@@ -123,23 +127,21 @@ class OperationServiceTest {
         var request = OperationUtils.asBaseRequest();
 
         var nonExistingId = nonExistingType.equals("Doctor") ?
-                request.getDoctor().getId() : request.getPatient().getId();
-        var nonExistingName = nonExistingType.equals("Doctor") ?
-                request.getDoctor().getFirstName() : request.getPatient().getFirstName();
+                request.getDoctorId() : request.getPatientId();
 
         var existingId = nonExistingType.equals("Doctor") ?
-                request.getPatient().getId() : request.getDoctor().getId();
+                request.getPatientId() : request.getDoctorId();
         var existingType = nonExistingType.equals("Doctor") ? "Patient" : "Doctor";
 
         lenient().doNothing().when(userValidator).assertIfUserExist(existingId, existingType);
 
         doThrow(new ResourceNotFoundException(
-                USER_NOT_FOUND_SAVE_OPERATION.formatted(nonExistingName, nonExistingId)))
+                USER_NOT_FOUND_SAVE_OPERATION.formatted(nonExistingType, nonExistingId)))
                 .when(userValidator).assertIfUserExist(nonExistingId, nonExistingType);
 
         assertThatThrownBy(() -> service.save(request))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage(USER_NOT_FOUND_SAVE_OPERATION.formatted(nonExistingName, nonExistingId));
+                .hasMessage(USER_NOT_FOUND_SAVE_OPERATION.formatted(nonExistingType, nonExistingId));
 
         verify(userValidator).assertIfUserExist(nonExistingId, nonExistingType);
     }
@@ -180,13 +182,13 @@ class OperationServiceTest {
         when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedOperation));
 
         if (nonExistingType.equals("Doctor")) {
-            when(userValidator.getDoctorIfExists(request.getDoctor().getId()))
+            when(userValidator.getDoctorIfExists(request.getDoctorId()))
                     .thenThrow(new ResourceNotFoundException(
-                            "Doctor with id %d not found".formatted(request.getDoctor().getId())));
+                            "Doctor with id %d not found".formatted(request.getDoctorId())));
         } else {
-            when(userValidator.getPatientIfExists(request.getPatient().getId()))
+            when(userValidator.getPatientIfExists(request.getPatientId()))
                     .thenThrow(new ResourceNotFoundException(
-                            "Patient with id %d not found".formatted(request.getPatient().getId())));
+                            "Patient with id %d not found".formatted(request.getPatientId())));
         }
 
         assertThatThrownBy(() -> service.update(request, EXISTING_ID))
@@ -194,9 +196,9 @@ class OperationServiceTest {
                 .hasMessageContaining(nonExistingType);
 
         if (nonExistingType.equals("Doctor")) {
-            verify(userValidator).getDoctorIfExists(request.getDoctor().getId());
+            verify(userValidator).getDoctorIfExists(request.getDoctorId());
         } else {
-            verify(userValidator).getPatientIfExists(request.getPatient().getId());
+            verify(userValidator).getPatientIfExists(request.getPatientId());
         }
 
         verify(repository).findById(EXISTING_ID);

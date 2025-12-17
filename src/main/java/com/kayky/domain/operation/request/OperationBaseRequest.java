@@ -38,18 +38,18 @@ public class OperationBaseRequest {
     private LocalDateTime scheduledAt;
 
     @Schema(
-            description = "Doctor assigned to perform the operation. Must contain at least the ID.",
-            implementation = DoctorBaseResponse.class
+            description = "ID of the doctor assigned to perform the operation",
+            example = "1"
     )
-    @NotNull(message = "Doctor information is required")
-    private DoctorBaseResponse doctor;
+    @NotNull(message = "Doctor ID is required")
+    private Long doctorId;
 
     @Schema(
-            description = "Patient who will undergo the operation. Must contain at least the ID.",
-            implementation = PatientBaseResponse.class
+            description = "ID of the patient who will undergo the operation",
+            example = "2"
     )
-    @NotNull(message = "Patient information is required")
-    private PatientBaseResponse patient;
+    @NotNull(message = "Patient ID is required")
+    private Long patientId;
 
     @Schema(
             description = "Current status of the operation",

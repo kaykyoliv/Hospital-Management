@@ -123,8 +123,8 @@ public class OperationUtils {
         return OperationBaseRequest.builder()
                 .description("Cirurgia cardíaca de alta complexidade")
                 .scheduledAt(LocalDateTime.of(2025, 9, 10, 14, 30))
-                .doctor(DoctorUtils.asBaseResponse(DoctorUtils.savedDoctor(1L)))
-                .patient(PatientUtils.asBaseResponse(PatientUtils.savedPatient(1L)))
+                .doctorId(1L)
+                .patientId(1L)
                 .status(OperationStatus.SCHEDULED)
                 .build();
     }

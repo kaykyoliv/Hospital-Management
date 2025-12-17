@@ -93,10 +93,15 @@ public class OperationController {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ApiError.class))),
             @ApiResponse(
-                    responseCode = "422",
-                    description = "Validation error",
+                    responseCode = "404",
+                    description = "Doctor or Patient not found (ID does not exist)",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ValidationError.class)))
+                            schema = @Schema(implementation = ApiError.class))),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Business validation error: ID exists but does not belong to the correct user type (e.g., doctorId refers to a Patient)",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ValidationError.class))),
     })
     @PostMapping
     public ResponseEntity<OperationBaseResponse> save(@Valid @RequestBody OperationBaseRequest request) {

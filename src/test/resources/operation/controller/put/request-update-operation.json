@@ -1,0 +1,8 @@
+{
+  "id": 1,
+  "description": "updated",
+  "scheduledAt": "2026-09-10T14:30:00",
+  "status": "SCHEDULED",
+  "doctorId": 1,
+  "patientId": 1
+}

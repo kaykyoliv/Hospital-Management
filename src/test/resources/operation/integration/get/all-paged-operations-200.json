@@ -1,0 +1,31 @@
+{
+  "content": [
+    {
+      "id": 1,
+      "description": "Cirurgia cardíaca de alta complexidade",
+      "scheduledAt": "2025-09-10T14:30:00",
+      "doctorName": "Robert",
+      "patientName": "John",
+      "status": "SCHEDULED"
+    },
+    {
+      "id": 2,
+      "description": "Cirurgia ortopédica de joelho",
+      "scheduledAt": "2025-10-15T09:00:00",
+      "doctorName": "Emily",
+      "patientName": "Jane",
+      "status": "IN_PROGRESS"
+    },
+    {
+      "id": 3,
+      "description": "Cirurgia neurológica de alta precisão",
+      "scheduledAt": "2025-11-20T16:45:00",
+      "doctorName": "Michael",
+      "patientName": "Alice",
+      "status": "CANCELED"
+    }
+  ],
+  "currentPage": 0,
+  "totalElements": 3,
+  "totalPages": 1
+}

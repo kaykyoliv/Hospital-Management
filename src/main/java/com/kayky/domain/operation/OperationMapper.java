@@ -18,7 +18,9 @@ public interface OperationMapper {
     @Mapping(target = "patientName", source = "patientFirstName")
     OperationDetailsResponse toOperationDetailsResponse(OperationProjection operation);
 
-    Operation toEntity(OperationBaseRequest postRequest);
+    @Mapping(target = "doctor", ignore = true)
+    @Mapping(target = "patient", ignore = true)
+    Operation toEntity(OperationBaseRequest request);
 
     @Mapping(target = "doctor", ignore = true)
     @Mapping(target = "patient", ignore = true)
@@ -34,5 +36,6 @@ public interface OperationMapper {
                 operation.getStatus().name()
         );
     }
+
 
 }
