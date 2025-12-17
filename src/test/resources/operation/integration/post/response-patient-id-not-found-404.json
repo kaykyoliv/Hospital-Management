@@ -1,0 +1,6 @@
+{
+  "error": "Patient with id 9999 not found",
+  "path": "/v1/operation",
+  "status": 404,
+  "timestamp": "2025-12-17T21:50:48.747106200Z"
+}

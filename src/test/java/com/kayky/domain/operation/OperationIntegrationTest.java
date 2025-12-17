@@ -116,6 +116,39 @@
             }
 
             @Test
+            @DisplayName("POST /v1/operation - Should return 400 when JSON is malformed")
+            void shouldReturn400_whenJsonIsMalformed(){
+                var request = readResourceFile(POST + "request-json-malformed-400.json");
+                var expectedResponse = readResourceFile(POST + "response-json-malformed-400.json");
+
+                var response = api().post("", request, HttpStatus.BAD_REQUEST).asString();
+
+                assertJson(response, expectedResponse, "timestamp");
+            }
+
+            @Test
+            @DisplayName("POST /v1/operation - Should return 404 when doctorId does not exist")
+            void shouldReturn404_whenDoctorIdNotExists(){
+                var request = readResourceFile(POST + "request-doctor-id-not-found-404.json");
+                var expectedResponse = readResourceFile(POST + "response-doctor-id-not-found-404.json");
+
+                var response = api().post("", request, HttpStatus.NOT_FOUND).asString();
+
+                assertJson(response, expectedResponse, "timestamp");
+            }
+
+            @Test
+            @DisplayName("POST /v1/operation - Should return 404 when patientId does not exist")
+            void shouldReturn404_whenPatientIdNotExists(){
+                var request = readResourceFile(POST + "request-patient-id-not-found-404.json");
+                var expectedResponse = readResourceFile(POST + "response-patient-id-not-found-404.json");
+
+                var response = api().post("", request, HttpStatus.NOT_FOUND).asString();
+
+                assertJson(response, expectedResponse, "timestamp");
+            }
+
+            @Test
             @DisplayName("POST /v1/operation - Should return 422 when required field is missing")
             void shouldReturn422_whenRequiredFieldIsMissing() {
                 var request = readResourceFile(POST + "request-missing-description-422.json");
