@@ -1,0 +1,6 @@
+{
+  "error": "Invalid value 'INVALID_STATUS' for enum OperationStatus. Accepted values are: [SCHEDULED, IN_PROGRESS, COMPLETED, CANCELED]",
+  "path": "/v1/operation",
+  "status": 400,
+  "timestamp": "2025-12-17T08:46:46.492958400Z"
+}

@@ -233,7 +233,7 @@ public class PatientIntegrationTest extends BaseIntegrationTest {
         var assertion = JsonAssertions.assertThatJson(actual);
 
         if (ignoredPaths.length > 0) {
-            assertion.whenIgnoringPaths(ignoredPaths);
+            assertion = assertion.whenIgnoringPaths(ignoredPaths);
         }
 
         assertion

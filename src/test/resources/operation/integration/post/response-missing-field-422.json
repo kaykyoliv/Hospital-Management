@@ -1,0 +1,12 @@
+{
+  "error": "Validation failed",
+  "fieldErrors": [
+    {
+      "fieldName": "description",
+      "message": "Description is required"
+    }
+  ],
+  "path": "/v1/operation",
+  "status": 422,
+  "timestamp": "2025-12-17T08:37:19.911520100Z"
+}

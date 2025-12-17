@@ -1,0 +1,7 @@
+{
+  "description": "Cirurgia cardíaca de alta complexidade",
+  "scheduledAt": "2026-01-10T14:30:00",
+  "doctorId": 1,
+  "patientId": 2,
+  "status": "INVALID_STATUS"
+}

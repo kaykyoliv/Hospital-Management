@@ -103,6 +103,30 @@
 
                 assertJson(json, expectedResponse, "id");
             }
+
+            @Test
+            @DisplayName("POST /v1/operation - Should return 400 when enum value is invalid")
+            void shouldReturn400_whenEnumValueIsInvalid() {
+                var request = readResourceFile(POST + "request-invalid-enum-400.json");
+                var expectedResponse = readResourceFile(POST + "response-invalid-enum-400.json");
+
+                var response = api().post("", request, HttpStatus.BAD_REQUEST).asString();
+
+                assertJson(response, expectedResponse, "timestamp");
+            }
+
+            @Test
+            @DisplayName("POST /v1/operation - Should return 422 when required field is missing")
+            void shouldReturn422_whenRequiredFieldIsMissing() {
+                var request = readResourceFile(POST + "request-missing-description-422.json");
+                var expectedResponse = readResourceFile(POST + "response-missing-field-422.json");
+
+                var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
+
+                assertJson(response, expectedResponse, "timestamp");
+            }
+
+
         }
 
 
@@ -143,7 +167,7 @@
             var assertion = JsonAssertions.assertThatJson(actual);
 
             if (ignoredPaths.length > 0) {
-                assertion.whenIgnoringPaths(ignoredPaths);
+                assertion = assertion.whenIgnoringPaths(ignoredPaths);
             }
 
             assertion
