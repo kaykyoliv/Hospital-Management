@@ -90,8 +90,8 @@
             @Sql(value = "/operation/sql/cleanup-operation-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
             @Sql(value = "/operation/sql/operation-post-base-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
             void shouldReturn201_whenRequestIsValid_onPost() {
-                var request = readResourceFile(POST + "request-create-operation-201.json");
-                var expectedResponse = readResourceFile(POST + "response-created-operation-201.json");
+                var request = readResourceFile(POST + "request/request-create-operation-201.json");
+                var expectedResponse = readResourceFile(POST + "response/response-created-operation-201.json");
 
                 var response = api().post("", request, HttpStatus.CREATED);
                 assertThat(response.header(HttpHeaders.LOCATION)).matches(".*/v1/operation/\\d+$");
@@ -107,8 +107,8 @@
             @Test
             @DisplayName("POST /v1/operation - Should return 400 when enum value is invalid")
             void shouldReturn400_whenEnumValueIsInvalid() {
-                var request = readResourceFile(POST + "request-invalid-enum-400.json");
-                var expectedResponse = readResourceFile(POST + "response-invalid-enum-400.json");
+                var request = readResourceFile(POST + "request/request-invalid-enum-400.json");
+                var expectedResponse = readResourceFile(POST + "response/response-invalid-enum-400.json");
 
                 var response = api().post("", request, HttpStatus.BAD_REQUEST).asString();
 
@@ -118,8 +118,8 @@
             @Test
             @DisplayName("POST /v1/operation - Should return 400 when JSON is malformed")
             void shouldReturn400_whenJsonIsMalformed(){
-                var request = readResourceFile(POST + "request-json-malformed-400.json");
-                var expectedResponse = readResourceFile(POST + "response-json-malformed-400.json");
+                var request = readResourceFile(POST + "request/request-json-malformed-400.json");
+                var expectedResponse = readResourceFile(POST + "response/response-json-malformed-400.json");
 
                 var response = api().post("", request, HttpStatus.BAD_REQUEST).asString();
 
@@ -129,8 +129,8 @@
             @Test
             @DisplayName("POST /v1/operation - Should return 404 when doctorId does not exist")
             void shouldReturn404_whenDoctorIdNotExists(){
-                var request = readResourceFile(POST + "request-doctor-id-not-found-404.json");
-                var expectedResponse = readResourceFile(POST + "response-doctor-id-not-found-404.json");
+                var request = readResourceFile(POST + "request/request-doctor-id-not-found-404.json");
+                var expectedResponse = readResourceFile(POST + "response/response-doctor-id-not-found-404.json");
 
                 var response = api().post("", request, HttpStatus.NOT_FOUND).asString();
 
@@ -140,8 +140,8 @@
             @Test
             @DisplayName("POST /v1/operation - Should return 404 when patientId does not exist")
             void shouldReturn404_whenPatientIdNotExists(){
-                var request = readResourceFile(POST + "request-patient-id-not-found-404.json");
-                var expectedResponse = readResourceFile(POST + "response-patient-id-not-found-404.json");
+                var request = readResourceFile(POST + "request/request-patient-id-not-found-404.json");
+                var expectedResponse = readResourceFile(POST + "response/response-patient-id-not-found-404.json");
 
                 var response = api().post("", request, HttpStatus.NOT_FOUND).asString();
 
@@ -149,15 +149,50 @@
             }
 
             @Test
-            @DisplayName("POST /v1/operation - Should return 422 when required field is missing")
-            void shouldReturn422_whenRequiredFieldIsMissing() {
-                var request = readResourceFile(POST + "request-missing-description-422.json");
-                var expectedResponse = readResourceFile(POST + "response-missing-field-422.json");
+            @DisplayName("POST /v1/operation - Should return 422 when doctorId belongs to a non-doctor user")
+            void shouldReturn422_whenDoctorIdIsNotADoctor() {
+                var request = readResourceFile(POST + "request/request-doctor-id-not-a-doctor-422.json");
+                var expectedResponse = readResourceFile(POST + "response/response-doctor-id-not-a-doctor-422.json");
 
                 var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
 
                 assertJson(response, expectedResponse, "timestamp");
             }
+
+            @Test
+            @DisplayName("POST /v1/operation - Should return 422 when patientId belongs to a non-patient user")
+            void shouldReturn422_whenPatientIdIsNotAPatient() {
+                var request = readResourceFile(POST + "request/request-patient-id-not-a-patient-422.json");
+                var expectedResponse = readResourceFile(POST + "response/response-patient-id-not-a-patient-422.json");
+
+                var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
+
+                assertJson(response, expectedResponse, "timestamp");
+            }
+
+
+            @Test
+            @DisplayName("POST /v1/operation - Should return 422 when required field is missing")
+            void shouldReturn422_whenRequiredFieldIsMissing() {
+                var request = readResourceFile(POST + "request/request-missing-description-422.json");
+                var expectedResponse = readResourceFile(POST + "response/response-missing-field-422.json");
+
+                var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
+
+                assertJson(response, expectedResponse, "timestamp");
+            }
+
+            @Test
+            @DisplayName("POST /v1/operation - Should return 422 when scheduledAt is in the past")
+            void shouldReturn422_whenScheduledAtIsInThePast() {
+                var request = readResourceFile(POST + "request/request-scheduled-at-in-the-past-422.json");
+                var expectedResponse = readResourceFile(POST + "response/response-scheduled-at-in-the-past-422.json");
+
+                var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
+
+                assertJson(response, expectedResponse, "timestamp");
+            }
+
 
 
         }

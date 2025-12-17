@@ -1,5 +1,6 @@
 package com.kayky.domain.user;
 
+import com.kayky.core.exception.BusinessRuleViolationException;
 import com.kayky.domain.doctor.Doctor;
 import com.kayky.domain.patient.Patient;
 import com.kayky.core.exception.EmailAlreadyExistsException;
@@ -45,7 +46,7 @@ public class UserValidator {
 
         if (!(user instanceof Patient patient)) {
             log.warn("User with id {} is not a Patient", id);
-            throw new IllegalArgumentException("ID %d does not belong to a Patient".formatted(id));
+            throw new BusinessRuleViolationException("ID %d does not belong to a Patient".formatted(id));
         }
 
         return patient;
@@ -60,7 +61,7 @@ public class UserValidator {
 
         if (!(user instanceof Doctor doctor)) {
             log.warn("User with id {} is not a Doctor", id);
-            throw new IllegalArgumentException("ID %d does not belong to a Doctor".formatted(id));
+            throw new BusinessRuleViolationException("ID %d does not belong to a Doctor".formatted(id));
         }
 
         return doctor;
