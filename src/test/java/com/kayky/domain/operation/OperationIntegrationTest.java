@@ -217,7 +217,7 @@ public class OperationIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("PUT /v1/operation/{id} - Should return 400 when enum value is invalid")
-        void shouldReturn400_whenEnumValueIsInvalid(){
+        void shouldReturn400_whenEnumValueIsInvalid() {
             var request = readResourceFile(PUT + "request/request-invalid-enum-400.json");
             var expectedResponse = readResourceFile(PUT + "response/response-invalid-enum-400.json");
 
@@ -228,7 +228,7 @@ public class OperationIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("PUT /v1/operation/{id} - Should return 400 when JSON is malformed")
-        void shouldReturn400_whenJsonIsMalformed(){
+        void shouldReturn400_whenJsonIsMalformed() {
             var request = readResourceFile(PUT + "request/request-json-malformed-400.json");
             var expectedResponse = readResourceFile(PUT + "response/response-json-malformed-400.json");
 
@@ -238,12 +238,78 @@ public class OperationIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
+        @DisplayName("PUT /v1/operation/{id} - Should return 404 when operation does not exist")
+        void shouldReturn404_whenOperationDoesNotExist() {
+            var request = readResourceFile(PUT + "request/request-operation-not-found-404.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-operation-not-found-404.json");
+
+            var response = api().put("/{id}", request, HttpStatus.NOT_FOUND, Map.of("id", NON_EXISTING_ID)).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+        @Test
         @DisplayName("PUT /v1/operation/{id} - Should return 404 when doctorId does not exist")
-        void shouldReturn404_whenDoctorIdNotExists(){
+        void shouldReturn404_whenDoctorIdNotExists() {
             var request = readResourceFile(PUT + "request/request-doctor-id-not-found-404.json");
             var expectedResponse = readResourceFile(PUT + "response/response-doctor-id-not-found-404.json");
 
             var response = api().put("/{id}", request, HttpStatus.NOT_FOUND, Map.of("id", EXISTING_ID)).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+        @Test
+        @DisplayName("PUT /v1/operation/{id} - Should return 404 when patientId does not exist")
+        void shouldReturn404_whenPatientIdNotExists() {
+            var request = readResourceFile(PUT + "request/request-patient-id-not-found-404.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-patient-id-not-found-404.json");
+
+            var response = api().put("/{id}", request, HttpStatus.NOT_FOUND, Map.of("id", EXISTING_ID)).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+        @Test
+        @DisplayName("PUT /v1/operation/{id} - Should return 422 when doctorId belongs to a non-doctor user")
+        void shouldReturn422_whenDoctorIdIsNotADoctor() {
+            var request = readResourceFile(PUT + "request/request-doctor-id-not-a-doctor-422.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-doctor-id-not-a-doctor-422.json");
+
+            var response = api().put("/{id}", request, HttpStatus.UNPROCESSABLE_ENTITY, Map.of("id", EXISTING_ID)).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+        @Test
+        @DisplayName("PUT /v1/operation/{id} - Should return 422 when patientId belongs to a non-patient user")
+        void shouldReturn422_whenPatientIdIsNotADoctor() {
+            var request = readResourceFile(PUT + "request/request-patient-id-not-a-patient-422.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-patient-id-not-a-patient-422.json");
+
+            var response = api().put("/{id}", request, HttpStatus.UNPROCESSABLE_ENTITY, Map.of("id", EXISTING_ID)).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+        @Test
+        @DisplayName("PUT /v1/operation/{id} - Should return 422 when required field is missing")
+        void shouldReturn422_whenRequiredFieldIsMissing() {
+            var request = readResourceFile(PUT + "request/request-missing-description-422.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-missing-field-422.json");
+
+            var response = api().put("/{id}", request, HttpStatus.UNPROCESSABLE_ENTITY, Map.of("id", EXISTING_ID)).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+        @Test
+        @DisplayName("PUT /v1/operation/{id} - Should return 422 when scheduledAt is in the past")
+        void shouldReturn422_whenScheduledAtIsInThePast() {
+            var request = readResourceFile(PUT + "request/request-scheduled-at-in-the-past-422.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-scheduled-at-in-the-past-422.json");
+
+            var response = api().put("/{id}", request, HttpStatus.UNPROCESSABLE_ENTITY, Map.of("id", EXISTING_ID)).asString();
 
             assertJsonEquals(response, expectedResponse, "timestamp");
         }
