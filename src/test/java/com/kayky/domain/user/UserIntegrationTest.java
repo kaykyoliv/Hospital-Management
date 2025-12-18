@@ -17,6 +17,7 @@ import org.springframework.test.context.jdbc.Sql;
 import java.util.Map;
 
 import static com.kayky.commons.FileUtils.readResourceFile;
+import static com.kayky.commons.JsonTestUtils.assertJsonEquals;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -58,7 +59,7 @@ public class UserIntegrationTest extends BaseIntegrationTest {
                     .patch("/{id}/activate", HttpStatus.NOT_FOUND, Map.of("id", NON_EXISTENT_ID))
                     .asString();
 
-            assertJson(response, expectedError, "timestamp");
+            assertJsonEquals(response, expectedError, "timestamp");
         }
 
         @Test
@@ -70,7 +71,7 @@ public class UserIntegrationTest extends BaseIntegrationTest {
                     .patch("/{id}/activate", HttpStatus.BAD_REQUEST, Map.of("id", ACTIVE_USER_ID))
                     .asString();
 
-            assertJson(response, expectedError, "timestamp");
+            assertJsonEquals(response, expectedError, "timestamp");
         }
     }
 
@@ -95,7 +96,7 @@ public class UserIntegrationTest extends BaseIntegrationTest {
                     .patch("/{id}/deactivate", HttpStatus.NOT_FOUND, Map.of("id", NON_EXISTENT_ID))
                     .asString();
 
-            assertJson(response, expectedError, "timestamp");
+            assertJsonEquals(response, expectedError, "timestamp");
         }
 
         @Test
@@ -107,7 +108,7 @@ public class UserIntegrationTest extends BaseIntegrationTest {
                     .patch("/{id}/deactivate", HttpStatus.BAD_REQUEST, Map.of("id", INACTIVE_USER_ID))
                     .asString();
 
-            assertJson(response, expectedError, "timestamp");
+            assertJsonEquals(response, expectedError, "timestamp");
         }
 
     }
@@ -130,22 +131,5 @@ public class UserIntegrationTest extends BaseIntegrationTest {
                     .statusCode(status.value())
                     .extract();
         }
-
-        ExtractableResponse<Response> patch(String path, HttpStatus expectedStatus) {
-            return patch(path, expectedStatus, Map.of());
-        }
-
-    }
-
-    private void assertJson(String actual, String expected, String... ignoredPaths) {
-        var assertion = JsonAssertions.assertThatJson(actual);
-
-        if (ignoredPaths.length > 0) {
-            assertion.whenIgnoringPaths(ignoredPaths);
-        }
-
-        assertion
-                .when(Option.IGNORING_EXTRA_FIELDS)
-                .isEqualTo(expected);
     }
 }

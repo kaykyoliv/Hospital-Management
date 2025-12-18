@@ -1,5 +1,6 @@
     package com.kayky.domain.operation;
 
+    import com.kayky.commons.JsonTestUtils;
     import com.kayky.config.BaseIntegrationTest;
     import com.kayky.domain.operation.response.OperationBaseResponse;
     import io.restassured.http.ContentType;
@@ -18,6 +19,7 @@
     import java.util.Map;
 
     import static com.kayky.commons.FileUtils.readResourceFile;
+    import static com.kayky.commons.JsonTestUtils.assertJsonEquals;
     import static com.kayky.commons.TestConstants.EXISTING_ID;
     import static com.kayky.commons.TestConstants.NON_EXISTING_ID;
     import static io.restassured.RestAssured.given;
@@ -45,7 +47,7 @@
 
                 var response = api().get("/{id}", HttpStatus.OK, Map.of("id", EXISTING_ID)).asString();
 
-                assertJson(response, expectedResponse, "id");
+                assertJsonEquals(response, expectedResponse, "id");
             }
 
             @Test
@@ -55,7 +57,7 @@
 
                 var response = api().get("/{id}", HttpStatus.NOT_FOUND, Map.of("id", NON_EXISTING_ID)).asString();
 
-                assertJson(response, expectedResponse, "id");
+                assertJsonEquals(response, expectedResponse, "id");
             }
 
             @Test
@@ -101,7 +103,7 @@
 
                 assertThat(operation.getId()).isPositive();
 
-                assertJson(json, expectedResponse, "id");
+                assertJsonEquals(json, expectedResponse, "id");
             }
 
             @Test
@@ -112,7 +114,7 @@
 
                 var response = api().post("", request, HttpStatus.BAD_REQUEST).asString();
 
-                assertJson(response, expectedResponse, "timestamp");
+                assertJsonEquals(response, expectedResponse, "timestamp");
             }
 
             @Test
@@ -123,7 +125,7 @@
 
                 var response = api().post("", request, HttpStatus.BAD_REQUEST).asString();
 
-                assertJson(response, expectedResponse, "timestamp");
+                assertJsonEquals(response, expectedResponse, "timestamp");
             }
 
             @Test
@@ -134,7 +136,7 @@
 
                 var response = api().post("", request, HttpStatus.NOT_FOUND).asString();
 
-                assertJson(response, expectedResponse, "timestamp");
+                assertJsonEquals(response, expectedResponse, "timestamp");
             }
 
             @Test
@@ -145,7 +147,7 @@
 
                 var response = api().post("", request, HttpStatus.NOT_FOUND).asString();
 
-                assertJson(response, expectedResponse, "timestamp");
+                assertJsonEquals(response, expectedResponse, "timestamp");
             }
 
             @Test
@@ -156,7 +158,7 @@
 
                 var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
 
-                assertJson(response, expectedResponse, "timestamp");
+                assertJsonEquals(response, expectedResponse, "timestamp");
             }
 
             @Test
@@ -167,7 +169,7 @@
 
                 var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
 
-                assertJson(response, expectedResponse, "timestamp");
+                assertJsonEquals(response, expectedResponse, "timestamp");
             }
 
 
@@ -179,7 +181,7 @@
 
                 var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
 
-                assertJson(response, expectedResponse, "timestamp");
+                assertJsonEquals(response, expectedResponse, "timestamp");
             }
 
             @Test
@@ -190,13 +192,9 @@
 
                 var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
 
-                assertJson(response, expectedResponse, "timestamp");
+                assertJsonEquals(response, expectedResponse, "timestamp");
             }
-
-
-
         }
-
 
         record ApiClient(int port) {
             private static final String BASE_URI = "http://localhost:%d/v1/operation";
@@ -229,17 +227,5 @@
                         .statusCode(status.value())
                         .extract();
             }
-        }
-
-        private void assertJson(String actual, String expected, String... ignoredPaths) {
-            var assertion = JsonAssertions.assertThatJson(actual);
-
-            if (ignoredPaths.length > 0) {
-                assertion = assertion.whenIgnoringPaths(ignoredPaths);
-            }
-
-            assertion
-                    .when(Option.IGNORING_EXTRA_FIELDS)
-                    .isEqualTo(expected);
         }
     }

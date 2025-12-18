@@ -18,6 +18,7 @@ import org.springframework.test.context.jdbc.Sql;
 import java.util.Map;
 
 import static com.kayky.commons.FileUtils.readResourceFile;
+import static com.kayky.commons.JsonTestUtils.assertJsonEquals;
 import static com.kayky.commons.TestConstants.EXISTING_ID;
 import static com.kayky.commons.TestConstants.NON_EXISTING_ID;
 import static io.restassured.RestAssured.given;
@@ -46,7 +47,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
 
             var response = api().get("/{id}", HttpStatus.OK, Map.of("id", EXISTING_ID)).asString();
 
-            assertJson(response, expectedResponse, "id");
+            assertJsonEquals(response, expectedResponse, "id");
         }
 
         @Test
@@ -56,7 +57,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
 
             var response = api().get("/{id}", HttpStatus.NOT_FOUND, Map.of("id", NON_EXISTING_ID)).asString();
 
-            assertJson(response, expectedResponse, "id");
+            assertJsonEquals(response, expectedResponse, "id");
         }
 
         @Test
@@ -66,7 +67,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
 
             var response = api().get("", HttpStatus.OK).asString();
 
-            assertJson(response, expectedResponse, "content[*].id");
+            assertJsonEquals(response, expectedResponse, "content[*].id");
 
             JsonAssertions.assertThatJson(response)
                     .node("content").isArray().hasSize(3);
@@ -100,7 +101,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
 
             assertThat(doctor.getId()).isPositive();
 
-            assertJson(json, expectedResponse, "id");
+            assertJsonEquals(json, expectedResponse, "id");
         }
 
         @Test
@@ -111,7 +112,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
 
             var response = api().post("", request, HttpStatus.BAD_REQUEST).asString();
 
-            assertJson(response, expectedResponse, "timestamp");
+            assertJsonEquals(response, expectedResponse, "timestamp");
         }
 
         @DisplayName("POST /v1/doctor - Should return 422 when request is invalid")
@@ -122,7 +123,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
 
             var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
 
-            assertJson(response, expectedResponse, "timestamp");
+            assertJsonEquals(response, expectedResponse, "timestamp");
         }
     }
     @Nested
@@ -151,7 +152,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
 
             var response = api().put("/{id}", request, HttpStatus.NOT_FOUND, Map.of("id", NON_EXISTING_ID)).asString();
 
-            assertJson(response, expectedResponse, "id");
+            assertJsonEquals(response, expectedResponse, "id");
         }
 
         @Test
@@ -162,7 +163,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
 
             var response = api().put("/{id}", request, HttpStatus.BAD_REQUEST, Map.of("id", EXISTING_ID)).asString();
 
-            assertJson(response, expectedResponse, "id", "timestamp");
+            assertJsonEquals(response, expectedResponse, "id", "timestamp");
         }
 
 
@@ -174,7 +175,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
 
             var response = api().put("/{id}", request, HttpStatus.UNPROCESSABLE_ENTITY, Map.of("id", EXISTING_ID)).asString();
 
-            assertJson(response, expectedResponse, "timestamp");
+            assertJsonEquals(response, expectedResponse, "timestamp");
         }
     }
     
@@ -221,17 +222,4 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
         }
 
     }
-
-    private void assertJson(String actual, String expected, String... ignoredPaths) {
-        var assertion = JsonAssertions.assertThatJson(actual);
-
-        if (ignoredPaths.length > 0) {
-            assertion = assertion.whenIgnoringPaths(ignoredPaths);
-        }
-
-        assertion
-                .when(Option.IGNORING_EXTRA_FIELDS)
-                .isEqualTo(expected);
-    }
-
 }
