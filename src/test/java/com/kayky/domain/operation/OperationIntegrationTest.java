@@ -11,6 +11,7 @@ import net.javacrumbs.jsonunit.core.Option;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
@@ -32,6 +33,9 @@ public class OperationIntegrationTest extends BaseIntegrationTest {
     private static final String GET = "operation/integration/get/";
     private static final String POST = "operation/integration/post/";
     private static final String PUT = "operation/integration/put/";
+
+    @Autowired
+    private OperationRepository repository;
 
     private ApiClient api() {
         return new ApiClient(port);
@@ -315,6 +319,24 @@ public class OperationIntegrationTest extends BaseIntegrationTest {
         }
     }
 
+    @Nested
+    @DisplayName("DELETE /v1/operation/{id}")
+    class DeleteEndpoints{
+        @Test
+        @DisplayName("DELETE /v1/operation/{id} - Should return 204 no content when operation exists")
+        void shouldReturn204_whenIdExists() {
+            api().delete("/{id}", HttpStatus.NO_CONTENT, Map.of("id", EXISTING_ID));
+
+            assertThat(repository.findById(EXISTING_ID)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("DELETE /v1/operation/{id} - Should return 404 when operation does not exist")
+        void shouldReturn404_whenIdDoesNotExist() {
+            api().delete("/{id}", HttpStatus.NOT_FOUND, Map.of("id", NON_EXISTING_ID));
+        }
+    }
+
     record ApiClient(int port) {
         private static final String BASE_URI = "http://localhost:%d/v1/operation";
 
@@ -352,6 +374,15 @@ public class OperationIntegrationTest extends BaseIntegrationTest {
                     .pathParams(pathParams)
                     .body(body)
                     .put(path)
+                    .then()
+                    .statusCode(status.value())
+                    .extract();
+        }
+
+        ExtractableResponse<Response> delete(String path, HttpStatus status, Map<String, ?> pathParams) {
+            return baseRequest()
+                    .pathParams(pathParams)
+                    .delete(path)
                     .then()
                     .statusCode(status.value())
                     .extract();
