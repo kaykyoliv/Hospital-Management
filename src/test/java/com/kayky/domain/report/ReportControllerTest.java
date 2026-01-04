@@ -41,8 +41,8 @@ class ReportControllerTest {
 
     @BeforeEach
     void setup() {
-        validUpdateRequest = FileUtils.readResourceFile("report/put/request-update-report-200.json");
-        validCreateRequest = FileUtils.readResourceFile("report/post/request-create-report-201.json");
+        validUpdateRequest = FileUtils.readResourceFile("report/controller/put/request-update-report-200.json");
+        validCreateRequest = FileUtils.readResourceFile("report/controller/post/request-create-report-201.json");
     }
 
     @Test
@@ -54,7 +54,7 @@ class ReportControllerTest {
 
         when(service.findById(EXISTING_ID)).thenReturn(response);
 
-        var expectedJsonResponse = FileUtils.readResourceFile("report/get/report-by-id-200.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("report/controller/get/report-by-id-200.json");
 
         mockMvc.perform(get(PATH_ID, response.id())
                         .accept(MediaType.APPLICATION_JSON))
@@ -68,7 +68,7 @@ class ReportControllerTest {
     @Test
     @DisplayName("GET /v1/report/{id} - Should return 404 when report is not found")
     void findById_ShouldThrowResourceNotFoundException_WhenReportDoesNotExist() throws Exception {
-        var expectedJsonResponse = FileUtils.readResourceFile("report/get/report-not-found-404.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("report/controller/get/report-not-found-404.json");
 
         var expectedErrorMessage = REPORT_NOT_FOUND;
 
@@ -91,7 +91,7 @@ class ReportControllerTest {
         var reportPage = PageUtils.toPage(reportList);
         var pageResponse = PageUtils.pageResponse(reportPage);
 
-        var expectedJsonResponse = FileUtils.readResourceFile("report/get/all-paged-reports-200.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("report/controller/get/all-paged-reports-200.json");
 
         when(service.findAll(any(Pageable.class))).thenReturn(pageResponse);
 
@@ -106,7 +106,7 @@ class ReportControllerTest {
     @Test
     @DisplayName("POST /v1/report - Should return 201 Created when report is saved successfully")
     void save_ShouldReturn201Created_WhenRequestIsValid() throws Exception {
-        var expectedJsonResponse = FileUtils.readResourceFile("report/post/response-created-report-200.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("report/controller/post/response-created-report-200.json");
 
         var savedReport = ReportUtils.savedReport();
         var expectedResponse = ReportUtils.asBaseResponse(savedReport);
@@ -127,7 +127,7 @@ class ReportControllerTest {
     @Test
     @DisplayName("POST /v1/report - Should return 400 when report data is inconsistent")
     void save_ShouldReturn400_WhenReportsDataIsInvalid() throws Exception {
-        var expectedJsonResponse = FileUtils.readResourceFile("report/post/operation-mismatch-400.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("report/controller/post/operation-mismatch-400.json");
 
         var expectedErrorMessage = OPERATION_PATIENT_MISMATCH.formatted(1L, 2L);
 
@@ -149,7 +149,7 @@ class ReportControllerTest {
     @Test
     @DisplayName("POST /v1/report - Should return 404 when related resource does not exist")
     void save_ShouldReturn404_WhenPatientDoesNotExist() throws Exception {
-        var expectedJsonResponse = FileUtils.readResourceFile("report/post/resource-not-found-404.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("report/controller/post/resource-not-found-404.json");
 
         when(service.save(any(ReportBaseRequest.class)))
                 .thenThrow(new ResourceNotFoundException("Patient not found"));
@@ -167,7 +167,7 @@ class ReportControllerTest {
     @Test
     @DisplayName("POST /v1/report - Should return 409 when report already exists")
     void save_ShouldReturn409_WhenReportAlreadyExists() throws Exception {
-        var expectedJsonResponse = FileUtils.readResourceFile("report/post/report-already-exists-409.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("report/controller/post/report-already-exists-409.json");
 
         when(service.save(any(ReportBaseRequest.class)))
                 .thenThrow(new ReportAlreadyExistsException(EXISTING_ID));
@@ -187,8 +187,8 @@ class ReportControllerTest {
     @Test
     @DisplayName("POST /v1/report - Should return 422 when request is invalid")
     void save_ShouldReturn422_WhenRequestIsInvalid() throws Exception {
-        var invalidRequest = FileUtils.readResourceFile("report/post/request-create-report-invalid-422.json");
-        var expectedJsonResponse = FileUtils.readResourceFile("report/post/validation-error-422.json");
+        var invalidRequest = FileUtils.readResourceFile("report/controller/post/request-create-report-invalid-422.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("report/controller/post/validation-error-422.json");
 
         mockMvc.perform(post(BASE_URI)
                         .accept(MediaType.APPLICATION_JSON)
@@ -201,7 +201,7 @@ class ReportControllerTest {
     @Test
     @DisplayName("PUT /v1/report/{id} - Should return 200 OK when report is updated successfully")
     void update_ShouldReturn200OK_WhenRequestIsValid() throws Exception {
-        var expectedJsonResponse = FileUtils.readResourceFile("report/put/response-updated-report-200.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("report/controller/put/response-updated-report-200.json");
 
         var updatedReport = ReportUtils.updatedReport();
         var response = ReportUtils.asBaseResponse(updatedReport);
@@ -222,7 +222,7 @@ class ReportControllerTest {
     @Test
     @DisplayName("PUT /v1/report/{id} - Should return 400 when report data is inconsistent")
     void update_ShouldReturn400_WhenReportDataIsInvalid() throws Exception {
-        var expectedJsonResponse = FileUtils.readResourceFile("report/put/operation-mismatch-400.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("report/controller/put/operation-mismatch-400.json");
 
         var expectedErrorMessage = OPERATION_PATIENT_MISMATCH.formatted(1L, 2L);
 
@@ -243,7 +243,7 @@ class ReportControllerTest {
     @Test
     @DisplayName("PUT /v1/report/{id} - Should return 404 when report is not found")
     void update_ShouldReturn404_WhenReportDoesNotExist() throws Exception {
-        var expectedJsonResponse = FileUtils.readResourceFile("report/put/report-not-found-404.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("report/controller/put/report-not-found-404.json");
 
         var expectedErrorMessage = REPORT_NOT_FOUND;
 
@@ -264,7 +264,7 @@ class ReportControllerTest {
     @Test
     @DisplayName("PUT /v1/report/{id} - Should return 404 when related resource does not exist")
     void update_ShouldReturn404_WhenPatientDoesNotExist() throws Exception {
-        var expectedJsonResponse = FileUtils.readResourceFile("report/put/resource-not-found-404.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("report/controller/put/resource-not-found-404.json");
 
         var expectedErrorMessage = PATIENT_NOT_FOUND;
 
@@ -285,7 +285,7 @@ class ReportControllerTest {
     @Test
     @DisplayName("PUT /v1/report/{id} - Should return 409 when report already exists")
     void update_ShouldReturn409_WhenReportAlreadyExists() throws Exception {
-        var expectedJsonResponse = FileUtils.readResourceFile("report/put/report-already-exists-409.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("report/controller/put/report-already-exists-409.json");
 
         when(service.update(any(ReportBaseRequest.class), eq(EXISTING_ID)))
                 .thenThrow(new ReportAlreadyExistsException(EXISTING_ID));
@@ -305,8 +305,8 @@ class ReportControllerTest {
     @Test
     @DisplayName("PUT /v1/report/{id} - Should return 422 when request is invalid")
     void update_ShouldReturn422_WhenRequestIsInvalid() throws Exception {
-        var invalidRequest = FileUtils.readResourceFile("report/put/request-create-report-invalid-422.json");
-        var expectedJsonResponse = FileUtils.readResourceFile("report/put/validation-error-422.json");
+        var invalidRequest = FileUtils.readResourceFile("report/controller/put/request-create-report-invalid-422.json");
+        var expectedJsonResponse = FileUtils.readResourceFile("report/controller/put/validation-error-422.json");
 
         mockMvc.perform(put(PATH_ID, EXISTING_ID)
                         .accept(MediaType.APPLICATION_JSON)

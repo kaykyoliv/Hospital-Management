@@ -66,7 +66,7 @@ public class OperationIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("GET /v1/operation - Should return 200 with paged operation data when operations exist")
-        void shouldReturnPagedOperations_whenOperationsExist() {
+        void shouldReturnPagedOperations_whenOperationsExists() {
             var expectedResponse = readResourceFile(GET + "all-paged-operations-200.json");
 
             var response = api().get("", HttpStatus.OK).asString();
@@ -321,7 +321,7 @@ public class OperationIntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("DELETE /v1/operation/{id}")
-    class DeleteEndpoints{
+    class DeleteEndpoints {
         @Test
         @DisplayName("DELETE /v1/operation/{id} - Should return 204 no content when operation exists")
         void shouldReturn204_whenIdExists() {

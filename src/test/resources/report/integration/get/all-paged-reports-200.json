@@ -1,0 +1,82 @@
+{
+  "content": [
+    {
+      "id": 1,
+      "title": "Relatório Cirurgia Cardíaca",
+      "description": "Procedimento realizado com sucesso, sem complicações durante a cirurgia.",
+      "diagnosis": "Doença arterial coronariana",
+      "treatmentPlan": "Acompanhamento cardiológico, uso contínuo de medicação e repouso por 30 dias.",
+      "reportDate": "2025-09-10",
+      "status": "FINALIZED",
+      "patient": {
+        "id": 2,
+        "name": "John"
+      },
+      "doctor": {
+        "id": 1,
+        "name": "Robert"
+      },
+      "operation": {
+        "id": 1,
+        "description": "Cirurgia cardíaca de alta complexidade",
+        "scheduledAt": "2025-09-10T14:30:00",
+        "status": "SCHEDULED"
+      },
+      "createdAt": "2025-09-10T18:00:00",
+      "updatedAt": "2025-09-10T18:00:00"
+    },
+    {
+      "id": 2,
+      "title": "Relatório Cirurgia Ortopédica de Joelho",
+      "description": "Cirurgia em andamento com evolução clínica satisfatória até o momento.",
+      "diagnosis": "Lesão ligamentar no joelho direito",
+      "treatmentPlan": "Fisioterapia após alta e acompanhamento ortopédico.",
+      "reportDate": "2025-10-15",
+      "status": "ARCHIVED",
+      "patient": {
+        "id": 4,
+        "name": "Jane"
+      },
+      "doctor": {
+        "id": 3,
+        "name": "Emily"
+      },
+      "operation": {
+        "id": 2,
+        "description": "Cirurgia ortopédica de joelho",
+        "scheduledAt": "2025-10-15T09:00:00",
+        "status": "IN_PROGRESS"
+      },
+      "createdAt": "2025-10-15T12:00:00",
+      "updatedAt": "2025-10-15T12:00:00"
+    },
+    {
+      "id": 3,
+      "title": "Relatório Cirurgia Neurológica",
+      "description": "Procedimento cancelado antes da execução devido a intercorrências clínicas.",
+      "diagnosis": "Tumor cerebral (suspeita)",
+      "treatmentPlan": "Reavaliação clínica e novos exames antes de reagendar o procedimento.",
+      "reportDate": "2025-11-20",
+      "status": "DRAFT",
+      "patient": {
+        "id": 6,
+        "name": "Alice"
+      },
+      "doctor": {
+        "id": 5,
+        "name": "Michael"
+      },
+      "operation": {
+        "id": 3,
+        "description": "Cirurgia neurológica de alta precisão",
+        "scheduledAt": "2025-11-20T16:45:00",
+        "status": "CANCELED"
+      },
+      "createdAt": "2025-11-20T10:00:00",
+      "updatedAt": "2025-11-20T10:00:00"
+    }
+  ],
+  "currentPage": 0,
+  "totalElements": 3,
+  "totalPages": 1
+}

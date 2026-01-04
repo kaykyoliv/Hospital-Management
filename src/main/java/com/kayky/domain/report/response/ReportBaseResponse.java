@@ -38,7 +38,7 @@ public record ReportBaseResponse(
         LocalDate reportDate,
 
         @Schema(description = "Current status of the medical report",
-                example = "COMPLETED")
+                example = "FINISHED")
         ReportStatus status,
 
         @Schema(description = "Information about the patient associated with the report")
@@ -91,7 +91,7 @@ public record ReportBaseResponse(
             LocalDateTime scheduledAt,
 
             @Schema(description = "Current operation status",
-                    example = "FINISHED")
+                    example = "COMPLETED")
             String status
     ) {}
 }

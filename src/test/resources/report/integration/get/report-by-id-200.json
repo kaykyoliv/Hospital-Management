@@ -1,0 +1,25 @@
+{
+  "id": 1,
+  "title": "Relatório Cirurgia Cardíaca",
+  "description": "Procedimento realizado com sucesso, sem complicações durante a cirurgia.",
+  "diagnosis": "Doença arterial coronariana",
+  "treatmentPlan": "Acompanhamento cardiológico, uso contínuo de medicação e repouso por 30 dias.",
+  "reportDate": "2025-09-10",
+  "status": "FINALIZED",
+  "patient": {
+    "id": 2,
+    "name": "John"
+  },
+  "doctor": {
+    "id": 1,
+    "name": "Robert"
+  },
+  "operation": {
+    "id": 1,
+    "description": "Cirurgia cardíaca de alta complexidade",
+    "scheduledAt": "2025-09-10T14:30:00",
+    "status": "SCHEDULED"
+  },
+  "createdAt": "2025-09-10T18:00:00",
+  "updatedAt": "2025-09-10T18:00:00"
+}
