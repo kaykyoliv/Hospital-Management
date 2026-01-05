@@ -110,8 +110,8 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
         @Sql(value = "/report/sql/cleanup-report-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
         @Sql(value = "/report/sql/report-post-base-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
         void shouldReturn400_whenOperationDoesNotBelongToPatient(){
-            var request = readResourceFile(POST + "request/request-create-report-400-operation-patient-mismatch.json");
-            var expectedResponse = readResourceFile(POST + "response/response-create-report-400-operation-patient-mismatch.json");
+            var request = readResourceFile(POST + "request/request-operation-patient-mismatch-400.json");
+            var expectedResponse = readResourceFile(POST + "response/response-operation-patient-mismatch-400.json");
 
             var response = api().post("", request, HttpStatus.BAD_REQUEST).asString();
 
@@ -123,8 +123,8 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
         @Sql(value = "/report/sql/cleanup-report-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
         @Sql(value = "/report/sql/report-post-base-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
         void shouldReturn400_whenOperationDoesNotBelongToDoctor(){
-            var request = readResourceFile(POST + "request/request-create-report-400-operation-doctor-mismatch.json");
-            var expectedResponse = readResourceFile(POST + "response/response-create-report-400-operation-doctor-mismatch.json");
+            var request = readResourceFile(POST + "request/request-operation-doctor-mismatch-400.json");
+            var expectedResponse = readResourceFile(POST + "response/response-operation-doctor-mismatch-400.json");
 
             var response = api().post("", request, HttpStatus.BAD_REQUEST).asString();
 
@@ -132,10 +132,32 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
+        @DisplayName("POST /v1/report - Should return 404 when patient does not exist")
+        void shouldReturn404_whenPatientDoesNotExist(){
+            var request = readResourceFile(POST + "request/request-patient-id-not-found-404.json");
+            var expectedResponse = readResourceFile(POST + "response/response-patient-id-not-found-404.json");
+
+            var response = api().post("", request, HttpStatus.NOT_FOUND).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+        @Test
+        @DisplayName("POST /v1/report - Should return 404 when doctor does not exist")
+        void shouldReturn404_whenDoctorDoesNotExist(){
+            var request = readResourceFile(POST + "request/request-doctor-id-not-found-404.json");
+            var expectedResponse = readResourceFile(POST + "response/response-doctor-id-not-found-404.json");
+
+            var response = api().post("", request, HttpStatus.NOT_FOUND).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+        @Test
         @DisplayName("POST /v1/report - Should return 409 when report already exists for the operation")
         void shouldReturn409_whenReportAlreadyExistsForOperation(){
-            var request = readResourceFile(POST + "request/request-create-report-409-conflict.json");
-            var expectedResponse = readResourceFile(POST + "response/response-create-report-409-conflict.json");
+            var request = readResourceFile(POST + "request/request-report-already-exists-409.json");
+            var expectedResponse = readResourceFile(POST + "response/response-report-already-exists-409.json");
 
             var response = api().post("", request, HttpStatus.CONFLICT).asString();
 
