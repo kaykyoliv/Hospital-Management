@@ -106,6 +106,32 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
+        @DisplayName("POST /v1/report - Should return 400 when operation does not belong to the given patient")
+        @Sql(value = "/report/sql/cleanup-report-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+        @Sql(value = "/report/sql/report-post-base-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+        void shouldReturn400_whenOperationDoesNotBelongToPatient(){
+            var request = readResourceFile(POST + "request/request-create-report-400-operation-patient-mismatch.json");
+            var expectedResponse = readResourceFile(POST + "response/response-create-report-400-operation-patient-mismatch.json");
+
+            var response = api().post("", request, HttpStatus.BAD_REQUEST).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+        @Test
+        @DisplayName("POST /v1/report - Should return 400 when operation does not belong to the given doctor")
+        @Sql(value = "/report/sql/cleanup-report-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+        @Sql(value = "/report/sql/report-post-base-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+        void shouldReturn400_whenOperationDoesNotBelongToDoctor(){
+            var request = readResourceFile(POST + "request/request-create-report-400-operation-doctor-mismatch.json");
+            var expectedResponse = readResourceFile(POST + "response/response-create-report-400-operation-doctor-mismatch.json");
+
+            var response = api().post("", request, HttpStatus.BAD_REQUEST).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+        @Test
         @DisplayName("POST /v1/report - Should return 409 when report already exists for the operation")
         void shouldReturn409_whenReportAlreadyExistsForOperation(){
             var request = readResourceFile(POST + "request/request-create-report-409-conflict.json");
