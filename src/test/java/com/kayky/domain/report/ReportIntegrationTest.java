@@ -1,6 +1,7 @@
 package com.kayky.domain.report;
 
 import com.kayky.config.BaseIntegrationTest;
+import com.kayky.domain.report.response.ReportBaseResponse;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -10,6 +11,7 @@ import net.javacrumbs.jsonunit.core.Option;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -20,6 +22,7 @@ import static com.kayky.commons.JsonTestUtils.assertJsonEquals;
 import static com.kayky.commons.TestConstants.EXISTING_ID;
 import static com.kayky.commons.TestConstants.NON_EXISTING_ID;
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DisplayName("Report Controller - Integration Tests")
 @Sql(value = "/report/sql/cleanup-report-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -27,6 +30,7 @@ import static io.restassured.RestAssured.given;
 public class ReportIntegrationTest extends BaseIntegrationTest {
 
     private static final String GET = "report/integration/get/";
+    private static final String POST = "report/integration/post/";
 
     private ApiClient api() {
         return new ApiClient(port);
@@ -79,6 +83,40 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
         }
     }
 
+    @Nested
+    @DisplayName("POST /v1/report")
+    class PostEndPoints{
+        @Test
+        @DisplayName("POST /v1/report - Should return 201 with report data when request is valid")
+        @Sql(value = "/report/sql/cleanup-report-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+        @Sql(value = "/report/sql/report-post-base-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+        void shouldReturn201_whenValidRequest(){
+            var request = readResourceFile(POST + "request/request-create-report-201.json");
+            var expectedResponse = readResourceFile(POST + "response/response-created-report-201.json");
+
+            var response = api().post("", request, HttpStatus.CREATED);
+            assertThat(response.header(HttpHeaders.LOCATION)).matches(".*/v1/report/\\d+$");
+
+            var report = response.as(ReportBaseResponse.class);
+            var json = response.asString();
+
+            assertThat(report.id()).isPositive();
+
+            assertJsonEquals(json, expectedResponse, "id", "createdAt", "updatedAt");
+        }
+
+        @Test
+        @DisplayName("POST /v1/report - Should return 409 when report already exists for the operation")
+        void shouldReturn409_whenReportAlreadyExistsForOperation(){
+            var request = readResourceFile(POST + "request/request-create-report-409-conflict.json");
+            var expectedResponse = readResourceFile(POST + "response/response-create-report-409-conflict.json");
+
+            var response = api().post("", request, HttpStatus.CONFLICT).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+    }
+
     record ApiClient(int port) {
         private static final String BASE_URI = "http://localhost:%d/v1/report";
 
@@ -100,6 +138,15 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
 
         ExtractableResponse<Response> get(String path, HttpStatus status) {
             return get(path, status, Map.of());
+        }
+
+        ExtractableResponse<Response> post(String path, String body, HttpStatus status) {
+            return baseRequest()
+                    .body(body)
+                    .post(path)
+                    .then()
+                    .statusCode(status.value())
+                    .extract();
         }
 
     }

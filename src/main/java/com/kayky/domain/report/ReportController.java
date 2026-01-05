@@ -74,6 +74,42 @@ public class ReportController {
         return service.findAll(pageable);
     }
 
+    @Operation(
+            summary = "Register a new report",
+            description = "Creates a new report and its ID and details"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Report created successfully",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ReportBaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "The operation does not match the provided patient/doctor",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Patient, doctor or operation not found",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "A report already exists for the given operation ID",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Validation error - invalid or missing fields in request body",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ValidationError.class))
+            )
+    })
     @PostMapping
     public ResponseEntity<ReportBaseResponse> save(@Valid @RequestBody ReportBaseRequest request) {
         log.debug("Request to create new report");

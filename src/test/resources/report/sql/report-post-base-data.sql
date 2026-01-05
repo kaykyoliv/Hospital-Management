@@ -14,3 +14,6 @@ VALUES
 INSERT INTO tb_patient (id, address, blood_type)
 VALUES
   (2, 'Street A, 123', 'A+');
+
+INSERT INTO tb_operation (id, description, scheduled_at, doctor_id, patient_id, status)
+VALUES(1, 'Cirurgia cardíaca de alta complexidade', '2025-09-10 14:30:00', 1, 2, 'SCHEDULED')
