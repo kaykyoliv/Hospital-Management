@@ -237,6 +237,38 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
             assertJsonEquals(response, expectedResponse, "timestamp");
         }
 
+        @Test
+        @DisplayName("PUT /v1/report/{id} - Should return 404 when patient does not exist")
+        void shouldReturn404_whenPatientDoesNotExist(){
+            var request = readResourceFile(PUT + "request/request-patient-id-not-found-404.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-patient-id-not-found-404.json");
+
+            var response = api().put("/{id}", request, HttpStatus.NOT_FOUND, Map.of("id", EXISTING_ID)).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+        @Test
+        @DisplayName("PUT /v1/report/{id} - Should return 404 when doctor does not exist")
+        void shouldReturn404_whenDoctorDoesNotExist(){
+            var request = readResourceFile(PUT + "request/request-doctor-id-not-found-404.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-doctor-id-not-found-404.json");
+
+            var response = api().put("/{id}", request, HttpStatus.NOT_FOUND, Map.of("id", EXISTING_ID)).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+        @Test
+        @DisplayName("PUT /v1/report/{id} - Should return 404 when operation does not exist")
+        void shouldReturn404_whenOperationDoesNotExist(){
+            var request = readResourceFile(PUT + "request/request-operation-id-not-found-404.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-operation-id-not-found-404.json");
+
+            var response = api().put("/{id}", request, HttpStatus.NOT_FOUND, Map.of("id", EXISTING_ID)).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
 
     }
 

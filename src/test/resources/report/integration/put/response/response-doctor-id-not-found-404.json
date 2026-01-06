@@ -1,0 +1,6 @@
+{
+  "error": "Doctor not found with id=999",
+  "path": "/v1/report/1",
+  "status": 404,
+  "timestamp": "2025-12-17T21:50:48.747106200Z"
+}
