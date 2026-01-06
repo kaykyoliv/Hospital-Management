@@ -1,0 +1,11 @@
+{
+  "title": "Pediatric Post-op Review",
+  "description": "",
+  "diagnosis": "x",
+  "treatmentPlan": "",
+  "reportDate": "2024-07-04",
+  "status": "FINALIZED",
+  "patientId": 2,
+  "doctorId": 1,
+  "operationId": -1
+}

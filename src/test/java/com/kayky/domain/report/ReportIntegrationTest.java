@@ -60,7 +60,7 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /v1/report = Should return 200 with paged report data when reports exists")
+        @DisplayName("GET /v1/report - Should return 200 with paged report data when reports exists")
         void shouldReturnPagedReports_whenReportsExists(){
             var expectedResponse = readResourceFile(GET + "all-paged-reports-200.json");
 
@@ -153,6 +153,18 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
             assertJsonEquals(response, expectedResponse, "timestamp");
         }
 
+
+        @Test
+        @DisplayName("POST /v1/report - Should return 404 when operation does not exist")
+        void shouldReturn404_whenOperationDoesNotExist() {
+            var request = readResourceFile(POST + "request/request-operation-id-not-found-404.json");
+            var expectedResponse = readResourceFile(POST + "response/response-operation-id-not-found-404.json");
+
+            var response = api().post("", request, HttpStatus.NOT_FOUND).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
         @Test
         @DisplayName("POST /v1/report - Should return 409 when report already exists for the operation")
         void shouldReturn409_whenReportAlreadyExistsForOperation(){
@@ -160,6 +172,28 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
             var expectedResponse = readResourceFile(POST + "response/response-report-already-exists-409.json");
 
             var response = api().post("", request, HttpStatus.CONFLICT).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+        @Test
+        @DisplayName("POST /v1/report - Should return 422 when required field is missing")
+        void shouldReturn422_whenRequiredFieldIsMissing() {
+            var request = readResourceFile(POST + "request/request-missing-field-422.json");
+            var expectedResponse = readResourceFile(POST + "response/response-missing-field-422.json");
+
+            var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+        @Test
+        @DisplayName("POST /v1/report - Should return 422 when request contains invalid field values")
+        void shouldReturn422_whenRequestContainsInvalidFieldValues() {
+            var request = readResourceFile(POST + "request/request-invalid-field-values-422.json");
+            var expectedResponse = readResourceFile(POST + "response/response-invalid-field-values-422.json");
+
+            var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
 
             assertJsonEquals(response, expectedResponse, "timestamp");
         }

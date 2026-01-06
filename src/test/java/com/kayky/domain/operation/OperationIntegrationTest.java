@@ -180,7 +180,7 @@ public class OperationIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("POST /v1/operation - Should return 422 when required field is missing")
         void shouldReturn422_whenRequiredFieldIsMissing() {
-            var request = readResourceFile(POST + "request/request-missing-description-422.json");
+            var request = readResourceFile(POST + "request/request-missing-field-422.json");
             var expectedResponse = readResourceFile(POST + "response/response-missing-field-422.json");
 
             var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
@@ -299,7 +299,7 @@ public class OperationIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("PUT /v1/operation/{id} - Should return 422 when required field is missing")
         void shouldReturn422_whenRequiredFieldIsMissing() {
-            var request = readResourceFile(PUT + "request/request-missing-description-422.json");
+            var request = readResourceFile(PUT + "request/request-missing-field-422.json");
             var expectedResponse = readResourceFile(PUT + "response/response-missing-field-422.json");
 
             var response = api().put("/{id}", request, HttpStatus.UNPROCESSABLE_ENTITY, Map.of("id", EXISTING_ID)).asString();
