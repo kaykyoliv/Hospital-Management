@@ -1,6 +1,7 @@
 package com.kayky.domain.cashier;
 
 import com.kayky.config.BaseIntegrationTest;
+import com.kayky.domain.cashier.response.CashierBaseResponse;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -10,6 +11,7 @@ import net.javacrumbs.jsonunit.core.Option;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -20,6 +22,7 @@ import static com.kayky.commons.JsonTestUtils.assertJsonEquals;
 import static com.kayky.commons.TestConstants.EXISTING_ID;
 import static com.kayky.commons.TestConstants.NON_EXISTING_ID;
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DisplayName("Cashier Controller - Integration Tests")
 @Sql(value = "/cashier/sql/cleanup-cashier-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -27,6 +30,7 @@ import static io.restassured.RestAssured.given;
 public class CashierIntegrationTest extends BaseIntegrationTest {
 
     private static final String GET = "cashier/integration/get/";
+    private static final String POST = "cashier/integration/post/";
 
     private ApiClient api() {
         return new ApiClient(port);
@@ -80,6 +84,50 @@ public class CashierIntegrationTest extends BaseIntegrationTest {
         }
     }
 
+    @Nested
+    @DisplayName("POST /v1/cashier")
+    class PostEndPoints {
+
+        @Test
+        @DisplayName("POST /v1/cashier - Should return 201 with cashier data when request is valid")
+        void shouldReturn201_whenValidRequest(){
+            var request = readResourceFile(POST + "request/request-create-report-201.json");
+            var expectedResponse = readResourceFile(POST + "response/response-created-report-201.json");
+
+            var response = api().post("", request, HttpStatus.CREATED);
+            assertThat(response.header(HttpHeaders.LOCATION)).matches(".*/v1/cashier/\\d+$");
+
+            var cashier = response.as(CashierBaseResponse.class);
+            var json = response.asString();
+
+            assertThat(cashier.id()).isPositive();
+
+            assertJsonEquals(json, expectedResponse, "id");
+        }
+
+        @Test
+        @DisplayName("POST /v1/cashier - Should return 400 when email already exists")
+        void shouldReturn400_whenEmailAlreadyExists(){
+            var request = readResourceFile(POST + "request/request-email-already-exists.json");
+            var expectedResponse = readResourceFile(POST + "response/response-email-already-exists-400.json");
+
+            var response = api().post("", request, HttpStatus.BAD_REQUEST).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+        @Test
+        @DisplayName("POST /v1/cashier - Should return 422 when request is invalid")
+        void shouldReturn422_whenRequestIsInvalid(){
+            var request = readResourceFile(POST + "request/request-create-cashier-invalid-422.json");
+            var expectedResponse = readResourceFile(POST + "response/response-validation-error-422.json");
+
+            var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+    }
+
     record ApiClient(int port) {
         private static final String BASE_URI = "http://localhost:%d/v1/cashier";
 
@@ -98,6 +146,16 @@ public class CashierIntegrationTest extends BaseIntegrationTest {
                     .statusCode(status.value())
                     .extract();
         }
+
+        ExtractableResponse<Response> post(String path, String body, HttpStatus status) {
+            return baseRequest()
+                    .body(body)
+                    .post(path)
+                    .then()
+                    .statusCode(status.value())
+                    .extract();
+        }
+
 
         ExtractableResponse<Response> get(String path, HttpStatus status) {
             return get(path, status, Map.of());

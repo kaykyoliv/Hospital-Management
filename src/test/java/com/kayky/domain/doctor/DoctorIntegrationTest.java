@@ -87,7 +87,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("POST /v1/doctor - Should return 201 with doctor data when request is valid")
         @Sql(value = "/doctor/sql/cleanup-doctor-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-        void shouldReturn201_WhenRequestIsValid_onPost(){
+        void shouldReturn201_whenValidRequest(){
             var request = readResourceFile(POST + "request-create-doctor-201.json");
             var expectedResponse = readResourceFile(POST + "response-created-doctor-201.json");
 
@@ -106,7 +106,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("POST /v1/doctor - Should return 400 when email already exists")
-        void shouldReturn400_whenEmailAlreadyExists_onPost(){
+        void shouldReturn400_whenEmailAlreadyExists(){
             var request = readResourceFile(POST + "request-email-already-exists.json");
             var expectedResponse = readResourceFile(POST + "response-email-already-exists-400.json");
 
@@ -115,9 +115,9 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
             assertJsonEquals(response, expectedResponse, "timestamp");
         }
 
-        @DisplayName("POST /v1/doctor - Should return 422 when request is invalid")
         @Test
-        void shouldReturn422_whenRequestIsInvalid_onPost() {
+        @DisplayName("POST /v1/doctor - Should return 422 when request is invalid")
+        void shouldReturn422_whenRequestIsInvalid() {
             var request = readResourceFile(POST + "request-create-doctor-invalid-422.json");
             var expectedResponse = readResourceFile(POST + "validation-error-422.json");
 
@@ -131,7 +131,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
     class PutEndpoints {
         @Test
         @DisplayName("PUT /v1/doctor - Should return 200 with updated doctor data when request is valid")
-        void shouldReturn200_whenRequestIsValid_onPut() {
+        void shouldReturn200_whenValidRequest() {
             var request = readResourceFile(PUT + "request-update-doctor.json");
             var expectedResponse = readResourceFile(PUT + "response-updated-doctor.json");
 
@@ -146,7 +146,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("PUT /v1/doctor - Should return 404 when doctor does not exist")
-        void shouldReturn404_whenDoctorDoesNotExist_onPut() {
+        void shouldReturn404_whenDoctorDoesNotExist() {
             var request = readResourceFile(PUT + "request-update-doctor.json");
             var expectedResponse = readResourceFile(PUT + "response-doctor-not-found-404.json");
 
@@ -157,7 +157,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("PUT /v1/doctor - Should return 400 when email already exists")
-        void shouldReturn400_whenEmailAlreadyExists_onPut() {
+        void shouldReturn400_whenEmailAlreadyExists() {
             var request = readResourceFile(PUT + "request-email-already-exists.json");
             var expectedResponse = readResourceFile(PUT + "response-email-already-exists-400.json");
 
@@ -169,7 +169,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("PUT /v1/doctor - Should return 422 when request is invalid")
-        void shouldReturn422_whenRequestIsInvalid_onPut() {
+        void shouldReturn422_whenRequestIsInvalid() {
             var request = readResourceFile(PUT + "request-update-doctor-invalid-422.json");
             var expectedResponse = readResourceFile(PUT + "validation-error-422.json");
 
