@@ -1,0 +1,6 @@
+{
+  "error": "Validation failed",
+  "path": "/v1/report/1",
+  "status": 422,
+  "timestamp": "2025-12-17T21:50:48.747106200Z"
+}

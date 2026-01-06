@@ -270,6 +270,28 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
             assertJsonEquals(response, expectedResponse, "timestamp");
         }
 
+        @Test
+        @DisplayName("PUT /v1/report/{id} - Should return 422 when required field is missing")
+        void shouldReturn422_whenRequiredFieldIsMissing() {
+            var request = readResourceFile(PUT + "request/request-missing-field-422.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-missing-field-422.json");
+
+            var response = api().put("/{id}", request, HttpStatus.UNPROCESSABLE_ENTITY, Map.of("id", EXISTING_ID)).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+        @Test
+        @DisplayName("PUT /v1/report/{id} - Should return 422 when request contains invalid field values")
+        void shouldReturn422_whenRequestContainsInvalidFieldValues() {
+            var request = readResourceFile(PUT + "request/request-invalid-field-values-422.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-invalid-field-values-422.json");
+
+            var response = api().put("/{id}", request, HttpStatus.UNPROCESSABLE_ENTITY, Map.of("id", EXISTING_ID)).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
     }
 
     record ApiClient(int port) {
