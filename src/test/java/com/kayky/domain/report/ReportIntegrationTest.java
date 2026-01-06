@@ -11,6 +11,7 @@ import net.javacrumbs.jsonunit.core.Option;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
@@ -32,6 +33,9 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
     private static final String GET = "report/integration/get/";
     private static final String POST = "report/integration/post/";
     private static final String PUT = "report/integration/put/";
+
+    @Autowired
+    private ReportRepository repository;
 
     private ApiClient api() {
         return new ApiClient(port);
@@ -62,7 +66,7 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("GET /v1/report - Should return 200 with paged report data when reports exists")
-        void shouldReturnPagedReports_whenReportsExists(){
+        void shouldReturnPagedReports_whenReportsExists() {
             var expectedResponse = readResourceFile(GET + "all-paged-reports-200.json");
 
             var response = api().get("", HttpStatus.OK).asString();
@@ -86,12 +90,12 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
 
     @Nested
     @DisplayName("POST /v1/report")
-    class PostEndPoints{
+    class PostEndPoints {
         @Test
         @DisplayName("POST /v1/report - Should return 201 with report data when request is valid")
         @Sql(value = "/report/sql/cleanup-report-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
         @Sql(value = "/report/sql/report-post-base-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-        void shouldReturn201_whenValidRequest(){
+        void shouldReturn201_whenValidRequest() {
             var request = readResourceFile(POST + "request/request-create-report-201.json");
             var expectedResponse = readResourceFile(POST + "response/response-created-report-201.json");
 
@@ -110,7 +114,7 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
         @DisplayName("POST /v1/report - Should return 400 when operation does not belong to the given patient")
         @Sql(value = "/report/sql/cleanup-report-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
         @Sql(value = "/report/sql/report-post-base-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-        void shouldReturn400_whenOperationDoesNotBelongToPatient(){
+        void shouldReturn400_whenOperationDoesNotBelongToPatient() {
             var request = readResourceFile(POST + "request/request-operation-patient-mismatch-400.json");
             var expectedResponse = readResourceFile(POST + "response/response-operation-patient-mismatch-400.json");
 
@@ -123,7 +127,7 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
         @DisplayName("POST /v1/report - Should return 400 when operation does not belong to the given doctor")
         @Sql(value = "/report/sql/cleanup-report-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
         @Sql(value = "/report/sql/report-post-base-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-        void shouldReturn400_whenOperationDoesNotBelongToDoctor(){
+        void shouldReturn400_whenOperationDoesNotBelongToDoctor() {
             var request = readResourceFile(POST + "request/request-operation-doctor-mismatch-400.json");
             var expectedResponse = readResourceFile(POST + "response/response-operation-doctor-mismatch-400.json");
 
@@ -134,7 +138,7 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("POST /v1/report - Should return 404 when patient does not exist")
-        void shouldReturn404_whenPatientDoesNotExist(){
+        void shouldReturn404_whenPatientDoesNotExist() {
             var request = readResourceFile(POST + "request/request-patient-id-not-found-404.json");
             var expectedResponse = readResourceFile(POST + "response/response-patient-id-not-found-404.json");
 
@@ -145,7 +149,7 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("POST /v1/report - Should return 404 when doctor does not exist")
-        void shouldReturn404_whenDoctorDoesNotExist(){
+        void shouldReturn404_whenDoctorDoesNotExist() {
             var request = readResourceFile(POST + "request/request-doctor-id-not-found-404.json");
             var expectedResponse = readResourceFile(POST + "response/response-doctor-id-not-found-404.json");
 
@@ -168,7 +172,7 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("POST /v1/report - Should return 409 when report already exists for the operation")
-        void shouldReturn409_whenReportAlreadyExistsForOperation(){
+        void shouldReturn409_whenReportAlreadyExistsForOperation() {
             var request = readResourceFile(POST + "request/request-report-already-exists-409.json");
             var expectedResponse = readResourceFile(POST + "response/response-report-already-exists-409.json");
 
@@ -206,7 +210,7 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("PUT /v1/report/{id} - Should return 200 with updated report data when request is valid")
-        void shouldReturn200_whenValidRequest(){
+        void shouldReturn200_whenValidRequest() {
             var request = readResourceFile(PUT + "request/request-update-report-200.json");
             var expectedResponse = readResourceFile(PUT + "response/response-updated-report-200.json");
 
@@ -217,7 +221,7 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("PUT /v1/report/{id} - Should return 400 when operation does not belong to the given patient")
-        void shouldReturn400_whenOperationDoesNotBelongToPatient(){
+        void shouldReturn400_whenOperationDoesNotBelongToPatient() {
             var request = readResourceFile(PUT + "request/request-operation-patient-mismatch-400.json");
             var expectedResponse = readResourceFile(PUT + "response/response-operation-patient-mismatch-400.json");
 
@@ -228,7 +232,7 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("PUT /v1/report/{id} - Should return 400 when operation does not belong to the given doctor")
-        void shouldReturn400_whenOperationDoesNotBelongToDoctor(){
+        void shouldReturn400_whenOperationDoesNotBelongToDoctor() {
             var request = readResourceFile(PUT + "request/request-operation-doctor-mismatch-400.json");
             var expectedResponse = readResourceFile(PUT + "response/response-operation-doctor-mismatch-400.json");
 
@@ -239,7 +243,7 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("PUT /v1/report/{id} - Should return 404 when patient does not exist")
-        void shouldReturn404_whenPatientDoesNotExist(){
+        void shouldReturn404_whenPatientDoesNotExist() {
             var request = readResourceFile(PUT + "request/request-patient-id-not-found-404.json");
             var expectedResponse = readResourceFile(PUT + "response/response-patient-id-not-found-404.json");
 
@@ -250,7 +254,7 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("PUT /v1/report/{id} - Should return 404 when doctor does not exist")
-        void shouldReturn404_whenDoctorDoesNotExist(){
+        void shouldReturn404_whenDoctorDoesNotExist() {
             var request = readResourceFile(PUT + "request/request-doctor-id-not-found-404.json");
             var expectedResponse = readResourceFile(PUT + "response/response-doctor-id-not-found-404.json");
 
@@ -261,7 +265,7 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("PUT /v1/report/{id} - Should return 404 when operation does not exist")
-        void shouldReturn404_whenOperationDoesNotExist(){
+        void shouldReturn404_whenOperationDoesNotExist() {
             var request = readResourceFile(PUT + "request/request-operation-id-not-found-404.json");
             var expectedResponse = readResourceFile(PUT + "response/response-operation-id-not-found-404.json");
 
@@ -291,7 +295,24 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
 
             assertJsonEquals(response, expectedResponse, "timestamp");
         }
+    }
 
+    @Nested
+    @DisplayName("DELETE /v1/report/{id}")
+    class DeleteEndpoints {
+        @Test
+        @DisplayName("DELETE /v1/report/{id} - Should return 204 no content when report exists")
+        void shouldReturn204_whenIdExists() {
+            api().delete("/{id}", HttpStatus.NO_CONTENT, Map.of("id", EXISTING_ID));
+
+            assertThat(repository.findById(EXISTING_ID)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("DELETE /v1/report/{id} - Should return 404 when report does not exist")
+        void shouldReturn404_whenIdDoesNotExist() {
+            api().delete("/{id}", HttpStatus.NOT_FOUND, Map.of("id", NON_EXISTING_ID));
+        }
     }
 
     record ApiClient(int port) {
@@ -326,11 +347,20 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
                     .extract();
         }
 
-        ExtractableResponse<Response> put(String path, String body, HttpStatus status, Map<String, ?> pathParams){
+        ExtractableResponse<Response> put(String path, String body, HttpStatus status, Map<String, ?> pathParams) {
             return baseRequest()
                     .pathParams(pathParams)
                     .body(body)
                     .put(path)
+                    .then()
+                    .statusCode(status.value())
+                    .extract();
+        }
+
+        ExtractableResponse<Response> delete(String path, HttpStatus status, Map<String, ?> pathParams) {
+            return baseRequest()
+                    .pathParams(pathParams)
+                    .delete(path)
                     .then()
                     .statusCode(status.value())
                     .extract();

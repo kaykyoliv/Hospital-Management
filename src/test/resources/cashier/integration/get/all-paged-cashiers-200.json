@@ -1,0 +1,40 @@
+{
+  "content": [
+    {
+      "id": 1,
+      "firstName": "Robert",
+      "lastName": "Williams",
+      "email": "robert.williams@example.com",
+      "gender": "MALE",
+      "registrationNumber": "REG-001",
+      "department": "Finance",
+      "salary": 18000.00,
+      "active": true
+    },
+    {
+      "id": 2,
+      "firstName": "Emily",
+      "lastName": "Johnson",
+      "email": "emily.johnson@example.com",
+      "gender": "FEMALE",
+      "registrationNumber": "REG-002",
+      "department": "Finance",
+      "salary": 15000.00,
+      "active": true
+    },
+    {
+      "id": 3,
+      "firstName": "Michael",
+      "lastName": "Brown",
+      "email": "michael.brown@example.com",
+      "gender": "MALE",
+      "registrationNumber": "REG-003",
+      "department": "Finance",
+      "salary": 20000.00,
+      "active": true
+    }
+  ],
+  "currentPage": 0,
+  "totalElements": 3,
+  "totalPages": 1
+}
