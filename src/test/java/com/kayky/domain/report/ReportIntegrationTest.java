@@ -31,6 +31,7 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
 
     private static final String GET = "report/integration/get/";
     private static final String POST = "report/integration/post/";
+    private static final String PUT = "report/integration/put/";
 
     private ApiClient api() {
         return new ApiClient(port);
@@ -199,6 +200,46 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
         }
     }
 
+    @Nested
+    @DisplayName("PUT /v1/report/{id}")
+    class PutEndPoints {
+
+        @Test
+        @DisplayName("PUT /v1/report/{id} - Should return 200 with updated report data when request is valid")
+        void shouldReturn200_whenValidRequest(){
+            var request = readResourceFile(PUT + "request/request-update-report-200.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-updated-report-200.json");
+
+            var response = api().put("/{id}", request, HttpStatus.OK, Map.of("id", EXISTING_ID)).asString();
+
+            assertJsonEquals(response, expectedResponse, "id", "createdAt", "updatedAt");
+        }
+
+        @Test
+        @DisplayName("PUT /v1/report/{id} - Should return 400 when operation does not belong to the given patient")
+        void shouldReturn400_whenOperationDoesNotBelongToPatient(){
+            var request = readResourceFile(PUT + "request/request-operation-patient-mismatch-400.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-operation-patient-mismatch-400.json");
+
+            var response = api().put("/{id}", request, HttpStatus.BAD_REQUEST, Map.of("id", EXISTING_ID)).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+        @Test
+        @DisplayName("PUT /v1/report/{id} - Should return 400 when operation does not belong to the given doctor")
+        void shouldReturn400_whenOperationDoesNotBelongToDoctor(){
+            var request = readResourceFile(PUT + "request/request-operation-doctor-mismatch-400.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-operation-doctor-mismatch-400.json");
+
+            var response = api().put("/{id}", request, HttpStatus.BAD_REQUEST, Map.of("id", EXISTING_ID)).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+
+    }
+
     record ApiClient(int port) {
         private static final String BASE_URI = "http://localhost:%d/v1/report";
 
@@ -226,6 +267,16 @@ public class ReportIntegrationTest extends BaseIntegrationTest {
             return baseRequest()
                     .body(body)
                     .post(path)
+                    .then()
+                    .statusCode(status.value())
+                    .extract();
+        }
+
+        ExtractableResponse<Response> put(String path, String body, HttpStatus status, Map<String, ?> pathParams){
+            return baseRequest()
+                    .pathParams(pathParams)
+                    .body(body)
+                    .put(path)
                     .then()
                     .statusCode(status.value())
                     .extract();
