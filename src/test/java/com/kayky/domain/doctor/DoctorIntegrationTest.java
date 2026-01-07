@@ -107,7 +107,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("POST /v1/doctor - Should return 400 when email already exists")
         void shouldReturn400_whenEmailAlreadyExists(){
-            var request = readResourceFile(POST + "request-email-already-exists.json");
+            var request = readResourceFile(POST + "request-email-already-exists-400.json");
             var expectedResponse = readResourceFile(POST + "response-email-already-exists-400.json");
 
             var response = api().post("", request, HttpStatus.BAD_REQUEST).asString();
@@ -158,7 +158,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("PUT /v1/doctor - Should return 400 when email already exists")
         void shouldReturn400_whenEmailAlreadyExists() {
-            var request = readResourceFile(PUT + "request-email-already-exists.json");
+            var request = readResourceFile(PUT + "request-email-already-exists-400.json");
             var expectedResponse = readResourceFile(PUT + "response-email-already-exists-400.json");
 
             var response = api().put("/{id}", request, HttpStatus.BAD_REQUEST, Map.of("id", EXISTING_ID)).asString();

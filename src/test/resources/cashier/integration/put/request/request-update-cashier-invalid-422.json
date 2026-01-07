@@ -1,0 +1,10 @@
+{
+  "firstName": "",
+  "lastName": "Silva",
+  "email": "maria.silva@example.com",
+  "password": "password123",
+  "gender": "FEMALE",
+  "registrationNumber": "REG-001",
+  "department": "Finance",
+  "salary": 3500.00
+}
