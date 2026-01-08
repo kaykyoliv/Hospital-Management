@@ -3,7 +3,6 @@ package com.kayky.domain.payment;
 import com.kayky.commons.FileUtils;
 import com.kayky.commons.PageUtils;
 import com.kayky.commons.PaymentUtils;
-import com.kayky.core.exception.EmailAlreadyExistsException;
 import com.kayky.core.exception.ResourceNotFoundException;
 import com.kayky.domain.payment.request.PaymentBaseRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +39,7 @@ class PaymentControllerTest {
     
     @BeforeEach
     void setUp() {
-        validCreateRequest = FileUtils.readResourceFile("payment/post/request-create-payment-201.json");
+        validCreateRequest = FileUtils.readResourceFile("payment/controller/post/request-create-payment-201.json");
     }
     
     private String loadExpectedJson(String resourcePath) {
@@ -71,7 +70,7 @@ class PaymentControllerTest {
         mockMvc.perform(get(PATH_ID, paymentId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json(loadExpectedJson("payment/get/payment-by-id-200.json")))
+                .andExpect(content().json(loadExpectedJson("payment/controller/get/payment-by-id-200.json")))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
         verify(service).findById(EXISTING_ID);
@@ -87,7 +86,7 @@ class PaymentControllerTest {
         mockMvc.perform(get(PATH_ID, NON_EXISTING_ID)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(content().json(loadExpectedJson("payment/get/payment-by-id-404.json")))
+                .andExpect(content().json(loadExpectedJson("payment/controller/get/payment-by-id-404.json")))
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
@@ -106,7 +105,7 @@ class PaymentControllerTest {
         mockMvc.perform(get(BASE_URI))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(loadExpectedJson("payment/get/all-paged-payments-200.json")));
+                .andExpect(content().json(loadExpectedJson("payment/controller/get/all-paged-payments-200.json")));
 
 
         verify(service).findAll(any(Pageable.class));
@@ -124,7 +123,7 @@ class PaymentControllerTest {
         mockMvc.perform(get(urlForPatientPayments(patientId)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(loadExpectedJson("payment/get/payments-by-patient-200.json")));
+                .andExpect(content().json(loadExpectedJson("payment/controller/get/payments-by-patient-200.json")));
 
         verify(service).findByPatient(patientId);
     }
@@ -139,7 +138,7 @@ class PaymentControllerTest {
         mockMvc.perform(get(urlForPatientPayments(NON_EXISTING_ID))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(content().json(loadExpectedJson("payment/get/payments-by-patient-404.json")))
+                .andExpect(content().json(loadExpectedJson("payment/controller/get/payments-by-patient-404.json")))
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
@@ -157,7 +156,7 @@ class PaymentControllerTest {
         performPostRequest(validCreateRequest)
                 .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(loadExpectedJson("payment/post/response-created-payment-200.json")));
+                .andExpect(content().json(loadExpectedJson("payment/controller/post/response-created-payment-200.json")));
 
         verify(service).save(any(PaymentBaseRequest.class));
     }
@@ -191,10 +190,10 @@ class PaymentControllerTest {
     @Test
     @DisplayName("POST /v1/payment - Should return 422 when request is invalid")
     void save_ShouldReturn422_WhenRequestIsInvalid() throws Exception {
-        var invalidRequest = FileUtils.readResourceFile("payment/post/request-create-payment-invalid-422.json");
+        var invalidRequest = FileUtils.readResourceFile("payment/controller/post/request-create-payment-invalid-422.json");
 
         performPostRequest(invalidRequest)
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(content().json(loadExpectedJson("payment/post/validation-error-422.json")));
+                .andExpect(content().json(loadExpectedJson("payment/controller/post/validation-error-422.json")));
     }
 }

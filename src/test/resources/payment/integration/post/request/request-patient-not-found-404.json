@@ -1,0 +1,6 @@
+{
+  "patientId": 3,
+  "cashierId": 1,
+  "amount": 350.00,
+  "paymentMethod": "CREDIT_CARD"
+}

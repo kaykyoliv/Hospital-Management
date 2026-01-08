@@ -1,0 +1,5 @@
+{
+  "status": 404,
+  "error": "Cashier not found",
+  "path": "/v1/payment"
+}

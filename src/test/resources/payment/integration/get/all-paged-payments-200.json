@@ -1,0 +1,40 @@
+{
+  "content": [
+    {
+      "id": 1,
+      "patientId": 2,
+      "patientName": "John Doe",
+      "cashierId": 1,
+      "cashierName": "Robert Williams",
+      "amount": 350.00,
+      "paymentMethod": "CREDIT_CARD",
+      "status": "PAID",
+      "paymentDate": "2026-01-03T14:40:00"
+    },
+    {
+      "id": 2,
+      "patientId": 4,
+      "patientName": "Jane Smith",
+      "cashierId": 3,
+      "cashierName": "Emily Clark",
+      "amount": 1200.50,
+      "paymentMethod": "PIX",
+      "status": "PAID",
+      "paymentDate": "2026-01-04T11:20:00"
+    },
+    {
+      "id": 3,
+      "patientId": 6,
+      "patientName": "Alice Johnson",
+      "cashierId": 3,
+      "cashierName": "Emily Clark",
+      "amount": 500.00,
+      "paymentMethod": "DEBIT_CARD",
+      "status": "PENDING",
+      "paymentDate": "2026-01-04T10:00:00"
+    }
+  ],
+  "currentPage": 0,
+  "totalElements": 3,
+  "totalPages": 1
+}

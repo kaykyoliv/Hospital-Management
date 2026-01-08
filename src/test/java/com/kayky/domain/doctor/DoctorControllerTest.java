@@ -121,7 +121,7 @@ class DoctorControllerTest {
     @DisplayName("POST /v1/doctor - Should return 400 when email already exists")
     void save_ShouldThrowEmailAlreadyExistsException_WhenEmailAlreadyExists() throws Exception {
 
-        var request = FileUtils.readResourceFile("doctor/post/request-email-already-exists.json");
+        var request = FileUtils.readResourceFile("doctor/post/request-email-already-exists-400.json");
         var expectedJsonResponse = FileUtils.readResourceFile("doctor/post/response-email-already-exists-400.json");
 
         var doctorList = DoctorUtils.doctorList();
@@ -193,7 +193,7 @@ class DoctorControllerTest {
     @DisplayName("PUT /v1/doctor/{id}  - Should return 400 when email already exists")
     void update_ShouldThrowEmailAlreadyExistsException_WhenEmailAlreadyExists() throws Exception {
 
-        var request = FileUtils.readResourceFile("doctor/put/request-email-already-exists.json");
+        var request = FileUtils.readResourceFile("doctor/put/request-email-already-exists-400.json");
         var expectedJsonResponse = FileUtils.readResourceFile("doctor/put/response-email-already-exists-400.json");
 
         var doctorList = DoctorUtils.doctorList();

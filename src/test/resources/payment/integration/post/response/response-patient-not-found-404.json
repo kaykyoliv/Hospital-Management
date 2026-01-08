@@ -1,0 +1,5 @@
+{
+  "status": 404,
+  "error": "Patient not found",
+  "path": "/v1/payment"
+}

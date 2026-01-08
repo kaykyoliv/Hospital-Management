@@ -1,0 +1,11 @@
+{
+  "status": 422,
+  "error": "Validation failed",
+  "path": "/v1/payment",
+  "fieldErrors": [
+    {
+      "fieldName": "amount",
+      "message": "Amount is required"
+    }
+  ]
+}
