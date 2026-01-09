@@ -32,13 +32,14 @@ public class PaymentIntegrationTest extends BaseIntegrationTest {
     private static final String GET = "payment/integration/get/";
     private static final String POST = "payment/integration/post/";
 
-    private ApiClient api(){
+    private ApiClient api() {
         return new ApiClient(port);
     }
 
     @Nested
     @DisplayName("GET /v1/payment/{id}")
     class GetEndPoints {
+        private static final int PATIENT_ID = 2;
 
         @Test
         @DisplayName("GET /v1/payment/{id} - Should return 200 when request is valid")
@@ -61,7 +62,7 @@ public class PaymentIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("GET /v1/payment/{id} - Should return 200 with paged payment data when payment exist")
+        @DisplayName("GET /v1/payment - Should return 200 with paged payments when payments exist")
         void shouldReturnPagedPayments_whenPaymentsExists() {
             var expectedResponse = readResourceFile(GET + "all-paged-payments-200.json");
 
@@ -82,11 +83,31 @@ public class PaymentIntegrationTest extends BaseIntegrationTest {
                         json.node("content[2].id").asNumber().isPositive();
                     });
         }
+
+        @Test
+        @DisplayName("GET /v1/payment/patients/{patientId}/payments - Should return 200 with payment list when patient exists")
+        void shouldReturnPayments_whenPatientExists() {
+            var expectedResponse = readResourceFile(GET + "payments-by-patient-200.json");
+
+            var response = api().get("patients/{id}/payments", HttpStatus.OK, Map.of("id", PATIENT_ID)).asString();
+
+            assertJsonEquals(response, expectedResponse, "id");
+        }
+
+        @Test
+        @DisplayName("GET /v1/payment/patients/{patientId}/payments - Should return 404 when patient does not exist")
+        void shouldReturn404_whenPatientDoesNotExist() {
+            var expectedResponse = readResourceFile(GET + "payments-by-patient-404.json");
+
+            var response = api().get("patients/{id}/payments", HttpStatus.NOT_FOUND, Map.of("id", NON_EXISTING_ID)).asString();
+
+            assertJsonEquals(response, expectedResponse, "id");
+        }
     }
 
     @Nested
     @DisplayName("POST /v1/payment")
-    class PostEndPoints{
+    class PostEndPoints {
 
         @Test
         @DisplayName("POST /v1/payment - Should return 201 with payment data when request is valid")
@@ -109,7 +130,7 @@ public class PaymentIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("POST /v1/payment - Should return 404 when cashier does not exist")
-        void shouldReturn404_whenCashierDoesNotExist(){
+        void shouldReturn404_whenCashierDoesNotExist() {
             var request = readResourceFile(POST + "request/request-cashier-not-found-404.json");
             var expectedResponse = readResourceFile(POST + "response/response-cashier-not-found-404.json");
 
@@ -120,7 +141,7 @@ public class PaymentIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("POST /v1/payment - Should return 404 when patient does not exist")
-        void shouldReturn404_whenPatientDoesNotExist(){
+        void shouldReturn404_whenPatientDoesNotExist() {
             var request = readResourceFile(POST + "request/request-patient-not-found-404.json");
             var expectedResponse = readResourceFile(POST + "response/response-patient-not-found-404.json");
 
@@ -131,7 +152,7 @@ public class PaymentIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("POST /v1/payment - Should return 422 when request is invalid")
-        void shouldReturn422_whenRequestIsInvalid(){
+        void shouldReturn422_whenRequestIsInvalid() {
             var request = readResourceFile(POST + "request/request-create-payment-invalid-422.json");
             var expectedResponse = readResourceFile(POST + "response/response-validation-error-422.json");
 
@@ -142,18 +163,17 @@ public class PaymentIntegrationTest extends BaseIntegrationTest {
     }
 
 
-
-    record ApiClient(int port){
+    record ApiClient(int port) {
         private static final String BASE_URI = "http://localhost:%d/v1/payment";
 
-        private RequestSpecification baseRequest(){
+        private RequestSpecification baseRequest() {
             return given()
                     .baseUri(BASE_URI.formatted(port))
                     .contentType(ContentType.JSON)
                     .accept(ContentType.JSON);
         }
 
-        private ExtractableResponse<Response> get(String path, HttpStatus status, Map<String, ?> pathParams){
+        private ExtractableResponse<Response> get(String path, HttpStatus status, Map<String, ?> pathParams) {
             return baseRequest()
                     .pathParams(pathParams)
                     .get(path)
@@ -162,11 +182,11 @@ public class PaymentIntegrationTest extends BaseIntegrationTest {
                     .extract();
         }
 
-        private ExtractableResponse<Response> get(String path, HttpStatus status){
+        private ExtractableResponse<Response> get(String path, HttpStatus status) {
             return get(path, status, Map.of());
         }
 
-        private ExtractableResponse<Response> post(String path, String body, HttpStatus status){
+        private ExtractableResponse<Response> post(String path, String body, HttpStatus status) {
             return baseRequest()
                     .body(body)
                     .post(path)
