@@ -1,0 +1,5 @@
+{
+  "status": 404,
+  "error": "Payment not found",
+  "path": "/v1/payment/999/receipt"
+}

@@ -30,6 +30,7 @@ VALUES
     (6, 'Street C, 789', 'B+');
 
 INSERT INTO tb_payment (
+    id,
     patient_id,
     cashier_id,
     amount,
@@ -38,6 +39,6 @@ INSERT INTO tb_payment (
     payment_date
 )
 VALUES
-    (2, 1, 350.00,  'CREDIT_CARD', 'PAID',    '2026-01-03 14:40:00'),
-    (4, 3, 1200.50, 'PIX',         'PAID',    '2026-01-04 11:20:00'),
-    (6, 3, 500.00,  'DEBIT_CARD',  'PENDING', '2026-01-04 10:00:00');
+    (1, 2, 1, 350.00,  'CREDIT_CARD', 'PAID',    '2026-01-03 14:40:00'),
+    (2, 4, 3, 1200.50, 'PIX',         'PAID',    '2026-01-04 11:20:00'),
+    (3, 6, 3, 500.00,  'DEBIT_CARD',  'PENDING', '2026-01-04 10:00:00');

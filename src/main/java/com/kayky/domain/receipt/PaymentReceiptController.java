@@ -30,7 +30,7 @@ public class PaymentReceiptController {
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200",
+                    responseCode = "200",      
                     description = "Receipt emitted successfully",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ReceiptBaseResponse.class))

@@ -160,6 +160,38 @@ public class PaymentIntegrationTest extends BaseIntegrationTest {
 
             assertJsonEquals(response, expectedResponse, "timestamp");
         }
+
+        @Test
+        @DisplayName("POST /v1/payment/{paymentId}/receipt - Should return 200 when receipt is emitted successfully")
+        void shouldReturn200_whenReceiptIsEmittedSuccessfully() {
+            var expectedResponse = readResourceFile(POST + "response/response-emit-receipt-200.json");
+
+            var response = api().post("{paymentId}/receipt", HttpStatus.OK, Map.of("paymentId", 1)).asString();
+
+            assertJsonEquals(response, expectedResponse, "issuedAt", " receiptNumber");
+        }
+
+        @Test
+        @DisplayName("POST /v1/payment/{paymentId}/receipt - Should return 404 when payment does not exist")
+        void shouldReturn404_whenPaymentDoesNotExist() {
+            var expectedResponse = readResourceFile(POST + "response/response-emit-receipt-404.json");
+
+            var response = api().post("{paymentId}/receipt", HttpStatus.NOT_FOUND, Map.of("paymentId", NON_EXISTING_ID)).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
+
+        @Test
+        @DisplayName("POST /v1/payment/{paymentId}/receipt - Should return 409 when receipt already exists for payment")
+        @Sql(value = "/payment/sql/cleanup-post-receipt-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+        @Sql(value = "/payment/sql/payment-post-receipt-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+        void shouldReturn409_whenReceiptAlreadyExistsForPayment() {
+            var expectedResponse = readResourceFile(POST + "response/response-emit-receipt-409.json");
+
+            var response = api().post("{paymentId}/receipt", HttpStatus.CONFLICT, Map.of("paymentId", EXISTING_ID)).asString();
+
+            assertJsonEquals(response, expectedResponse, "timestamp");
+        }
     }
 
 
@@ -189,6 +221,15 @@ public class PaymentIntegrationTest extends BaseIntegrationTest {
         private ExtractableResponse<Response> post(String path, String body, HttpStatus status) {
             return baseRequest()
                     .body(body)
+                    .post(path)
+                    .then()
+                    .statusCode(status.value())
+                    .extract();
+        }
+
+        private ExtractableResponse<Response> post(String path, HttpStatus status, Map<String, ?> pathParams) {
+            return baseRequest()
+                    .pathParams(pathParams)
                     .post(path)
                     .then()
                     .statusCode(status.value())
