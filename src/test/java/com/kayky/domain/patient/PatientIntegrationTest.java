@@ -124,7 +124,7 @@ public class PatientIntegrationTest extends BaseIntegrationTest {
         @Test
         void shouldReturn422_whenRequestIsInvalid_onPost() {
             var request = readResourceFile(POST + "request-create-patient-invalid-422.json");
-            var expectedResponse = readResourceFile(POST + "validation-error-422.json");
+            var expectedResponse = readResourceFile(POST + "response-response-validation-error-422.json");
 
             var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
 
@@ -178,7 +178,7 @@ public class PatientIntegrationTest extends BaseIntegrationTest {
         @DisplayName("PUT /v1/patient - Should return 422 when request is invalid")
         void shouldReturn422_whenRequestIsInvalid_onPut() {
             var request = readResourceFile(PUT + "request-update-patient-invalid-422.json");
-            var expectedResponse = readResourceFile(PUT + "validation-error-422.json");
+            var expectedResponse = readResourceFile(PUT + "response-response-validation-error-422.json");
 
             var response = api().put("/{id}", request, HttpStatus.UNPROCESSABLE_ENTITY, Map.of("id", EXISTING_ID)).asString();
 

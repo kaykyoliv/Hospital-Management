@@ -131,8 +131,8 @@ public class PaymentIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("POST /v1/payment - Should return 404 when cashier does not exist")
         void shouldReturn404_whenCashierDoesNotExist() {
-            var request = readResourceFile(POST + "request/request-cashier-not-found-404.json");
-            var expectedResponse = readResourceFile(POST + "response/response-cashier-not-found-404.json");
+            var request = readResourceFile(POST + "request/request-response-cashier-not-found-404.json");
+            var expectedResponse = readResourceFile(POST + "response/response-response-cashier-not-found-404.json");
 
             var response = api().post("", request, HttpStatus.NOT_FOUND).asString();
 
@@ -154,7 +154,7 @@ public class PaymentIntegrationTest extends BaseIntegrationTest {
         @DisplayName("POST /v1/payment - Should return 422 when request is invalid")
         void shouldReturn422_whenRequestIsInvalid() {
             var request = readResourceFile(POST + "request/request-create-payment-invalid-422.json");
-            var expectedResponse = readResourceFile(POST + "response/response-validation-error-422.json");
+            var expectedResponse = readResourceFile(POST + "response/response-response-response-validation-error-422.json");
 
             var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
 
@@ -168,7 +168,7 @@ public class PaymentIntegrationTest extends BaseIntegrationTest {
 
             var response = api().post("{paymentId}/receipt", HttpStatus.OK, Map.of("paymentId", 1)).asString();
 
-            assertJsonEquals(response, expectedResponse, "issuedAt", " receiptNumber");
+            assertJsonEquals(response, expectedResponse, "issuedAt", "receiptNumber");
         }
 
         @Test

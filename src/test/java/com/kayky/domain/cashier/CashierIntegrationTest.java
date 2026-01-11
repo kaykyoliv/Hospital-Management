@@ -54,7 +54,7 @@ public class CashierIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("GET /v1/cashier/{id} - Should return 404 when cashier does not exists")
         void shouldReturn404_whenIdDoesNotExists() {
-            var expectedResponse = readResourceFile(GET + "cashier-not-found-404.json");
+            var expectedResponse = readResourceFile(GET + "response-cashier-not-found-404.json");
 
             var response = api().get("/{id}", HttpStatus.NOT_FOUND, Map.of("id", NON_EXISTING_ID)).asString();
 
@@ -121,7 +121,7 @@ public class CashierIntegrationTest extends BaseIntegrationTest {
         @DisplayName("POST /v1/cashier - Should return 422 when request is invalid")
         void shouldReturn422_whenRequestIsInvalid(){
             var request = readResourceFile(POST + "request/request-create-cashier-invalid-422.json");
-            var expectedResponse = readResourceFile(POST + "response/response-validation-error-422.json");
+            var expectedResponse = readResourceFile(POST + "response/response-response-response-validation-error-422.json");
 
             var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
 
@@ -162,8 +162,8 @@ public class CashierIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("PUT /v1/cashier/{id} - Should return 404 when cashier does not exist")
         void shouldReturn404_whenCashierDoesNotExist(){
-            var request = readResourceFile(PUT + "request/request-cashier-not-found-404.json");
-            var expectedResponse = readResourceFile(PUT + "response/response-cashier-not-found-404.json");
+            var request = readResourceFile(PUT + "request/request-response-cashier-not-found-404.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-response-cashier-not-found-404.json");
 
             var response = api().put("/{id}", request, HttpStatus.NOT_FOUND, Map.of("id", NON_EXISTING_ID)).asString();
 
@@ -174,7 +174,7 @@ public class CashierIntegrationTest extends BaseIntegrationTest {
         @DisplayName("PUT /v1/cashier/{id} - Should return 422 when request is invalid")
         void shouldReturn422_whenRequestIsInvalid() {
             var request = readResourceFile(PUT + "request/request-update-cashier-invalid-422.json");
-            var expectedResponse = readResourceFile(PUT + "response/response-validation-error-422.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-response-response-validation-error-422.json");
 
             var response = api().put("/{id}", request, HttpStatus.UNPROCESSABLE_ENTITY, Map.of("id", EXISTING_ID)).asString();
 
