@@ -1,5 +1,0 @@
-{
-  "status": 400,
-  "error": "Email emily.johnson@example.com already in use",
-  "path": "/v1/doctor"
-}

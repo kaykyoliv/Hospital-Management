@@ -29,9 +29,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Doctor Controller - Integration Tests")
 public class DoctorIntegrationTest extends BaseIntegrationTest {
 
-    private static final String GET = "doctor/get/";
-    private static final String POST = "doctor/post/";
-    private static final String PUT = "doctor/put/";
+    private static final String GET = "doctor/controller/get/";
+    private static final String POST = "doctor/controller/post/";
+    private static final String PUT = "doctor/controller/put/";
 
     private ApiClient api() {
         return new ApiClient(port);
@@ -132,8 +132,8 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("PUT /v1/doctor - Should return 200 with updated doctor data when request is valid")
         void shouldReturn200_whenValidRequest() {
-            var request = readResourceFile(PUT + "request-update-doctor.json");
-            var expectedResponse = readResourceFile(PUT + "response-updated-doctor.json");
+            var request = readResourceFile(PUT + "request-update-doctor-200.json");
+            var expectedResponse = readResourceFile(PUT + "response-updated-doctor-200.json");
 
             var response = api().put("/{id}", request, HttpStatus.OK, Map.of("id", EXISTING_ID)).asString();
 
@@ -147,7 +147,7 @@ public class DoctorIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("PUT /v1/doctor - Should return 404 when doctor does not exist")
         void shouldReturn404_whenDoctorDoesNotExist() {
-            var request = readResourceFile(PUT + "request-update-doctor.json");
+            var request = readResourceFile(PUT + "request-update-doctor-200.json");
             var expectedResponse = readResourceFile(PUT + "response-doctor-not-found-404.json");
 
             var response = api().put("/{id}", request, HttpStatus.NOT_FOUND, Map.of("id", NON_EXISTING_ID)).asString();

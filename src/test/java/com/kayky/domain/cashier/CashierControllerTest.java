@@ -170,16 +170,17 @@ class CashierControllerTest {
     @DisplayName("PUT /v1/cashier/{id} - Should return 200 when request is valid")
     void updateCashier_shouldReturn200_whenRequestIsValid() throws Exception {
         var updatedCashier = CashierUtils.updatedCashier();
+        var cashierId = updatedCashier.getId();
         var response = CashierUtils.asBaseResponse(updatedCashier);
 
-        when(service.update(any(CashierBaseRequest.class), eq(response.id()))).thenReturn(response);
+        when(service.update(any(CashierBaseRequest.class), eq(cashierId))).thenReturn(response);
 
         performPutRequest(EXISTING_ID, validUpdateRequest)
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(loadExpectedJson("cashier/controller/put/response/response-updated-cashier-200.json")));
 
-        verify(service).update(any(CashierBaseRequest.class), eq(EXISTING_ID));
+        verify(service).update(any(CashierBaseRequest.class), eq(cashierId));
     }
 
     @Test
