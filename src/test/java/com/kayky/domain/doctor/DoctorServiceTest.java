@@ -1,6 +1,8 @@
 package com.kayky.domain.doctor;
 
 import com.kayky.commons.DoctorUtils;
+import com.kayky.commons.PageUtils;
+import com.kayky.domain.cashier.Cashier;
 import com.kayky.domain.user.UserValidator;
 import com.kayky.core.exception.EmailAlreadyExistsException;
 import com.kayky.core.exception.ResourceNotFoundException;
@@ -24,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@DisplayName("Doctor Service - Unit Tests")
 @ExtendWith(MockitoExtension.class)
 class DoctorServiceTest {
 
@@ -44,12 +47,12 @@ class DoctorServiceTest {
 
 
     @Test
-    @DisplayName("findById: Should return DoctorBaseResponse when the doctor exists")
-    void findBydId_ShouldReturnDoctorBaseResponse_WhenDoctorExists(){
+    @DisplayName("findById: Should return DoctorBaseResponse when doctor exists")
+    void findById_shouldReturnBaseResponse_whenDoctorExists() {
         var savedDoctor = DoctorUtils.savedDoctor(EXISTING_ID);
         var expectedResponse = DoctorUtils.asBaseResponse(savedDoctor);
 
-        BDDMockito.when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedDoctor));
+        when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedDoctor));
 
         var doctorFound = service.findById(EXISTING_ID);
 
@@ -61,8 +64,8 @@ class DoctorServiceTest {
     }
 
     @Test
-    @DisplayName("findById: Should throw ResourceNotFoundException when the doctor does not exist")
-    void findById_ShouldThrowResourceNotFoundException_WhenDoctorDoesNotExist() {
+    @DisplayName("findById - Should throw not-found exception when doctor does not exist")
+    void findById_shouldThrowNotFound_whenDoctorDoesNotExist() {
         when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.findById(NON_EXISTING_ID))
@@ -74,11 +77,11 @@ class DoctorServiceTest {
 
 
     @Test
-    @DisplayName("findAll: Should return PageResponse when doctors exist")
-    void findAll_ShouldReturnPageResponse_WhenDoctorsExist() {
+    @DisplayName("findAll - Should return paged response when doctors exist")
+    void findAll_shouldReturnPagedResponse_whenDoctorsExist() {
         PageRequest pageRequest = PageRequest.of(0, 3);
         var doctorList = DoctorUtils.doctorList();
-        var pagedDoctor = new PageImpl<>(doctorList, pageRequest, doctorList.size());
+        var pagedDoctor = PageUtils.toPage(doctorList);
 
         when(repository.findAll(pageRequest)).thenReturn(pagedDoctor);
 
@@ -88,9 +91,7 @@ class DoctorServiceTest {
         assertThat(result.getTotalPages()).isEqualTo(pagedDoctor.getTotalPages());
         assertThat(result.getCurrentPage()).isEqualTo(pagedDoctor.getNumber());
 
-        var expectedResponse = doctorList.stream()
-                .map(mapper::toDoctorBaseResponse)
-                .toList();
+        var expectedResponse = DoctorUtils.asBaseResponseList();
 
         assertThat(result.getContent())
                 .usingRecursiveComparison()
@@ -99,14 +100,16 @@ class DoctorServiceTest {
         verify(repository).findAll(pageRequest);
     }
 
+
     @Test
-    @DisplayName("save: Should return DoctorBaseResponse when email is unique")
-    void save_ShouldReturnDoctorBaseResponse_WhenEmailIsUnique() {
+    @DisplayName("save - Should return base response when request is valid")
+    void save_shouldReturnBaseResponse_whenCreatingValidDoctor() {
+        var savedDoctor = DoctorUtils.savedDoctor(EXISTING_ID);
+
+        var expectedResponse = DoctorUtils.asBaseResponse(savedDoctor);
         var request = DoctorUtils.asBaseRequest();
 
-
-        var savedDoctor = DoctorUtils.savedDoctor(EXISTING_ID);
-        var expectedResponse = DoctorUtils.asBaseResponse(savedDoctor);
+        doNothing().when(userValidator).assertEmailDoesNotExist(request.getEmail());
 
         when(repository.save(any(Doctor.class))).thenReturn(savedDoctor);
 
@@ -115,18 +118,16 @@ class DoctorServiceTest {
         assertThat(result).usingRecursiveComparison()
                 .isEqualTo(expectedResponse);
 
+        verify(userValidator).assertEmailDoesNotExist(request.getEmail());
         verify(repository).save(any(Doctor.class));
+        verifyNoMoreInteractions(repository);
     }
 
     @Test
-    @DisplayName("save: Should throw EmailAlreadyExistsException when email is already in use")
-    void save_ShouldThrowEmailAlreadyExistsException_WhenEmailAlreadyExists() {
+    @DisplayName("save - Should throw email-already-exists exception when email is in use")
+    void save_shouldThrowEmailAlreadyExists_whenCreatingWithDuplicateEmail() {
         var request = DoctorUtils.asBaseRequest();
-
-        var savedDoctor = DoctorUtils.savedDoctor(EXISTING_ID);
-        var email = savedDoctor.getEmail();
-
-        request.setEmail(email);
+        var email = request.getEmail();
 
         doThrow(new EmailAlreadyExistsException(EMAIL_ALREADY_EXISTS.formatted(email)))
                 .when(userValidator)
@@ -136,62 +137,65 @@ class DoctorServiceTest {
                 .isInstanceOf(EmailAlreadyExistsException.class)
                 .hasMessage(EMAIL_ALREADY_EXISTS.formatted(email));
 
-        verify(repository, times(0)).save(any());
+
+        verify(userValidator).assertEmailDoesNotExist(email);
+        verifyNoInteractions(repository);
     }
 
     @Test
-    @DisplayName("update: Should return DoctorBaseResponse when update is valid")
-    void update_ShouldReturnDoctorBaseResponse_WhenUpdateIsValid() {
-        var putRequest = DoctorUtils.asBaseRequest();
-        var savedDoctor = DoctorUtils.savedDoctor(EXISTING_ID);
-        var updatedDoctor = DoctorUtils.updatedDoctor();
+    @DisplayName("update - Should return base response when request is valid")
+    void update_shouldReturnBaseResponse_whenUpdatingValidDoctor() {
+        var doctorId = EXISTING_ID;
+        var savedDoctor = DoctorUtils.savedDoctor(doctorId);
 
-        var expectedResponse = DoctorUtils.asBaseResponse(updatedDoctor);
+        var request = DoctorUtils.asBaseRequest();
+        var expectedResponse = DoctorUtils.asBaseResponse(savedDoctor);
 
-        when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedDoctor));
-        when(repository.save(any(Doctor.class))).thenReturn(updatedDoctor);
+        doNothing().when(userValidator).assertEmailDoesNotExist(request.getEmail(), doctorId);
+        when(repository.findById(doctorId)).thenReturn(Optional.of(savedDoctor));
+        when(repository.save(any(Doctor.class))).thenReturn(savedDoctor);
 
-        var result = service.update(putRequest, EXISTING_ID);
+        var result = service.update(request, doctorId);
 
         assertThat(result)
                 .usingRecursiveComparison()
                 .isEqualTo(expectedResponse);
 
-        verify(repository).findById(EXISTING_ID);
+        verify(userValidator).assertEmailDoesNotExist(request.getEmail(), doctorId);
         verify(repository).save(any(Doctor.class));
     }
 
     @Test
-    @DisplayName("update: Should throw ResourceNotFoundException when doctor does not exist")
-    void update_ShouldThrowResourceNotFoundException_WhenDoctorDoesNotExist() {
-        var request = DoctorUtils.asBaseRequest();
-
+    @DisplayName("update - Should throw not-found exception when doctor does not exist")
+    void update_shouldThrowNotFound_whenUpdatingNonExistingDoctor() {
         when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.update(request, NON_EXISTING_ID))
+        assertThatThrownBy(() -> service.update(DoctorUtils.asBaseRequest(), NON_EXISTING_ID))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage(DOCTOR_NOT_FOUND);
 
         verify(repository).findById(NON_EXISTING_ID);
+        verifyNoMoreInteractions(repository);
     }
 
     @Test
-    @DisplayName("update: Should throw EmailAlreadyExistsException when email is used by another doctor")
-    void update_ShouldThrowEmailAlreadyExistsException_WhenEmailUsedByAnotherDoctor() {
-        var savedDoctor = DoctorUtils.savedDoctor(EXISTING_ID);
-        var email = savedDoctor.getEmail();
+    @DisplayName("update - Should throw email-already-exists exception when email is in use")
+    void update_shouldThrowEmailAlreadyExists_whenUpdatingWithDuplicateEmail() {
+        var doctorId = EXISTING_ID;
+        var savedDoctor = DoctorUtils.savedDoctor(doctorId);
         var request = DoctorUtils.asBaseRequest();
+        var email = request.getEmail();
 
-        when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedDoctor));
+        when(repository.findById(doctorId)).thenReturn(Optional.of(savedDoctor));
 
         doThrow(new EmailAlreadyExistsException(EMAIL_ALREADY_EXISTS.formatted(email)))
                 .when(userValidator)
-                .assertEmailDoesNotExist(request.getEmail(), EXISTING_ID);
+                .assertEmailDoesNotExist(request.getEmail(), doctorId);
 
-        assertThatThrownBy(() -> service.update(request, EXISTING_ID))
+        assertThatThrownBy(() -> service.update(request, doctorId))
                 .isInstanceOf(EmailAlreadyExistsException.class)
                 .hasMessage(EMAIL_ALREADY_EXISTS.formatted(email));
 
-        verify(userValidator).assertEmailDoesNotExist(request.getEmail(), EXISTING_ID);
+        verify(userValidator).assertEmailDoesNotExist(request.getEmail(), doctorId);
     }
 }

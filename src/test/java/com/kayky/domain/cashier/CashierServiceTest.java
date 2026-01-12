@@ -22,38 +22,38 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@DisplayName("Cashier Service - Unit Tests")
 @ExtendWith(MockitoExtension.class)
 class CashierServiceTest {
 
     private CashierService service;
 
     @Mock
-    private CashierRepository cashierRepository;
+    private CashierRepository repository;
     private final CashierMapper cashierMapper = Mappers.getMapper(CashierMapper.class);
     @Mock
     private UserValidator userValidator;
 
     @BeforeEach
     void setUp() {
-        service = new CashierService(cashierRepository, cashierMapper, userValidator);
+        service = new CashierService(repository, cashierMapper, userValidator);
     }
 
     @Test
     @DisplayName("findById: Should return CashierBaseResponse when cashier exists")
     void findById_shouldReturnBaseResponse_whenCashierExists() {
         var savedCashier = CashierUtils.savedCashier(EXISTING_ID);
+        var expectedResponse = CashierUtils.asBaseResponse(savedCashier);
 
-        when(cashierRepository.findById(EXISTING_ID)).thenReturn(Optional.of(savedCashier));
+        when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedCashier));
 
         var result = service.findById(EXISTING_ID);
-
-        var expectedResponse = CashierUtils.asBaseResponse(savedCashier);
 
         assertThat(result)
                 .usingRecursiveComparison()
                 .isEqualTo(expectedResponse);
 
-        verify(cashierRepository).findById(EXISTING_ID);
+        verify(repository).findById(EXISTING_ID);
     }
 
 
@@ -61,13 +61,13 @@ class CashierServiceTest {
     @DisplayName("findById - Should throw not-found exception when cashier does not exist")
     void findById_shouldThrowNotFound_whenCashierDoesNotExist() {
 
-        when(cashierRepository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
+        when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.findById(NON_EXISTING_ID))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage(CASHIER_NOT_FOUND);
 
-        verify(cashierRepository).findById(NON_EXISTING_ID);
+        verify(repository).findById(NON_EXISTING_ID);
     }
 
     @Test
@@ -77,7 +77,7 @@ class CashierServiceTest {
         var cashierList = CashierUtils.cashierList();
         var pagedCashiers = PageUtils.toPage(cashierList);
 
-        when(cashierRepository.findAll(pageRequest)).thenReturn(pagedCashiers);
+        when(repository.findAll(pageRequest)).thenReturn(pagedCashiers);
 
         var result = service.findAll(pageRequest);
 
@@ -89,7 +89,7 @@ class CashierServiceTest {
 
         assertThat(result.getContent()).usingRecursiveComparison().isEqualTo(expectedResponse);
 
-        verify(cashierRepository).findAll(pageRequest);
+        verify(repository).findAll(pageRequest);
     }
 
     @Test
@@ -102,15 +102,15 @@ class CashierServiceTest {
 
         doNothing().when(userValidator).assertEmailDoesNotExist(request.email());
 
-        when(cashierRepository.save(any(Cashier.class))).thenReturn(savedCashier);
+        when(repository.save(any(Cashier.class))).thenReturn(savedCashier);
 
         var result = service.save(request);
 
         assertThat(result).usingRecursiveComparison().isEqualTo(expectedResponse);
 
         verify(userValidator).assertEmailDoesNotExist(request.email());
-        verify(cashierRepository).save(any(Cashier.class));
-        verifyNoMoreInteractions(cashierRepository);
+        verify(repository).save(any(Cashier.class));
+        verifyNoMoreInteractions(repository);
     }
 
     @Test
@@ -128,7 +128,7 @@ class CashierServiceTest {
                 .hasMessage(EMAIL_ALREADY_EXISTS.formatted(email));
 
         verify(userValidator).assertEmailDoesNotExist(email);
-        verifyNoInteractions(cashierRepository);
+        verifyNoInteractions(repository);
     }
 
     @Test
@@ -140,17 +140,16 @@ class CashierServiceTest {
         var expectedResponse = CashierUtils.asBaseResponse(savedCashier);
         var request = CashierUtils.asBaseRequest();
 
-        when(cashierRepository.findById(cashierId)).thenReturn(Optional.of(savedCashier));
         doNothing().when(userValidator).assertEmailDoesNotExist(request.email(), cashierId);
-
-        when(cashierRepository.save(any(Cashier.class))).thenReturn(savedCashier);
+        when(repository.findById(cashierId)).thenReturn(Optional.of(savedCashier));
+        when(repository.save(any(Cashier.class))).thenReturn(savedCashier);
 
         var result = service.update(request, cashierId);
 
         assertThat(result).usingRecursiveComparison().isEqualTo(expectedResponse);
 
         verify(userValidator).assertEmailDoesNotExist(request.email(), cashierId);
-        verify(cashierRepository).save(any(Cashier.class));
+        verify(repository).save(any(Cashier.class));
     }
 
     @Test
@@ -161,7 +160,7 @@ class CashierServiceTest {
         var request = CashierUtils.asBaseRequest();
         var email = request.email();
 
-        when(cashierRepository.findById(cashierId)).thenReturn(Optional.of(savedCashier));
+        when(repository.findById(cashierId)).thenReturn(Optional.of(savedCashier));
 
         doThrow(new EmailAlreadyExistsException(EMAIL_ALREADY_EXISTS.formatted(email)))
                 .when(userValidator)
@@ -172,20 +171,20 @@ class CashierServiceTest {
                 .hasMessage(EMAIL_ALREADY_EXISTS.formatted(email));
 
         verify(userValidator).assertEmailDoesNotExist(email, cashierId);
-        verify(cashierRepository).findById(cashierId);
+        verify(repository).findById(cashierId);
     }
 
     @Test
     @DisplayName("update - Should throw not-found exception when cashier does not exist")
     void update_shouldThrowNotFound_whenUpdatingNonExistingCashier() {
-        when(cashierRepository.findById(NON_EXISTING_ID))
+        when(repository.findById(NON_EXISTING_ID))
                 .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.update(CashierUtils.asBaseRequest(), NON_EXISTING_ID))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage(CASHIER_NOT_FOUND);
 
-        verify(cashierRepository).findById(NON_EXISTING_ID);
-        verifyNoMoreInteractions(cashierRepository);
+        verify(repository).findById(NON_EXISTING_ID);
+        verifyNoMoreInteractions(repository);
     }
 }

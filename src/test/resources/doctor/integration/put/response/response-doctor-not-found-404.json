@@ -1,0 +1,7 @@
+{
+  "status": 404,
+  "error": "Doctor not found",
+  "path": "/v1/doctor/999"
+}
+
+
