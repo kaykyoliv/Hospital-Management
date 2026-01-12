@@ -39,8 +39,8 @@ class CashierServiceTest {
     }
 
     @Test
-    @DisplayName("findById: Should return CashierBaseResponse when the cashier exists")
-    void findById_ShouldReturnCashierBaseResponse_WhenCashierExists() {
+    @DisplayName("findById: Should return CashierBaseResponse when cashier exists")
+    void findById_shouldReturnBaseResponse_whenCashierExists() {
         var savedCashier = CashierUtils.savedCashier(EXISTING_ID);
 
         when(cashierRepository.findById(EXISTING_ID)).thenReturn(Optional.of(savedCashier));
@@ -58,8 +58,8 @@ class CashierServiceTest {
 
 
     @Test
-    @DisplayName("findById: Should throw ResourceNotFoundException when the Cashier does not exist")
-    void findById_ShouldThrowResourceNotFoundException_WhenCashierDoesNotExist() {
+    @DisplayName("findById - Should throw not-found exception when cashier does not exist")
+    void findById_shouldThrowNotFound_whenCashierDoesNotExist() {
 
         when(cashierRepository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
@@ -71,8 +71,8 @@ class CashierServiceTest {
     }
 
     @Test
-    @DisplayName("findAll: Should return PageResponse when cashiers exist")
-    void findAll_ShouldReturnPageResponse_WhenCashierExist() {
+    @DisplayName("findAll - Should return paged response when cashiers exist")
+    void findAll_shouldReturnPagedResponse_whenCashiersExist() {
         PageRequest pageRequest = PageRequest.of(0, 3);
         var cashierList = CashierUtils.cashierList();
         var pagedCashiers = PageUtils.toPage(cashierList);
@@ -93,8 +93,8 @@ class CashierServiceTest {
     }
 
     @Test
-    @DisplayName("save: should return CashierBaseResponse when data is valid")
-    void save_ShouldReturnCashierBaseResponse_WhenDataIsValid() {
+    @DisplayName("save - Should return base response when request is valid")
+    void save_shouldReturnBaseResponse_whenCreatingValidCashier() {
         var savedCashier = CashierUtils.savedCashier(EXISTING_ID);
 
         var expectedResponse = CashierUtils.asBaseResponse(savedCashier);
@@ -109,11 +109,13 @@ class CashierServiceTest {
         assertThat(result).usingRecursiveComparison().isEqualTo(expectedResponse);
 
         verify(userValidator).assertEmailDoesNotExist(request.email());
+        verify(cashierRepository).save(any(Cashier.class));
+        verifyNoMoreInteractions(cashierRepository);
     }
 
     @Test
-    @DisplayName("save: Should throw EmailAlreadyExistsException when email is already in use")
-    void save_ShouldThrowEmailAlreadyExistsException_WhenEmailAlreadyExists() {
+    @DisplayName("save - Should throw email-already-exists exception when email is in use")
+    void save_shouldThrowEmailAlreadyExists_whenCreatingWithDuplicateEmail() {
         var request = CashierUtils.asBaseRequest();
         var email = request.email();
 
@@ -130,8 +132,8 @@ class CashierServiceTest {
     }
 
     @Test
-    @DisplayName("update: should return CashierBaseResponse when data is valid")
-    void update_ShouldReturnCashierBaseResponse_WhenDataIsValid() {
+    @DisplayName("update - Should return base response when request is valid")
+    void update_shouldReturnBaseResponse_whenUpdatingValidCashier() {
         var cashierId = EXISTING_ID;
         var savedCashier = CashierUtils.savedCashier(cashierId);
 
@@ -148,11 +150,12 @@ class CashierServiceTest {
         assertThat(result).usingRecursiveComparison().isEqualTo(expectedResponse);
 
         verify(userValidator).assertEmailDoesNotExist(request.email(), cashierId);
+        verify(cashierRepository).save(any(Cashier.class));
     }
 
     @Test
-    @DisplayName("update: Should throw EmailAlreadyExistsException when email is already in use")
-    void update_ShouldThrowEmailAlreadyExistsException_WhenEmailAlreadyExists() {
+    @DisplayName("update - Should throw email-already-exists exception when email is in use")
+    void update_shouldThrowEmailAlreadyExists_whenUpdatingWithDuplicateEmail() {
         var cashierId = EXISTING_ID;
         var savedCashier = CashierUtils.savedCashier(cashierId);
         var request = CashierUtils.asBaseRequest();
@@ -172,4 +175,17 @@ class CashierServiceTest {
         verify(cashierRepository).findById(cashierId);
     }
 
+    @Test
+    @DisplayName("update - Should throw not-found exception when cashier does not exist")
+    void update_shouldThrowNotFound_whenUpdatingNonExistingCashier() {
+        when(cashierRepository.findById(NON_EXISTING_ID))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.update(CashierUtils.asBaseRequest(), NON_EXISTING_ID))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage(CASHIER_NOT_FOUND);
+
+        verify(cashierRepository).findById(NON_EXISTING_ID);
+        verifyNoMoreInteractions(cashierRepository);
+    }
 }
