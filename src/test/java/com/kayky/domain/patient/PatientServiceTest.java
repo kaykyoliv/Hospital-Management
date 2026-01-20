@@ -1,5 +1,7 @@
 package com.kayky.domain.patient;
 
+import com.kayky.commons.DoctorUtils;
+import com.kayky.commons.PageUtils;
 import com.kayky.commons.PatientUtils;
 import com.kayky.domain.user.UserValidator;
 import com.kayky.core.exception.EmailAlreadyExistsException;
@@ -22,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@DisplayName("Patient Service - Unit Tests")
 @ExtendWith(MockitoExtension.class)
 class PatientServiceTest {
 
@@ -41,10 +44,9 @@ class PatientServiceTest {
     }
 
     @Test
-    @DisplayName("findById: Should return PatientBaseResponse when the patient exists")
-    void findById_ShouldReturnPatientBaseResponse_WhenPatientExists() {
+    @DisplayName("findById: Should return PatientBaseResponse when patient exists")
+    void findById_shouldReturnBaseResponse_whenPatientExists() {
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
-
         var expectedResponse = PatientUtils.asBaseResponse(savedPatient);
 
         when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedPatient));
@@ -59,8 +61,8 @@ class PatientServiceTest {
     }
 
     @Test
-    @DisplayName("findById: Should throw ResourceNotFoundException when the patient does not exist")
-    void findById_ShouldThrowResourceNotFoundException_WhenPatientDoesNotExist() {
+    @DisplayName("findById - Should throw not-found exception when patient does not exist")
+    void findById_shouldThrowNotFound_whenPatientDoesNotExist() {
         when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.findById(NON_EXISTING_ID))
@@ -70,12 +72,13 @@ class PatientServiceTest {
         verify(repository).findById(NON_EXISTING_ID);
     }
 
+
     @Test
-    @DisplayName("findAll: Should return PageResponse when patients exist")
-    void findAll_ShouldReturnPageResponse_WhenPatientsExist() {
+    @DisplayName("findAll - Should return paged response when patients exist")
+    void findAll_shouldReturnPagedResponse_whenPatientsExist() {
         PageRequest pageRequest = PageRequest.of(0, 3);
         var patientList = PatientUtils.patientList();
-        var pagedPatient = new PageImpl<>(patientList, pageRequest, patientList.size());
+        var pagedPatient = PageUtils.toPage(patientList);
 
         when(repository.findAll(pageRequest)).thenReturn(pagedPatient);
 
@@ -85,8 +88,7 @@ class PatientServiceTest {
         assertThat(result.getTotalPages()).isEqualTo(pagedPatient.getTotalPages());
         assertThat(result.getCurrentPage()).isEqualTo(pagedPatient.getNumber());
 
-        var expectedResponse = patientList.stream()
-                        .map(mapper::toPatientBaseResponse).toList();
+        var expectedResponse = PatientUtils.asBaseResponseList();
 
         assertThat(result.getContent())
                 .usingRecursiveComparison()
@@ -96,8 +98,8 @@ class PatientServiceTest {
     }
 
     @Test
-    @DisplayName("save: Should return PatientBaseResponse when email is unique")
-    void save_ShouldReturnPatientBaseResponse_WhenEmailIsUnique() {
+    @DisplayName("save - Should return base response when request is valid")
+    void save_shouldReturnBaseResponse_whenCreatingValidPatient() {
         var request = PatientUtils.asBaseRequest();
 
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
@@ -114,8 +116,8 @@ class PatientServiceTest {
     }
 
     @Test
-    @DisplayName("save: Should throw EmailAlreadyExistsException when email is already in use")
-    void save_ShouldThrowEmailAlreadyExistsException_WhenEmailAlreadyExists() {
+    @DisplayName("save - Should throw email-already-exists exception when email is in use")
+    void save_shouldThrowEmailAlreadyExists_whenCreatingWithDuplicateEmail() {
         var request = PatientUtils.asBaseRequest();
 
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
@@ -135,8 +137,8 @@ class PatientServiceTest {
     }
 
     @Test
-    @DisplayName("update: Should return PatientBaseResponse when update is valid")
-    void update_ShouldReturnPatientBaseResponse_WhenUpdateIsValid() {
+    @DisplayName("update - Should return base response when request is valid")
+    void update_shouldReturnBaseResponse_whenUpdatingValidPatient() {
         var putRequest = PatientUtils.asBaseRequest();
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
         var updatedPatient = PatientUtils.updatedPatient();
@@ -157,8 +159,8 @@ class PatientServiceTest {
     }
 
     @Test
-    @DisplayName("update: Should throw ResourceNotFoundException when patient does not exist")
-    void update_ShouldThrowResourceNotFoundException_WhenPatientDoesNotExist() {
+    @DisplayName("update - Should throw not-found exception when patient does not exist")
+    void update_shouldThrowNotFound_whenUpdatingNonExistingPatient() {
         var request = PatientUtils.asBaseRequest();
 
         when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
@@ -171,8 +173,8 @@ class PatientServiceTest {
     }
 
     @Test
-    @DisplayName("update: Should throw EmailAlreadyExistsException when email is used by another patient")
-    void update_ShouldThrowEmailAlreadyExistsException_WhenEmailUsedByAnotherPatient() {
+    @DisplayName("update - Should throw email-already-exists exception when email is in use")
+    void update_shouldThrowEmailAlreadyExists_whenUpdatingWithDuplicateEmail() {
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
         var email = savedPatient.getEmail();
         var request = PatientUtils.asBaseRequest();

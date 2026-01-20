@@ -1,0 +1,11 @@
+{
+  "status": 422,
+  "error": "Validation failed",
+  "path": "/v1/patient/1",
+  "fieldErrors": [
+    {
+      "fieldName": "firstName",
+      "message": "First name must not be blank"
+    }
+  ]
+}

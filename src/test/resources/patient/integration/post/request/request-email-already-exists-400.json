@@ -1,0 +1,9 @@
+{
+  "firstName": "Maria",
+  "lastName": "Silva",
+  "email": "robert.williams@example.com",
+  "password": "password123",
+  "gender": "FEMALE",
+  "address": "101 Oak Lane, Newtown",
+  "bloodType": "AB-"
+}

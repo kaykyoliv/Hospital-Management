@@ -30,9 +30,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Patient Controller - Integration Tests")
 public class PatientIntegrationTest extends BaseIntegrationTest {
 
-    private static final String GET = "patient/get/";
-    private static final String POST = "patient/post/";
-    private static final String PUT = "patient/put/";
+    private static final String GET = "patient/integration/get/";
+    private static final String POST = "patient/integration/post/";
+    private static final String PUT = "patient/integration/put/";
 
     private ApiClient api() {
         return new ApiClient(port);
@@ -68,10 +68,7 @@ public class PatientIntegrationTest extends BaseIntegrationTest {
 
             var response = api().get("", HttpStatus.OK).asString();
 
-            JsonAssertions.assertThatJson(response)
-                    .whenIgnoringPaths("content[*].id")
-                    .when(Option.IGNORING_EXTRA_FIELDS)
-                    .isEqualTo(expectedResponse);
+            assertJsonEquals(response, expectedResponse, "content[*].id");
 
             JsonAssertions.assertThatJson(response)
                     .node("content").isArray().hasSize(3);
@@ -91,9 +88,9 @@ public class PatientIntegrationTest extends BaseIntegrationTest {
         @Test
         @DisplayName("POST /v1/patient - Should return 201 with patient data when request is valid")
         @Sql(value = "/patient/sql/cleanup-patient-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-        void shouldReturn201_whenRequestIsValid_onPost() {
-            var request = readResourceFile(POST + "request-create-patient-201.json");
-            var expectedResponse = readResourceFile(POST + "response-created-patient-201.json");
+        void shouldReturn201_whenValidRequest() {
+            var request = readResourceFile(POST + "request/request-create-patient-201.json");
+            var expectedResponse = readResourceFile(POST + "response/response-created-patient-201.json");
 
             var response = api().post("", request, HttpStatus.CREATED);
 
@@ -110,9 +107,9 @@ public class PatientIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("POST /v1/patient - Should return 400 when email already exists")
-        void shouldReturn400_whenEmailAlreadyExists_onPost() {
-            var request = readResourceFile(POST + "request-email-already-exists-400.json");
-            var expectedResponse = readResourceFile(POST + "response-email-already-exists-400.json");
+        void shouldReturn400_whenEmailAlreadyExists() {
+            var request = readResourceFile(POST + "request/request-email-already-exists-400.json");
+            var expectedResponse = readResourceFile(POST + "response/response-email-already-exists-400.json");
 
             var response = api().post("", request, HttpStatus.BAD_REQUEST).asString();
 
@@ -120,11 +117,11 @@ public class PatientIntegrationTest extends BaseIntegrationTest {
         }
 
 
-        @DisplayName("POST /v1/patient - Should return 422 when request is invalid")
         @Test
-        void shouldReturn422_whenRequestIsInvalid_onPost() {
-            var request = readResourceFile(POST + "request-create-patient-invalid-422.json");
-            var expectedResponse = readResourceFile(POST + "response-response-validation-error-422.json");
+        @DisplayName("POST /v1/patient - Should return 422 when request is invalid")
+        void shouldReturn422_whenRequestIsInvalid() {
+            var request = readResourceFile(POST + "request/request-create-patient-invalid-422.json");
+            var expectedResponse = readResourceFile(POST + "response/response-validation-error-422.json");
 
             var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
 
@@ -137,9 +134,9 @@ public class PatientIntegrationTest extends BaseIntegrationTest {
     class PutEndpoints {
         @Test
         @DisplayName("PUT /v1/patient - Should return 200 with updated patient data when request is valid")
-        void shouldReturn200_whenRequestIsValid_onPut() {
-            var request = readResourceFile(PUT + "request-update-patient.json");
-            var expectedResponse = readResourceFile(PUT + "response-updated-patient-200.json");
+        void shouldReturn200_whenValidRequest() {
+            var request = readResourceFile(PUT + "request/request-update-patient-200.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-updated-patient-200.json");
 
             var response = api().put("/{id}", request, HttpStatus.OK, Map.of("id", EXISTING_ID)).asString();
 
@@ -153,9 +150,9 @@ public class PatientIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("PUT /v1/patient - Should return 404 when patient does not exist")
-        void shouldReturn404_whenPatientDoesNotExist_onPut() {
-            var request = readResourceFile(PUT + "request-update-patient.json");
-            var expectedResponse = readResourceFile(PUT + "response-patient-not-found-404.json");
+        void shouldReturn404_whenPatientDoesNotExist() {
+            var request = readResourceFile(PUT + "request/request-update-patient-200.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-patient-not-found-404.json");
 
             var response = api().put("/{id}", request, HttpStatus.NOT_FOUND, Map.of("id", NON_EXISTING_ID)).asString();
 
@@ -164,9 +161,9 @@ public class PatientIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("PUT /v1/patient - Should return 400 when email already exists")
-        void shouldReturn400_whenEmailAlreadyExists_onPut() {
-            var request = readResourceFile(PUT + "request-email-already-exists-400.json");
-            var expectedResponse = readResourceFile(PUT + "response-email-already-exists-400.json");
+        void shouldReturn400_whenEmailAlreadyExists() {
+            var request = readResourceFile(PUT + "request/request-email-already-exists-400.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-email-already-exists-400.json");
 
             var response = api().put("/{id}", request, HttpStatus.BAD_REQUEST, Map.of("id", EXISTING_ID)).asString();
 
@@ -176,9 +173,9 @@ public class PatientIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("PUT /v1/patient - Should return 422 when request is invalid")
-        void shouldReturn422_whenRequestIsInvalid_onPut() {
-            var request = readResourceFile(PUT + "request-update-patient-invalid-422.json");
-            var expectedResponse = readResourceFile(PUT + "response-response-validation-error-422.json");
+        void shouldReturn422_whenRequestIsInvalid() {
+            var request = readResourceFile(PUT + "request/request-update-patient-invalid-422.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-validation-error-422.json");
 
             var response = api().put("/{id}", request, HttpStatus.UNPROCESSABLE_ENTITY, Map.of("id", EXISTING_ID)).asString();
 

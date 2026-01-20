@@ -1,8 +1,8 @@
 {
+  "id": 1,
   "firstName": "Robert",
   "lastName": "Williams",
-  "email": "jane.smith@example.com",
-  "password": "hashed_password_4",
+  "email": "robert.williams@example.com",
   "gender": "MALE",
   "address": "101 Oak Lane, Newtown",
   "bloodType": "AB-"

@@ -72,7 +72,6 @@ class DoctorControllerTest {
     void getDoctor_shouldReturn200_whenExists() throws Exception {
         var doctorId = EXISTING_ID;
         var savedDoctor = DoctorUtils.savedDoctor(doctorId);
-
         var response = DoctorUtils.asBaseResponse(savedDoctor);
 
         when(service.findById(doctorId)).thenReturn(response);
@@ -196,19 +195,20 @@ class DoctorControllerTest {
     @Test
     @DisplayName("PUT /v1/doctor/{id} - Should return 400 when email already exists")
     void updateDoctor_shouldReturn400_whenEmailAlreadyExists() throws Exception {
-        var doctorList = DoctorUtils.doctorList();
+        var doctorId = EXISTING_ID;
+        var savedDoctor = DoctorUtils.savedDoctor(doctorId);
 
-        var expectedErrorMessage = EMAIL_ALREADY_EXISTS.formatted(doctorList.get(1).getEmail());
+        var expectedErrorMessage = EMAIL_ALREADY_EXISTS.formatted(savedDoctor.getEmail());
 
-        when(service.update(any(DoctorBaseRequest.class), eq(EXISTING_ID)))
+        when(service.update(any(DoctorBaseRequest.class), eq(doctorId)))
                 .thenThrow(new EmailAlreadyExistsException(expectedErrorMessage));
 
-        performPutRequest(EXISTING_ID, validUpdateRequest)
+        performPutRequest(doctorId, validUpdateRequest)
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(loadExpectedJson("doctor/controller/put/response/response-email-already-exists-400.json")))
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage));
 
-        verify(service).update(any(DoctorBaseRequest.class), eq(EXISTING_ID));
+        verify(service).update(any(DoctorBaseRequest.class), eq(doctorId));
     }
 }

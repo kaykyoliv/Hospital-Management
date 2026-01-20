@@ -85,7 +85,7 @@ public final class PatientUtils {
     }
 
 
-    public static List<PatientBaseResponse> patientBaseResponseList() {
+    public static List<PatientBaseResponse> asBaseResponseList() {
         return patientList().stream()
                 .map(PatientUtils::asBaseResponse)
                 .toList();
