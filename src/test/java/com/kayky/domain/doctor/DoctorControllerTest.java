@@ -118,7 +118,6 @@ class DoctorControllerTest {
                 .andExpect(content().json(loadExpectedJson("doctor/controller/get/all-paged-doctors-200.json")))
                 .andExpect(jsonPath("$.content").isArray());
 
-
         verify(service).findAll(any(Pageable.class));
     }
 

@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@DisplayName("Operation Service - Unit Tests")
 @ExtendWith(MockitoExtension.class)
 class OperationServiceTest {
 
@@ -45,17 +46,16 @@ class OperationServiceTest {
     }
 
     @Test
-    @DisplayName("findById: Should return OperationBaseResponse when the operation exists")
-    void findById_ShouldReturnOperationBaseResponse_WhenOperationExists(){
+    @DisplayName("findById - Should return OperationBaseResponse when doctor exists")
+    void findById_shouldReturnBaseResponse_whenOperationExists() {
         var savedOperation = OperationUtils.savedOperation();
+        var expectedResponse = OperationUtils.asBaseResponse(savedOperation);
 
         when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedOperation));
 
-        var response = service.findById(EXISTING_ID);
+        var result = service.findById(EXISTING_ID);
 
-        var expectedResponse = OperationUtils.asBaseResponse(savedOperation);
-
-        Assertions.assertThat(response)
+        Assertions.assertThat(result)
                 .usingRecursiveComparison()
                 .isEqualTo(expectedResponse);
 
@@ -64,9 +64,8 @@ class OperationServiceTest {
 
 
     @Test
-    @DisplayName("findById: Should throw ResourceNotFoundException when the Operation does not exist")
-    void findById_ShouldThrowResourceNotFoundException_WhenOperationDoesNotExist() {
-
+    @DisplayName("findById - Should throw not-found exception when operation does not exist")
+    void findById_shouldThrowNotFound_whenOperationDoesNotExist() {
         when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() -> service.findById(NON_EXISTING_ID))
@@ -77,8 +76,8 @@ class OperationServiceTest {
     }
 
     @Test
-    @DisplayName("findAll: Should return PageResponse when doctors exist")
-    void findAll_ShouldReturnPageResponse_WhenOperationExists() {
+    @DisplayName("findAll - Should return paged response when operations exist")
+    void findAll_shouldReturnPagedResponse_whenOperationsExist() {
         PageRequest pageRequest = PageRequest.of(0, 3);
         var pagedOperation = OperationUtils.operationProjectionPage();
 
@@ -96,8 +95,8 @@ class OperationServiceTest {
     }
 
     @Test
-    @DisplayName("save: Should return OperationBaseResponse when correct data")
-    void save_ShouldReturnOperationBaseResponse_WhenCorrectData() {
+    @DisplayName("save - Should return base response when request is valid")
+    void save_shouldReturnBaseResponse_whenCreatingValidOperation() {
         var request = OperationUtils.asBaseRequest();
         var patient = PatientUtils.savedPatient(EXISTING_ID);
         var doctor = DoctorUtils.savedDoctor(EXISTING_ID);
@@ -118,37 +117,48 @@ class OperationServiceTest {
                 .isEqualTo(expectedResponse);
 
         verify(repository).save(any(Operation.class));
-    }
-
-    @ParameterizedTest(name = "save: should throw exception when {0} does not exist")
-    @MethodSource("provideNonExistingTypes")
-    void save_ShouldThrowResourceNotFoundException_WhenNonExistingUser(String nonExistingType){
-
-        var request = OperationUtils.asBaseRequest();
-
-        var nonExistingId = nonExistingType.equals("Doctor") ?
-                request.getDoctorId() : request.getPatientId();
-
-        var existingId = nonExistingType.equals("Doctor") ?
-                request.getPatientId() : request.getDoctorId();
-        var existingType = nonExistingType.equals("Doctor") ? "Patient" : "Doctor";
-
-        lenient().doNothing().when(userValidator).assertIfUserExist(existingId, existingType);
-
-        doThrow(new ResourceNotFoundException(
-                USER_NOT_FOUND_SAVE_OPERATION.formatted(nonExistingType, nonExistingId)))
-                .when(userValidator).assertIfUserExist(nonExistingId, nonExistingType);
-
-        assertThatThrownBy(() -> service.save(request))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage(USER_NOT_FOUND_SAVE_OPERATION.formatted(nonExistingType, nonExistingId));
-
-        verify(userValidator).assertIfUserExist(nonExistingId, nonExistingType);
+        verify(userValidator).assertIfUserExist(request.getPatientId(), "Patient");
+        verify(userValidator).assertIfUserExist(request.getDoctorId(), "Doctor");
+        verify(userValidator).getPatientIfExists(request.getPatientId());
+        verify(userValidator).getDoctorIfExists(request.getDoctorId());
     }
 
     @Test
-    @DisplayName("update: Should return OperationBaseResponse when update is valid")
-    void update_ShouldReturnOperationBaseResponse_WhenUpdateIsValid() {
+    @DisplayName("save - should throw not-found when patient does not exist")
+    void save_shouldThrowNotFound_whenPatientDoesNotExist() {
+        var request = OperationUtils.asBaseRequest();
+
+        doThrow(new ResourceNotFoundException("Patient not found"))
+                .when(userValidator).assertIfUserExist(request.getPatientId(), "Patient");
+
+        assertThatThrownBy(() -> service.save(request))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("Patient");
+
+        verify(userValidator).assertIfUserExist(request.getPatientId(), "Patient");
+    }
+
+    @Test
+    @DisplayName("save - should throw not-found when doctor does not exist")
+    void save_shouldThrowNotFound_whenDoctorDoesNotExist() {
+        var request = OperationUtils.asBaseRequest();
+
+        doThrow(new ResourceNotFoundException("Doctor not found"))
+                .when(userValidator).assertIfUserExist(request.getDoctorId(), "Doctor");
+
+        doNothing().when(userValidator).assertIfUserExist(request.getPatientId(), "Patient");
+
+        assertThatThrownBy(() -> service.save(request))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("Doctor");
+
+        verify(userValidator).assertIfUserExist(request.getPatientId(), "Patient");
+        verify(userValidator).assertIfUserExist(request.getDoctorId(), "Doctor");
+    }
+
+    @Test
+    @DisplayName("update - Should return base response when request is valid")
+    void update_shouldReturnBaseResponse_whenUpdatingValidOperation() {
         var request = OperationUtils.asBaseRequest();
         var patient = PatientUtils.savedPatient(EXISTING_ID);
         var doctor = DoctorUtils.savedDoctor(EXISTING_ID);
@@ -168,49 +178,56 @@ class OperationServiceTest {
                 .usingRecursiveComparison()
                 .isEqualTo(expectedResponse);
 
-        verify(userValidator).getPatientIfExists(EXISTING_ID);
-        verify(userValidator).getDoctorIfExists(EXISTING_ID);
-        verify(repository).save(any(Operation.class));
+        verify(userValidator).getPatientIfExists(request.getPatientId());
+        verify(userValidator).getDoctorIfExists(request.getDoctorId());
     }
 
-    @ParameterizedTest(name = "update: should throw ResourceNotFoundException when {0} does not exist")
-    @MethodSource("provideNonExistingTypes")
-    void update_ShouldThrowResourceNotFoundException_WhenNonExistingUser(String nonExistingType) {
+    @Test
+    @DisplayName("update - should throw not-found when patient does not exist")
+    void update_shouldThrowNotFound_whenPatientDoesNotExist() {
         var request = OperationUtils.asBaseRequest();
         var savedOperation = OperationUtils.savedOperation();
 
         when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedOperation));
 
-        if (nonExistingType.equals("Doctor")) {
-            when(userValidator.getDoctorIfExists(request.getDoctorId()))
-                    .thenThrow(new ResourceNotFoundException(
-                            "Doctor with id %d not found".formatted(request.getDoctorId())));
-        } else {
-            when(userValidator.getPatientIfExists(request.getPatientId()))
-                    .thenThrow(new ResourceNotFoundException(
-                            "Patient with id %d not found".formatted(request.getPatientId())));
-        }
+        when(userValidator.getPatientIfExists(request.getPatientId()))
+                .thenThrow(new ResourceNotFoundException(
+                        "Patient with id %d not found".formatted(request.getPatientId())));
 
         assertThatThrownBy(() -> service.update(request, EXISTING_ID))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining(nonExistingType);
-
-        if (nonExistingType.equals("Doctor")) {
-            verify(userValidator).getDoctorIfExists(request.getDoctorId());
-        } else {
-            verify(userValidator).getPatientIfExists(request.getPatientId());
-        }
+                .hasMessageContaining("Patient");
 
         verify(repository).findById(EXISTING_ID);
+        verify(userValidator).getPatientIfExists(request.getPatientId());
     }
-
-    private static Stream<String> provideNonExistingTypes() {
-        return Stream.of("Doctor", "Patient");
-    }
-
 
     @Test
-    @DisplayName("delete: should remove operation when ID exists")
+    @DisplayName("update - should throw not-found when doctor does not exist")
+    void update_shouldThrowNotFound_whenDoctorDoesNotExist() {
+        var request = OperationUtils.asBaseRequest();
+        var savedOperation = OperationUtils.savedOperation();
+
+        when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedOperation));
+
+        when(userValidator.getPatientIfExists(request.getPatientId()))
+                .thenReturn(PatientUtils.savedPatient(request.getPatientId()));
+
+        when(userValidator.getDoctorIfExists(request.getDoctorId()))
+                .thenThrow(new ResourceNotFoundException(
+                        "Doctor with id %d not found".formatted(request.getDoctorId())));
+
+        assertThatThrownBy(() -> service.update(request, EXISTING_ID))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("Doctor");
+
+        verify(repository).findById(EXISTING_ID);
+        verify(userValidator).getPatientIfExists(request.getPatientId());
+        verify(userValidator).getDoctorIfExists(request.getDoctorId());
+    }
+
+    @Test
+    @DisplayName("delete - Should remove operation when ID exists")
     void delete_ShouldRemoveOperation_WhenSuccessful() {
         when(repository.existsById(EXISTING_ID)).thenReturn(true);
         doNothing().when(repository).deleteById(EXISTING_ID);
@@ -222,15 +239,12 @@ class OperationServiceTest {
     }
 
     @Test
-    @DisplayName("delete: should throw ResourceNotFoundException when ID does not exist")
-    void delete_ShouldThrowResourceNotFoundException_WhenIdDoesNotExists() {
+    @DisplayName("delete - Should throw not-found exception when operation does not exist")
+    void delete_shouldThrowNotFound_WhenIdDoesNotExists() {
         when(repository.existsById(NON_EXISTING_ID)).thenReturn(false);
 
         assertThatThrownBy(() -> service.delete(NON_EXISTING_ID))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage(OPERATION_NOT_FOUND);
     }
-
-
-
 }

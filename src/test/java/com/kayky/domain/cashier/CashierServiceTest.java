@@ -40,7 +40,7 @@ class CashierServiceTest {
     }
 
     @Test
-    @DisplayName("findById: Should return CashierBaseResponse when cashier exists")
+    @DisplayName("findById - Should return CashierBaseResponse when cashier exists")
     void findById_shouldReturnBaseResponse_whenCashierExists() {
         var savedCashier = CashierUtils.savedCashier(EXISTING_ID);
         var expectedResponse = CashierUtils.asBaseResponse(savedCashier);

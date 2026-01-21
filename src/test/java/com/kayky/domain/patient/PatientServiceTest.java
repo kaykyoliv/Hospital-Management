@@ -44,16 +44,16 @@ class PatientServiceTest {
     }
 
     @Test
-    @DisplayName("findById: Should return PatientBaseResponse when patient exists")
+    @DisplayName("findById - Should return PatientBaseResponse when patient exists")
     void findById_shouldReturnBaseResponse_whenPatientExists() {
         var savedPatient = PatientUtils.savedPatient(EXISTING_ID);
         var expectedResponse = PatientUtils.asBaseResponse(savedPatient);
 
         when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedPatient));
 
-        var patientFound = service.findById(EXISTING_ID);
+        var result = service.findById(EXISTING_ID);
 
-        assertThat(patientFound)
+        assertThat(result)
                 .usingRecursiveComparison()
                 .isEqualTo(expectedResponse);
 

@@ -2,20 +2,17 @@ package com.kayky.domain.doctor;
 
 import com.kayky.commons.DoctorUtils;
 import com.kayky.commons.PageUtils;
-import com.kayky.domain.cashier.Cashier;
-import com.kayky.domain.user.UserValidator;
 import com.kayky.core.exception.EmailAlreadyExistsException;
 import com.kayky.core.exception.ResourceNotFoundException;
+import com.kayky.domain.user.UserValidator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.Optional;
@@ -47,16 +44,16 @@ class DoctorServiceTest {
 
 
     @Test
-    @DisplayName("findById: Should return DoctorBaseResponse when doctor exists")
+    @DisplayName("findById - Should return DoctorBaseResponse when doctor exists")
     void findById_shouldReturnBaseResponse_whenDoctorExists() {
         var savedDoctor = DoctorUtils.savedDoctor(EXISTING_ID);
         var expectedResponse = DoctorUtils.asBaseResponse(savedDoctor);
 
         when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedDoctor));
 
-        var doctorFound = service.findById(EXISTING_ID);
+        var result = service.findById(EXISTING_ID);
 
-        Assertions.assertThat(doctorFound)
+        Assertions.assertThat(result)
                 .usingRecursiveComparison()
                 .isEqualTo(expectedResponse);
 
