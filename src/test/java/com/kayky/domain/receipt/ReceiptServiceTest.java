@@ -56,7 +56,7 @@ public class ReceiptServiceTest {
 
     @Test
     @DisplayName("Should emit receipt successfully when payment exists and no receipt yet")
-    void shouldEmitReceiptSuccessfully() {
+    void emit_shouldReturnReceipt_whenPaymentExistsAndReceiptDoesNotExist() {
         var now = LocalDateTime.now(fixedClock);
 
         var savedReceipt = ReceiptUtils.savedReceiptWithIssuedAt(EXISTING_ID, now);
@@ -80,7 +80,7 @@ public class ReceiptServiceTest {
 
     @Test
     @DisplayName("Should throw ResourceNotFoundException when payment does not exist")
-    void emit_ShouldThrowResourceNotFound_WhenPaymentDoesNotExist() {
+    void emit_shouldThrowNotFound_whenPaymentDoesNotExist() {
         when(paymentRepository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() -> service.emit(NON_EXISTING_ID))
@@ -92,7 +92,7 @@ public class ReceiptServiceTest {
 
     @Test
     @DisplayName("Should throw ReceiptAlreadyExistsException when receipt already exists for payment")
-    void emit_ShouldThrowReceiptAlreadyExists_WhenPaymentDoesNotExist() {
+    void emit_shouldThrowAlreadyExists_whenReceiptExistsForPayment() {
         var payment = PaymentUtils.savedPayment(EXISTING_ID);
 
         when(paymentRepository.findById(payment.getId())).thenReturn(Optional.of(payment));

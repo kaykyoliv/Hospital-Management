@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@DisplayName("Payment controller")
 @WebMvcTest(controllers = PaymentController.class)
 class PaymentControllerTest {
 
@@ -58,9 +59,9 @@ class PaymentControllerTest {
     }
 
 
-    @Test
-    @DisplayName("GET /v1/payment/{id} - Should return 200 with payment data when payment exists")
-    void findById_ShouldReturnPaymentGetResponse_WhenPaymentExists() throws Exception {
+        @Test
+        @DisplayName("GET v1/payment/{id} - Should return 200 when payment exists")
+        void getPayment_shouldReturn200_whenExists() throws Exception{
         var paymentId = EXISTING_ID;
         var savedPayment = PaymentUtils.savedPayment(paymentId);
         var response = PaymentUtils.asBaseResponse(savedPayment);
@@ -77,8 +78,8 @@ class PaymentControllerTest {
     }
 
     @Test
-    @DisplayName("GET /v1/payment/{id} - Should return 404 when payment is not found")
-    void findById_ShouldThrowResourceNotFoundException_WhenPaymentDoesNotExist() throws Exception {
+    @DisplayName("GET /v1/payment/{id} - Should return 404 when payment does not exist")
+    void getPayment_shouldReturn404_whenDoesNotExist() throws Exception {
         var expectedErrorMessage = PAYMENT_NOT_FOUND;
 
         when(service.findById(NON_EXISTING_ID)).thenThrow(new ResourceNotFoundException(expectedErrorMessage));
@@ -94,8 +95,8 @@ class PaymentControllerTest {
     }
 
     @Test
-    @DisplayName("GET /v1/payment - Should return page with payments")
-    void findAll_ShouldReturnPaymentPageResponse_WhenPaymentExist() throws Exception {
+    @DisplayName("GET /v1/payment - Should return paged result when payments exist")
+    void getPayments_shouldReturnPagedResults_whenPaymentsExist() throws Exception {
         var paymentList = PaymentUtils.baseResponseList();
         var paymentPage = PageUtils.toPage(paymentList);
         var pagedPayment = PageUtils.pageResponse(paymentPage);
@@ -113,7 +114,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("GET /v1/payment/patients/{patientId}/payments - Should return list of payments when patient exists")
-    void findByPatient_ShouldReturnPaymentList_WhenPatientExists() throws Exception{
+    void findByPatient_shouldReturnPaymentList_whenPatientExists() throws Exception{
 
         var patientId = EXISTING_ID;
         var patientPayments  = PaymentUtils.paymentsForPatient(patientId);
@@ -130,7 +131,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("GET /v1/payment/patients/{patientId}/payments - Should return 404 when patient is not found")
-    void findByPatient_ShouldThrowResourceNotFoundException_WhenPatientDoesNotExist() throws Exception {
+    void findByPatient_shouldReturn404_whenPatientDoesNotExist() throws Exception {
         var expectedErrorMessage = PATIENT_NOT_FOUND;
 
         when(service.findByPatient(NON_EXISTING_ID)).thenThrow(new ResourceNotFoundException(expectedErrorMessage));
@@ -146,8 +147,8 @@ class PaymentControllerTest {
     }
 
     @Test
-    @DisplayName("POST /v1/payment - Should return 201 Created when payment is saved successfully")
-    void save_ShouldReturn201Created_WhenRequestIsValid() throws Exception {
+    @DisplayName("POST /v1/payment - Should return 201 when request is valid")
+    void createPayment_ShouldReturn201_whenRequestIsValid() throws Exception {
         var savedPayment = PaymentUtils.savedPayment(EXISTING_ID);
         var response = PaymentUtils.asBaseResponse(savedPayment);
 
@@ -163,7 +164,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("POST /v1/payment - Should return 404 when patient does not exist")
-    void save_ShouldReturn404_WhenPatientNotFound() throws Exception {
+    void createPayment_ShouldReturn404_whenPatientDoesNotExist() throws Exception {
         var expectedErrorMessage = PATIENT_NOT_FOUND;
 
         when(service.save(any(PaymentBaseRequest.class)))
@@ -176,7 +177,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("POST /v1/payment - Should return 404 when cashier does not exist")
-    void save_ShouldReturn404_WhenCashierNotFound() throws Exception {
+    void createPayment_shouldReturn404_whenCashierDoesNotExist() throws Exception {
         var expectedErrorMessage = CASHIER_NOT_FOUND;
 
         when(service.save(any(PaymentBaseRequest.class)))
@@ -189,7 +190,7 @@ class PaymentControllerTest {
 
     @Test
     @DisplayName("POST /v1/payment - Should return 422 when request is invalid")
-    void save_ShouldReturn422_WhenRequestIsInvalid() throws Exception {
+    void createPayment_shouldReturn422_whenRequestIsInvalid() throws Exception {
         var invalidRequest = FileUtils.readResourceFile("payment/controller/post/request-create-payment-invalid-422.json");
 
         performPostRequest(invalidRequest)

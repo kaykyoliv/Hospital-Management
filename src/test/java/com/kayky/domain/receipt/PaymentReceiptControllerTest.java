@@ -58,8 +58,8 @@ class PaymentReceiptControllerTest {
     }
 
     @Test
-    @DisplayName("POST /v1/payment/{paymentId}/receipt - Should return 200 OK when receipt is emitted successfully")
-    void emit_ShouldReturn200Ok_WhenReceiptEmittedSuccessfully() throws Exception {
+    @DisplayName("POST /v1/payment/{paymentId}/receipt - Should return 200 when receipt is emitted successfully")
+    void emitReceipt_shouldReturn200_whenReceiptIsEmitted() throws Exception {
         var paymentId = EXISTING_ID;
         var savedReceipt = ReceiptUtils.savedReceiptWithIssuedAt(paymentId, LocalDateTime.now(fixedClock));
         var response = ReceiptUtils.asBaseResponse(savedReceipt);
@@ -76,7 +76,7 @@ class PaymentReceiptControllerTest {
 
     @Test
     @DisplayName("POST /v1/payment/{paymentId}/receipt - Should return 404 Not Found when payment does not exist")
-    void emit_ShouldReturn404NotFound_WhenPaymentNotFound() throws Exception{
+    void emitReceipt_shouldReturn404_whenPaymentDoesNotExist() throws Exception {
         var paymentId = NON_EXISTING_ID;
 
         var expectedErrorMessage = PAYMENT_NOT_FOUND;
@@ -93,8 +93,8 @@ class PaymentReceiptControllerTest {
     }
 
     @Test
-    @DisplayName("POST /v1/payment/{paymentId}/receipt - Should return 409 Conflict when receipt already exists for payment")
-    void emit_ShouldReturn409Conflict_WhenReceiptAlreadyExists() throws Exception {
+    @DisplayName("POST /v1/payment/{paymentId}/receipt - Should return 409 Conflict when receipt already exists")
+    void emitReceipt_shouldReturn409_whenReceiptAlreadyExists() throws Exception {
         var paymentId = EXISTING_ID;
 
         when(service.emit(paymentId)).thenThrow(new ReceiptAlreadyExistsException(paymentId));

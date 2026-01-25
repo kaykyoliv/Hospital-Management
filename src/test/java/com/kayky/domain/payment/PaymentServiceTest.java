@@ -12,23 +12,22 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static com.kayky.commons.TestConstants.*;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.BDDMockito.when;
+import static org.mockito.Mockito.doThrow;
 
+@DisplayName("Payment Service - Unit Tests")
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceTest {
 
@@ -49,8 +48,8 @@ class PaymentServiceTest {
     }
 
     @Test
-    @DisplayName("findById: Should return PaymentBaseResponse when the payment exists")
-    void findById_ShouldReturnPaymentBaseResponse_WhenPaymentExists() {
+    @DisplayName("findById - Should return PaymentBaseResponse when payment exists")
+    void findById_shouldReturnBaseResponse_whenPaymentExists() {
         var savedPayment = PaymentUtils.savedPayment(EXISTING_ID);
 
         when(paymentRepository.findById(EXISTING_ID)).thenReturn(Optional.of(savedPayment));
@@ -68,9 +67,8 @@ class PaymentServiceTest {
 
 
     @Test
-    @DisplayName("findById: Should throw ResourceNotFoundException when the Payment does not exist")
-    void findById_ShouldThrowResourceNotFoundException_WhenPaymentDoesNotExist() {
-
+    @DisplayName("findById - Should throw not-found exception when payment does not exist")
+    void findById_shouldThrowNotFound_whenPaymentDoesNotExist() {
         when(paymentRepository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.findById(NON_EXISTING_ID))
@@ -81,8 +79,8 @@ class PaymentServiceTest {
     }
 
     @Test
-    @DisplayName("findAll: Should return PageResponse when payments exist")
-    void findAll_ShouldReturnPageResponse_WhenPaymentExist() {
+    @DisplayName("findAll - Should return paged response when payments exist")
+    void findAll_shouldReturnPagedResponse_whenPaymentsExist() {
         PageRequest pageRequest = PageRequest.of(0, 3);
         var paymentList = PaymentUtils.paymentList();
         var pagedPayments = PageUtils.toPage(paymentList);
@@ -103,8 +101,8 @@ class PaymentServiceTest {
     }
 
     @Test
-    @DisplayName("findByPatient: Should return List<PaymentBaseResponse> when payments exist for the patient")
-    void findByPatient_ShouldReturnListOfPaymentBaseResponse_WhenPaymentsExistForPatient() {
+    @DisplayName("findByPatient - should return list of payments when patient exists")
+    void findByPatient_shouldReturnPayments_whenPatientExists() {
         var patientId = EXISTING_ID;
         var savedPatient = PatientUtils.savedPatient(patientId);
         var paymentList = PaymentUtils.paymentList();
@@ -125,8 +123,8 @@ class PaymentServiceTest {
     }
 
     @Test
-    @DisplayName("findByPatient: Should throw ResourceNotFoundException when the patient does not exist")
-    void findByPatient_ShouldThrowResourceNotFoundException_WhenPatientDoesNotExist() {
+    @DisplayName("findByPatient - Should throw not-found exception when patient does not exist")
+    void findByPatient_shouldThrowNotFound_whenPatientDoesNotExist() {
         when(patientRepository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.findByPatient(NON_EXISTING_ID))
@@ -137,8 +135,8 @@ class PaymentServiceTest {
     }
 
     @Test
-    @DisplayName("save: should return PaymentBaseResponse when data is valid")
-    void save_ShouldReturnPaymentBaseResponse_WhenDataIsValid() {
+    @DisplayName("save - Should return base response when request is valid")
+    void save_shouldReturnBaseResponse_whenCreatingValidPayment() {
         var cashier = CashierUtils.savedCashier(EXISTING_ID);
         var patient = PatientUtils.savedPatient(EXISTING_ID);
         var savedPayment = PaymentUtils.savedPayment(EXISTING_ID);
@@ -155,31 +153,36 @@ class PaymentServiceTest {
         assertThat(result).usingRecursiveComparison().isEqualTo(expectedResponse);
     }
 
-    @ParameterizedTest(name = "save: should throw ResourceNotFoundException when {0} does not exist")
-    @MethodSource("provideNonExistingTypes")
-    void save_ShouldThrowResourceNotFoundException_WhenNonExistingType(String missingType) {
+    @Test
+    @DisplayName("save - should throw not-found when patient does not exist")
+    void save_shouldThrowNotFound_whenPatientDoesNotExist() {
         var request = PaymentUtils.asBaseRequest();
 
-        if (missingType.equals("Patient")) {
-            when(patientRepository.findById(request.patientId()))
-                    .thenReturn(Optional.empty());
-        }
+        var expectedErrorMessage = PATIENT_NOT_FOUND;
 
-        if (missingType.equals("Cashier")) {
-            when(patientRepository.findById(request.patientId()))
-                    .thenReturn(Optional.of(PatientUtils.savedPatient(1L)));
+        doThrow(new ResourceNotFoundException(expectedErrorMessage))
+                .when(patientRepository).findById(request.cashierId());
 
-            when(cashierRepository.findById(request.cashierId()))
-                    .thenReturn(Optional.empty());
-        }
-
-        assertThatExceptionOfType(ResourceNotFoundException.class)
-                .isThrownBy(() -> service.save(request))
-                .withMessage(missingType.equals("Patient") ? PATIENT_NOT_FOUND : CASHIER_NOT_FOUND);
+        assertThatThrownBy(() -> service.save(request))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining(expectedErrorMessage);
     }
 
-    private static Stream<String> provideNonExistingTypes() {
-        return Stream.of("Patient", "Cashier");
-    }
+    @Test
+    @DisplayName("save - should throw not-found when cashier does not exist")
+    void save_shouldThrowNotFound_whenCashierDoesNotExist() {
+        var request = PaymentUtils.asBaseRequest();
+        var patient = PatientUtils.savedPatient(EXISTING_ID);
 
+        var expectedErrorMessage = CASHIER_NOT_FOUND;
+
+        when(patientRepository.findById(patient.getId())).thenReturn(Optional.of(patient));
+
+        doThrow(new ResourceNotFoundException(expectedErrorMessage))
+                .when(cashierRepository).findById(request.cashierId());
+
+        assertThatThrownBy(() -> service.save(request))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining(expectedErrorMessage);
+    }
 }
