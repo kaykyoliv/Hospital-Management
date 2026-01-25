@@ -155,23 +155,23 @@ public class OperationIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("POST /v1/operation - Should return 422 when doctorId belongs to a non-doctor user")
-        void shouldReturn422_whenDoctorIdIsNotADoctor() {
-            var request = readResourceFile(POST + "request/request-doctor-id-not-a-doctor-422.json");
-            var expectedResponse = readResourceFile(POST + "response/response-doctor-id-not-a-doctor-422.json");
+        @DisplayName("POST /v1/operation - Should return 404 when doctorId belongs to a non-doctor user")
+        void shouldReturn404_whenDoctorIdIsNotADoctor() {
+            var request = readResourceFile(POST + "request/request-doctor-id-not-a-doctor-404.json");
+            var expectedResponse = readResourceFile(POST + "response/response-doctor-id-not-a-doctor-404.json");
 
-            var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
+            var response = api().post("", request, HttpStatus.NOT_FOUND).asString();
 
             assertJsonEquals(response, expectedResponse, "timestamp");
         }
 
         @Test
-        @DisplayName("POST /v1/operation - Should return 422 when patientId belongs to a non-patient user")
-        void shouldReturn422_whenPatientIdIsNotAPatient() {
-            var request = readResourceFile(POST + "request/request-patient-id-not-a-patient-422.json");
-            var expectedResponse = readResourceFile(POST + "response/response-patient-id-not-a-patient-422.json");
+        @DisplayName("POST /v1/operation - Should return 404 when patientId belongs to a non-patient user")
+        void shouldReturn404_whenPatientIdIsNotAPatient() {
+            var request = readResourceFile(POST + "request/request-patient-id-not-a-patient-404.json");
+            var expectedResponse = readResourceFile(POST + "response/response-patient-id-not-a-patient-404.json");
 
-            var response = api().post("", request, HttpStatus.UNPROCESSABLE_ENTITY).asString();
+            var response = api().post("", request, HttpStatus.NOT_FOUND).asString();
 
             assertJsonEquals(response, expectedResponse, "timestamp");
         }
@@ -275,23 +275,23 @@ public class OperationIntegrationTest extends BaseIntegrationTest {
         }
 
         @Test
-        @DisplayName("PUT /v1/operation/{id} - Should return 422 when doctorId belongs to a non-doctor user")
-        void shouldReturn422_whenDoctorIdIsNotADoctor() {
-            var request = readResourceFile(PUT + "request/request-doctor-id-not-a-doctor-422.json");
-            var expectedResponse = readResourceFile(PUT + "response/response-doctor-id-not-a-doctor-422.json");
+        @DisplayName("PUT /v1/operation/{id} - Should return 404 when doctorId belongs to a non-doctor user")
+        void shouldReturn404_whenDoctorIdIsNotADoctor() {
+            var request = readResourceFile(PUT + "request/request-doctor-id-not-a-doctor-404.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-doctor-id-not-a-doctor-404.json");
 
-            var response = api().put("/{id}", request, HttpStatus.UNPROCESSABLE_ENTITY, Map.of("id", EXISTING_ID)).asString();
+            var response = api().put("/{id}", request, HttpStatus.NOT_FOUND, Map.of("id", EXISTING_ID)).asString();
 
             assertJsonEquals(response, expectedResponse, "timestamp");
         }
 
         @Test
-        @DisplayName("PUT /v1/operation/{id} - Should return 422 when patientId belongs to a non-patient user")
-        void shouldReturn422_whenPatientIdIsNotADoctor() {
-            var request = readResourceFile(PUT + "request/request-patient-id-not-a-patient-422.json");
-            var expectedResponse = readResourceFile(PUT + "response/response-patient-id-not-a-patient-422.json");
+        @DisplayName("PUT /v1/operation/{id} - Should return 404 when patientId belongs to a non-patient user")
+        void shouldReturn404_whenPatientIdIsNotADoctor() {
+            var request = readResourceFile(PUT + "request/request-patient-id-not-a-patient-404.json");
+            var expectedResponse = readResourceFile(PUT + "response/response-patient-id-not-a-patient-404.json");
 
-            var response = api().put("/{id}", request, HttpStatus.UNPROCESSABLE_ENTITY, Map.of("id", EXISTING_ID)).asString();
+            var response = api().put("/{id}", request, HttpStatus.NOT_FOUND, Map.of("id", EXISTING_ID)).asString();
 
             assertJsonEquals(response, expectedResponse, "timestamp");
         }

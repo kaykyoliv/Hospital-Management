@@ -1,6 +1,6 @@
 {
-  "error": "ID 2 does not belong to a Doctor",
+  "error": "Doctor with id 2 not found",
   "path": "/v1/operation/1",
-  "status": 422,
+  "status": 404,
   "timestamp": "2025-12-17T21:50:48.747106200Z"
 }
