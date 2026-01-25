@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("User Repository")
 @DataJpaTest
 public class UserRepositoryTest {
 

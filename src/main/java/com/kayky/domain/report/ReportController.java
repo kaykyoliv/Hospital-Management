@@ -148,6 +148,12 @@ public class ReportController {
                             schema = @Schema(implementation = ApiError.class))
             ),
             @ApiResponse(
+                    responseCode = "409",
+                    description = "A report already exists for the given operation ID",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiError.class))
+            ),
+            @ApiResponse(
                     responseCode = "422",
                     description = "Validation error - invalid or missing fields in request body",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,

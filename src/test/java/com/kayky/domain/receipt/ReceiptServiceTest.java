@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.verify;
 
-
+@DisplayName("Receipt Service - Unit Tests")
 @ExtendWith(MockitoExtension.class)
 public class ReceiptServiceTest {
 

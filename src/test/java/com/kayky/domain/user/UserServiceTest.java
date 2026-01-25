@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.verify;
 
+@DisplayName("User Service - Unit Tests")
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
@@ -31,7 +32,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("activateUser - Should activate and save when user is deactivated")
-    void activateUser_ShouldActivate_WhenUserIsDeactivate() {
+    void activateUser_shouldActivate_whenUserIsDeactivate() {
         var patient = PatientUtils.savedPatient(EXISTING_ID);
         patient.setActive(false);
 
@@ -47,7 +48,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("deactivateUser - Should deactivate and save when user is activated")
-    void deactivateUser_ShouldDeactivate_WhenUserIsActivate() {
+    void deactivateUser_shouldDeactivate_whenUserIsActivate() {
         var patient = PatientUtils.savedPatient(EXISTING_ID);
         patient.setActive(true);
 
@@ -62,8 +63,8 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("activateUser - Should throw ResourceNotFoundException when user does not exist")
-    void activateUser_ShouldThrowResourceNotFoundException_WhenUserDoesNotExist() {
+    @DisplayName("activateUser - Should throw-not-found exception when user does not exist")
+    void activateUser_ShouldThrowNotFound_WhenUserDoesNotExist() {
 
         when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
@@ -78,8 +79,8 @@ class UserServiceTest {
 
 
     @Test
-    @DisplayName("deactivateUser - Should throw ResourceNotFoundException when user does not exist")
-    void deactivateUser_ShouldThrowResourceNotFoundException_WhenUserDoesNotExist() {
+    @DisplayName("deactivateUser - Should throw-not-found exception when user does not exist")
+    void deactivateUser_ShouldThrowNotFound_WhenUserDoesNotExist() {
 
         when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 

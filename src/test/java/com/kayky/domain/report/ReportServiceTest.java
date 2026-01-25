@@ -1,5 +1,6 @@
 package com.kayky.domain.report;
 
+import com.kayky.commons.DoctorUtils;
 import com.kayky.commons.OperationUtils;
 import com.kayky.commons.PageUtils;
 import com.kayky.commons.ReportUtils;
@@ -28,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@DisplayName("Report Service - Unit Tests")
 @ExtendWith(MockitoExtension.class)
 class ReportServiceTest {
 
@@ -47,8 +49,6 @@ class ReportServiceTest {
         service = new ReportService(repository, reportValidator, mapper);
     }
 
-    /// HELPERS
-
     private ReportValidator.ValidationResult mockValidatorResult(ReportBaseRequest request){
         var validationResult = ReportUtils.validationResult();
         when(reportValidator.validate(request)).thenReturn(validationResult);
@@ -67,11 +67,9 @@ class ReportServiceTest {
         when(reportValidator.validate(request)).thenThrow(exception);
     }
 
-    /// TESTS
-
     @Test
-    @DisplayName("findById: Should return ReportBaseResponse when the report exists")
-    void findById_ShouldReturnReportBaseResponse_WhenReportExists() {
+    @DisplayName("findById - Should return ReportBaseResponse when report exists")
+    void findById_shouldReturnBaseResponse_whenReportExists() {
         var savedReport = ReportUtils.savedReport();
 
         when(repository.findById(EXISTING_ID)).thenReturn(Optional.of(savedReport));
@@ -92,8 +90,8 @@ class ReportServiceTest {
     }
 
     @Test
-    @DisplayName("findById: Should throw ResourceNotFoundException when the Report does not exist")
-    void findById_ShouldThrowResourceNotFoundException_WhenReportDoesNotExist() {
+    @DisplayName("findById - Should throw not-found exception when report does not exist")
+    void findById_shouldThrowNotFound_whenReportDoesNotExist() {
 
         when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
 
@@ -105,8 +103,8 @@ class ReportServiceTest {
     }
 
     @Test
-    @DisplayName("findAll: Should return PageResponse when reports exist")
-    void findAll_ShouldReturnPageResponse_WhenReportExist() {
+    @DisplayName("findAll - Should return paged response when reports exist")
+    void findAll_shouldReturnPagedResponse_whenReportsExist() {
         PageRequest pageRequest = PageRequest.of(0, 3);
         var reportList = ReportUtils.reportList();
         var pagedReports = PageUtils.toPage(reportList);
@@ -128,8 +126,8 @@ class ReportServiceTest {
     }
 
     @Test
-    @DisplayName("save: should return ReportBaseResponse when data is valid")
-    void save_ShouldReturnReportBaseResponse_WhenDataIsValid() {
+    @DisplayName("save - Should return base response when request is valid")
+    void save_shouldReturnBaseResponse_whenCreatingValidReport() {
         var savedReport = ReportUtils.savedReport();
 
         var request = asBaseRequest();
@@ -150,8 +148,8 @@ class ReportServiceTest {
     }
 
     @Test
-    @DisplayName("save: should throw ReportAlreadyExistsException when report already exists")
-    void save_ShouldThrow_WhenReportAlreadyExists() {
+    @DisplayName("save: should throw report-already-exists exception when report already exists for the operation")
+    void save_shouldThrowAlreadyExists_whenReportAlreadyExists() {
         var request = asBaseRequest();
         var validatorResult = mockValidatorResult(request);
 
@@ -162,9 +160,9 @@ class ReportServiceTest {
                 .hasMessage(REPORT_ALREADY_EXISTS.formatted(request.operationId()));
     }
 
-    @ParameterizedTest(name = "save: should throw ResourceNotFoundException when {0} does not exist")
+    @ParameterizedTest(name = "save - should throw-not-found when {0} does not exist")
     @MethodSource("provideNonExistingTypes")
-    void save_ShouldThrowResourceNotFoundException_WhenNonExistingType(String nonExistingType) {
+    void save_shouldThrowNotFound_whenNonExistingType(String nonExistingType) {
         var request = asBaseRequest();
 
         when(reportValidator.validate(request))
@@ -176,8 +174,8 @@ class ReportServiceTest {
     }
 
     @Test
-    @DisplayName("save: propagates OperationMismatchException from validator")
-    void save_ShouldPropagateOperationMismatchException_WhenOperationPatientDoesNotMatch() {
+    @DisplayName("save - should fail when operation patient does not match")
+    void save_shouldThrowMismatch_whenOperationPatientDoesNotMatch() {
         var request = ReportUtils.asBaseRequest();
         var savedOperation = OperationUtils.savedOperation();
 
@@ -193,8 +191,8 @@ class ReportServiceTest {
     }
 
     @Test
-    @DisplayName("save: propagates OperationMismatchException from validator")
-    void save_ShouldPropagateOperationMismatchException_WhenOperationDoctorDoesNotMatch() {
+    @DisplayName("save - should fail when operation doctor does not match")
+    void save_shouldThrowMismatch_whenOperationDoctorDoesNotMatch() {
         var request = ReportUtils.asBaseRequest();
         var savedOperation = OperationUtils.savedOperation();
 
@@ -209,10 +207,9 @@ class ReportServiceTest {
         verify(reportValidator).validate(request);
     }
 
-
     @Test
-    @DisplayName("update: Should return ReportBaseResponse when update is valid")
-    void update_ShouldReturnReportBaseResponse_WhenUpdateIsValid() {
+    @DisplayName("update - Should return base response when request is valid")
+    void update_shouldReturnBaseResponse_whenUpdatingValidReport() {
         var savedReport = ReportUtils.savedReport();
 
         var request = ReportUtils.asBaseRequest();
@@ -237,9 +234,22 @@ class ReportServiceTest {
         verify(mapper).toReportBaseResponse(savedReport);
     }
 
-    @ParameterizedTest(name = "update: should throw ResourceNotFoundException when {0} does not exist")
+    @Test
+    @DisplayName("update - Should throw not-found exception when report does not exist")
+    void update_shouldThrowNotFound_whenUpdatingNonExistingReport() {
+        when(repository.findById(NON_EXISTING_ID)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.update(ReportUtils.asBaseRequest(), NON_EXISTING_ID))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage(REPORT_NOT_FOUND);
+
+        verify(repository).findById(NON_EXISTING_ID);
+        verifyNoMoreInteractions(repository);
+    }
+
+    @ParameterizedTest(name = "update - should throw-not-found when {0} does not exist")
     @MethodSource("provideNonExistingTypes")
-    void update_ShouldThrowResourceNotFoundException_WhenNonExistingType(String nonExistingType) {
+    void update_shouldThrowNotFound_whenNonExistingType(String nonExistingType) {
         var request = ReportUtils.asBaseRequest();
         var savedReport = ReportUtils.savedReport();
 
@@ -255,8 +265,8 @@ class ReportServiceTest {
     }
 
     @Test
-    @DisplayName("update: should throw ReportAlreadyExistsException when report already exists")
-    void update_ShouldThrow_WhenReportAlreadyExists() {
+    @DisplayName("update: should throw report-already-exists exception when report already exists for the operation")
+    void update_shouldThrowAlreadyExists_whenReportAlreadyExists() {
         var request = asBaseRequest();
 
         var savedReport = ReportUtils.savedReport();
@@ -273,14 +283,9 @@ class ReportServiceTest {
                 .hasMessage(REPORT_ALREADY_EXISTS.formatted(request.operationId()));
     }
 
-    private static Stream<String> provideNonExistingTypes() {
-        return Stream.of("Patient", "Doctor", "Operation");
-    }
-
-
     @Test
-    @DisplayName("update: propagates OperationMismatchException from validator")
-    void update_ShouldPropagateOperationMismatchException_WhenOperationPatientDoesNotMatch() {
+    @DisplayName("update - should fail when operation patient does not match")
+    void update_shouldThrowMismatch_whenOperationPatientDoesNotMatch() {
         var request = ReportUtils.asBaseRequest();
         var savedOperation = OperationUtils.savedOperation();
 
@@ -300,8 +305,8 @@ class ReportServiceTest {
     }
 
     @Test
-    @DisplayName("update: propagates OperationMismatchException from validator")
-    void update_ShouldPropagateOperationMismatchException_WhenOperationDoctorDoesNotMatch() {
+    @DisplayName("update - should fail when operation doctor does not match")
+    void update_shouldThrowMismatch_whenOperationDoctorDoesNotMatch() {
         var request = ReportUtils.asBaseRequest();
         var savedOperation = OperationUtils.savedOperation();
 
@@ -322,7 +327,7 @@ class ReportServiceTest {
 
 
     @Test
-    @DisplayName("delete: should remove report when ID exists")
+    @DisplayName("delete - Should remove report when ID exists")
     void delete_ShouldRemoveReport_WhenSuccessful() {
         when(repository.existsById(EXISTING_ID)).thenReturn(true);
         doNothing().when(repository).deleteById(EXISTING_ID);
@@ -334,12 +339,17 @@ class ReportServiceTest {
     }
 
     @Test
-    @DisplayName("delete: should throw ResourceNotFoundException when ID does not exist")
-    void delete_ShouldThrowResourceNotFoundException_WhenIdDoesNotExists() {
+    @DisplayName("delete - Should throw not-found exception when report does not exist")
+    void delete_shouldThrowNotFound_WhenIdDoesNotExists() {
         when(repository.existsById(NON_EXISTING_ID)).thenReturn(false);
 
         assertThatThrownBy(() -> service.delete(NON_EXISTING_ID))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage(REPORT_NOT_FOUND);
     }
+
+    private static Stream<String> provideNonExistingTypes() {
+        return Stream.of("Patient", "Doctor", "Operation");
+    }
+
 }

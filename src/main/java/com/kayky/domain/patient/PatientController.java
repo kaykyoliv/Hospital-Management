@@ -125,6 +125,11 @@ public class PatientController {
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ApiError.class))),
             @ApiResponse(
+                    responseCode = "404",
+                    description = "Patient not found",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiError.class))),
+            @ApiResponse(
                     responseCode = "422",
                     description = "Validation error",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,

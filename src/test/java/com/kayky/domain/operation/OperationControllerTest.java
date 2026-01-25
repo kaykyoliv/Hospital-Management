@@ -219,7 +219,7 @@ class OperationControllerTest {
 
     @Test
     @DisplayName("DELETE /v1/operation/{id} - Should return 204 No Content when operation is deleted successfully")
-    void delete_ShouldReturn204NoContent_WhenOperationExists() throws Exception {
+    void delete_shouldReturn204_whenOperationExists() throws Exception {
         doNothing().when(service).delete(EXISTING_ID);
 
         mockMvc.perform(delete(PATH_ID, EXISTING_ID))
@@ -230,7 +230,7 @@ class OperationControllerTest {
 
     @Test
     @DisplayName("DELETE /v1/operation/{id} - Should return 404 Not Found when operation does not exist")
-    void delete_ShouldReturn404NotFound_WhenOperationDoesNotExist() throws Exception {
+    void delete_shouldReturn404_whenOperationDoesNotExist() throws Exception {
         var expectedErrorMessage = OPERATION_NOT_FOUND;
 
         doThrow(new ResourceNotFoundException(expectedErrorMessage))

@@ -27,6 +27,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @Sql(value = "/payment/sql/cleanup-payment-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(value = "/payment/sql/payment-test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(value = "/payment/sql/cleanup-payment-data.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS)
+@DisplayName("Payment Controller - Integration Tests")
 public class PaymentIntegrationTest extends BaseIntegrationTest {
 
     private static final String GET = "payment/integration/get/";
