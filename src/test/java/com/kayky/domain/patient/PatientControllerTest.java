@@ -20,10 +20,10 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import static com.kayky.commons.TestConstants.*;
 import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.verify;
 import static org.mockito.BDDMockito.when;
+import static org.mockito.Mockito.never;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -159,6 +159,19 @@ class PatientControllerTest {
     }
 
     @Test
+    @DisplayName("POST /v1/patient - Should return 422 when request is invalid")
+    void createPatient_shouldReturn422_whenRequestIsInvalid() throws Exception {
+        var invalidRequest = FileUtils.readResourceFile("patient/controller/post/request/request-create-patient-invalid-422.json");
+
+        performPostRequest(invalidRequest)
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(loadExpectedJson("patient/controller/post/response/response-validation-error-422.json")));
+
+        verify(service, never()).save(any());
+    }
+
+    @Test
     @DisplayName("PUT /v1/patient/{id} - Should return 200 when request is valid")
     void updatePatient_shouldReturn200_whenRequestIsValid() throws Exception {
         var updatedPatient = PatientUtils.updatedPatient();
@@ -196,8 +209,8 @@ class PatientControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /v1/doctor/{id} - Should return 404 when doctor does not exist")
-    void updateDoctor_shouldReturn404_whenDoesNotExist() throws Exception {
+    @DisplayName("PUT /v1/patient/{id} - Should return 404 when patient does not exist")
+    void updatePatient_shouldReturn404_whenDoesNotExist() throws Exception {
         var expectedErrorMessage = PATIENT_NOT_FOUND;
 
         when(service.update(any(PatientBaseRequest.class), eq(NON_EXISTING_ID)))
@@ -209,5 +222,18 @@ class PatientControllerTest {
                 .andExpect(content().json(loadExpectedJson("patient/controller/put/response/response-patient-not-found-404.json")));
 
         verify(service).update(any(PatientBaseRequest.class), eq(NON_EXISTING_ID));
+    }
+
+    @Test
+    @DisplayName("PUT /v1/patient/{id} - Should return 422 when request is invalid")
+    void updateDoctor_shouldReturn422_whenRequestIsInvalid() throws Exception {
+        var invalidRequest = FileUtils.readResourceFile("patient/controller/put/request/request-update-patient-invalid-422.json");
+
+        performPutRequest(EXISTING_ID, invalidRequest)
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(loadExpectedJson("patient/controller/put/response/response-validation-error-422.json")));
+
+        verify(service, never()).update(any(), anyLong());
     }
 }

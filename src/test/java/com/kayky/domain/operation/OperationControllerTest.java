@@ -167,6 +167,18 @@ class OperationControllerTest {
     }
 
     @Test
+    @DisplayName("POST /v1/operation - Should return 422 when request is invalid")
+    void createOperation_shouldReturn422_whenRequestIsInvalid() throws Exception {
+        var invalidRequest = FileUtils.readResourceFile("operation/controller/post/request/request-create-operation-invalid-422.json");
+
+        performPostRequest(invalidRequest)
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(content().json(loadExpectedJson("operation/controller/post/response/response-validation-error-422.json")));
+
+        verify(service, never()).save(any());
+    }
+
+    @Test
     @DisplayName("PUT /v1/operation/{id} - Should return 200 when request is valid")
     void updateOperation_shouldReturn200_whenRequestIsValid() throws Exception {
         var updatedOperation = OperationUtils.updatedOperation();
@@ -242,5 +254,17 @@ class OperationControllerTest {
                 .andExpect(jsonPath("$.error").value(expectedErrorMessage));
 
         verify(service).delete(NON_EXISTING_ID);
+    }
+
+    @Test
+    @DisplayName("PUT /v1/operation/{id} - Should return 422 when request is invalid")
+    void updateOperation_shouldReturn422_whenRequestIsInvalid() throws Exception {
+        var invalidRequest = FileUtils.readResourceFile("operation/controller/put/request/request-update-operation-invalid-422.json");
+
+        performPutRequest(EXISTING_ID, invalidRequest)
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(content().json(loadExpectedJson("operation/controller/put/response/response-validation-error-422.json")));
+
+        verify(service, never()).update(any(), anyLong());
     }
 }

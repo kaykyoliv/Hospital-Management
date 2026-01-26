@@ -40,7 +40,7 @@ class PaymentControllerTest {
     
     @BeforeEach
     void setUp() {
-        validCreateRequest = FileUtils.readResourceFile("payment/controller/post/request-create-payment-201.json");
+        validCreateRequest = FileUtils.readResourceFile("payment/controller/post/request/request-create-payment-201.json");
     }
     
     private String loadExpectedJson(String resourcePath) {
@@ -157,7 +157,7 @@ class PaymentControllerTest {
         performPostRequest(validCreateRequest)
                 .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(loadExpectedJson("payment/controller/post/response-created-payment-200.json")));
+                .andExpect(content().json(loadExpectedJson("payment/controller/post/response/response-created-payment-200.json")));
 
         verify(service).save(any(PaymentBaseRequest.class));
     }
@@ -191,10 +191,10 @@ class PaymentControllerTest {
     @Test
     @DisplayName("POST /v1/payment - Should return 422 when request is invalid")
     void createPayment_shouldReturn422_whenRequestIsInvalid() throws Exception {
-        var invalidRequest = FileUtils.readResourceFile("payment/controller/post/request-create-payment-invalid-422.json");
+        var invalidRequest = FileUtils.readResourceFile("payment/controller/post/request/request-create-payment-invalid-422.json");
 
         performPostRequest(invalidRequest)
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(content().json(loadExpectedJson("payment/controller/post/validation-error-422.json")));
+                .andExpect(content().json(loadExpectedJson("payment/controller/post/response/validation-error-422.json")));
     }
 }

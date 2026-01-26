@@ -99,9 +99,9 @@ public class OperationController {
                             schema = @Schema(implementation = ApiError.class))),
             @ApiResponse(
                     responseCode = "422",
-                    description = "Business validation error: ID exists but does not belong to the correct user type (e.g., doctorId refers to a Patient)",
+                    description = "Validation error",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ValidationError.class))),
+                            schema = @Schema(implementation = ValidationError.class)))
     })
     @PostMapping
     public ResponseEntity<OperationBaseResponse> save(@Valid @RequestBody OperationBaseRequest request) {
@@ -126,7 +126,11 @@ public class OperationController {
                     description = "Operation updated successfully",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = OperationBaseResponse.class))),
-
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Patient, doctor or operation not found (ID does not exist)",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiError.class))),
             @ApiResponse(
                     responseCode = "400",
                     description = "Malformed JSON or invalid enum",

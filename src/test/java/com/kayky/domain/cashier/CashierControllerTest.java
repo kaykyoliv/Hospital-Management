@@ -164,6 +164,8 @@ class CashierControllerTest {
         performPostRequest(invalidRequest)
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(content().json(loadExpectedJson("cashier/controller/post/response/response-validation-error-422.json")));
+
+        verify(service, never()).save(any());
     }
 
     @Test

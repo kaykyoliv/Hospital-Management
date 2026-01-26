@@ -1,0 +1,11 @@
+{
+  "status": 422,
+  "error": "Validation failed",
+  "path": "/v1/operation/1",
+  "fieldErrors": [
+    {
+      "fieldName": "description",
+      "message": "Description is required"
+    }
+  ]
+}

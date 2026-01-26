@@ -82,12 +82,12 @@ public class DoctorController {
                     description = "Doctor created successfully",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = DoctorBaseResponse.class))),
-
             @ApiResponse(
                     responseCode = "400",
-                    description = "Malformed JSON or invalid enum",
+                    description = "Email already exists",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiError.class))),
+                            schema = @Schema(implementation = ApiError.class))
+            ),
             @ApiResponse(
                     responseCode = "422",
                     description = "Validation error",
@@ -117,12 +117,18 @@ public class DoctorController {
                     description = "Doctor updated successfully",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = DoctorBaseResponse.class))),
-
             @ApiResponse(
                     responseCode = "400",
-                    description = "Malformed JSON or invalid enum",
+                    description = "Email already exists",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiError.class))),
+                            schema = @Schema(implementation = ApiError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Doctor not found",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiError.class))
+            ),
             @ApiResponse(
                     responseCode = "422",
                     description = "Validation error",
