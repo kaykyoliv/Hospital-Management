@@ -3,7 +3,7 @@ package com.kayky.commons;
 import com.kayky.domain.cashier.Cashier;
 import com.kayky.domain.cashier.request.CashierBaseRequest;
 import com.kayky.domain.cashier.response.CashierBaseResponse;
-import com.kayky.enums.Gender;
+import com.kayky.domain.user.enums.Gender;
 
 import java.math.BigDecimal;
 import java.util.List;

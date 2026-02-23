@@ -1,7 +1,6 @@
 package com.kayky.domain.doctor.response;
 
 import com.kayky.domain.employee.response.EmployeeResponse;
-import com.kayky.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

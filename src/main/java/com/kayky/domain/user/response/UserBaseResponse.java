@@ -1,8 +1,7 @@
 package com.kayky.domain.user.response;
 
-import com.kayky.enums.Gender;
+import com.kayky.domain.user.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 

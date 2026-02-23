@@ -1,6 +1,7 @@
 package com.kayky.domain.user;
 
-import com.kayky.enums.Gender;
+import com.kayky.domain.user.enums.Gender;
+import com.kayky.domain.user.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -31,4 +32,9 @@ public abstract class User {
     @Builder.Default
     @Column(columnDefinition = "BOOLEAN DEFAULT true")
     private Boolean active = true;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
 }

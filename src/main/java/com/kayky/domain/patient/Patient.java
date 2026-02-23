@@ -1,13 +1,14 @@
 package com.kayky.domain.patient;
 
 import com.kayky.domain.user.User;
-import com.kayky.enums.Gender;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.springframework.security.core.GrantedAuthority;
+
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_patient")

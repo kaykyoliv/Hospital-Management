@@ -1,4 +1,4 @@
-package com.kayky.enums;
+package com.kayky.domain.user.enums;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

@@ -3,7 +3,7 @@ package com.kayky.commons;
 import com.kayky.domain.patient.Patient;
 import com.kayky.domain.patient.request.PatientBaseRequest;
 import com.kayky.domain.patient.response.PatientBaseResponse;
-import com.kayky.enums.Gender;
+import com.kayky.domain.user.enums.Gender;
 
 import java.util.List;
 

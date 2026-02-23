@@ -1,6 +1,6 @@
 package com.kayky.domain.cashier.response;
 
-import com.kayky.enums.Gender;
+import com.kayky.domain.user.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 

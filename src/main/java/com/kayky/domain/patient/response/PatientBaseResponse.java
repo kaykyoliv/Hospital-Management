@@ -1,7 +1,6 @@
 package com.kayky.domain.patient.response;
 
 import com.kayky.domain.user.response.UserBaseResponse;
-import com.kayky.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

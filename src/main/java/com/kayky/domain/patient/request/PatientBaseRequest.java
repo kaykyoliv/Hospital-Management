@@ -2,10 +2,8 @@ package com.kayky.domain.patient.request;
 
 
 import com.kayky.domain.user.request.UserBaseRequest;
-import com.kayky.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

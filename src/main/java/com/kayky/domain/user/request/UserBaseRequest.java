@@ -1,6 +1,6 @@
 package com.kayky.domain.user.request;
 
-import com.kayky.enums.Gender;
+import com.kayky.domain.user.enums.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
